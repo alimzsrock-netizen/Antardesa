@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Dashboard Kurir | AntarDesa</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -16,11 +17,13 @@ header{
 }
 header h1{margin:0}
 header p{font-size:13px}
+
 main{
  max-width:650px;
  margin:auto;
  padding:20px 16px 90px;
 }
+
 .card{
  background:white;
  border:1px solid #e2e9e4;
@@ -28,26 +31,31 @@ main{
  padding:18px;
  margin-bottom:18px;
 }
+
 .stats{
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:12px;
 }
+
 .stat{
  background:#f4f7f5;
  padding:18px;
  border-radius:12px;
 }
+
 .stat strong{
  display:block;
  font-size:27px;
  color:#16805d;
 }
+
 .muted{
  color:#61746b;
  font-size:13px;
  line-height:1.6;
 }
+
 button{
  border:0;
  border-radius:10px;
@@ -55,21 +63,25 @@ button{
  font-weight:bold;
  cursor:pointer;
 }
+
 .primary{
  background:#16805d;
  color:white;
  width:100%;
 }
+
 .secondary{
  background:#e8f4ee;
  color:#16805d;
  width:100%;
 }
+
 .status{
  font-size:13px;
  font-weight:bold;
  color:#16805d;
 }
+
 nav{
  position:fixed;
  bottom:0;
@@ -79,145 +91,495 @@ nav{
  border-top:1px solid #ddd;
  display:flex;
  justify-content:space-around;
+ align-items:center;
  padding:14px;
+ padding-bottom:max(14px,env(safe-area-inset-bottom));
 }
-nav a{
+
+nav a,
+nav button{
  text-decoration:none;
  color:#16805d;
  font-size:13px;
+ font-weight:normal;
+ font-family:inherit;
+ background:transparent;
+ border:0;
+ padding:0;
+ cursor:pointer;
+}
+
+/* Dashboard tersembunyi sebelum akses disetujui. */
+#dashboard{
+ display:none;
+}
+
+#accessScreen{
+ max-width:460px;
+ margin:55px auto;
+ padding:24px;
+ text-align:center;
+}
+
+#accessScreen p{
+ line-height:1.6;
+}
+
+#accessScreen a{
+ display:inline-block;
+ margin-top:12px;
+ color:#16805d;
+}
+
+#accessLink[hidden]{
+ display:none;
+}
+
+#retryButton{
+ margin-top:14px;
+ background:#16805d;
+ color:white;
+}
+
+#retryButton[hidden]{
+ display:none;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>AntarDesa.</h1>
-<p>Dashboard Mitra Kurir 🛵</p>
-</header>
+<!-- Gerbang pemeriksaan akses Kurir -->
+<section id="accessScreen" role="status" aria-live="polite">
+ <h2>AntarDesa 🛵</h2>
 
-<main>
+ <p id="accessMessage">
+  Sedang memeriksa hak akses Kurir...
+ </p>
 
-<div class="card">
-<h2>Halo, Mitra Kurir!</h2>
-<p class="muted">
-Kelola aktivitas pengantaran melalui
-dashboard AntarDesa.
-</p>
+ <a id="accessLink" href="login.html" hidden>
+  Kembali ke Login
+ </a>
 
-<p class="status" id="courierStatus">
-Status: Tidak Aktif (Demo)
-</p>
+ <button id="retryButton" type="button" hidden>
+  Coba Lagi
+ </button>
+</section>
 
-<button class="secondary" id="statusButton"
-onclick="toggleStatus()">
-Aktifkan Status
-</button>
+<!-- Dashboard hanya tampil setelah verifikasi berhasil -->
+<div id="dashboard">
+
+ <header>
+  <h1>AntarDesa.</h1>
+  <p>Dashboard Mitra Kurir 🛵</p>
+ </header>
+
+ <main>
+
+  <div class="card">
+   <h2>Halo, Mitra Kurir!</h2>
+
+   <p class="muted">
+    Kelola aktivitas pengantaran melalui
+    dashboard AntarDesa.
+   </p>
+
+   <p class="status" id="courierStatus">
+    Status: Tidak Aktif (Demo)
+   </p>
+
+   <button
+    class="secondary"
+    id="statusButton"
+    type="button"
+    onclick="toggleStatus()"
+   >
+    Aktifkan Status
+   </button>
+  </div>
+
+  <div class="stats">
+
+   <div class="stat">
+    <strong id="activeCount">0</strong>
+    <span class="muted">Pesanan Aktif</span>
+   </div>
+
+   <div class="stat">
+    <strong id="doneCount">0</strong>
+    <span class="muted">Pesanan Selesai</span>
+   </div>
+
+  </div>
+
+  <br>
+
+  <div class="card">
+   <h3>Permintaan Pengantaran</h3>
+
+   <p><strong>📦 Antar Paket (Demo)</strong></p>
+
+   <p class="muted">
+    Penjemputan: Pasar Desa<br>
+    Tujuan: Balai Desa<br>
+    Barang: Paket contoh
+   </p>
+
+   <p class="status" id="orderStatus">
+    Status: Menunggu
+   </p>
+
+   <button
+    class="primary"
+    id="orderButton"
+    type="button"
+    onclick="updateOrder()"
+   >
+    Terima Pesanan Demo
+   </button>
+
+   <p class="muted">
+    Pesanan ini hanya contoh dan tidak
+    terhubung dengan pelanggan asli.
+   </p>
+  </div>
+
+  <div class="card">
+   <h3>Informasi</h3>
+
+   <p class="muted">
+    AntarDesa v0.2.0 masih dalam tahap
+    pengembangan. Data akan hilang jika
+    halaman dimuat ulang.
+   </p>
+  </div>
+
+ </main>
+
+ <nav aria-label="Navigasi Kurir">
+  <a href="kurir.html">⌂ Dashboard</a>
+  <a href="index.html">▤ Beranda Demo</a>
+
+  <button id="logoutButton" type="button">
+   ♙ Keluar
+  </button>
+ </nav>
+
 </div>
 
-<div class="stats">
-<div class="stat">
-<strong id="activeCount">0</strong>
-<span class="muted">Pesanan Aktif</span>
-</div>
-
-<div class="stat">
-<strong id="doneCount">0</strong>
-<span class="muted">Pesanan Selesai</span>
-</div>
-</div>
-
-<br>
-
-<div class="card">
-<h3>Permintaan Pengantaran</h3>
-
-<p><strong>📦 Antar Paket (Demo)</strong></p>
-<p class="muted">
-Penjemputan: Pasar Desa<br>
-Tujuan: Balai Desa<br>
-Barang: Paket contoh
-</p>
-
-<p class="status" id="orderStatus">
-Status: Menunggu
-</p>
-
-<button class="primary" id="orderButton"
-onclick="updateOrder()">
-Terima Pesanan Demo
-</button>
-
-<p class="muted">
-Pesanan ini hanya contoh dan tidak
-terhubung dengan pelanggan asli.
-</p>
-</div>
-
-<div class="card">
-<h3>Informasi</h3>
-<p class="muted">
-AntarDesa v0.2.0 masih dalam tahap
-pengembangan. Data akan hilang jika
-halaman dimuat ulang.
-</p>
-</div>
-
-</main>
-
-<nav>
-<a href="kurir.html">⌂ Dashboard</a>
-<a href="index.html">▤ Beranda Demo</a>
-<a href="login.html">♙ Masuk</a>
-</nav>
+<!-- Supabase JavaScript SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
-let isActive=false;
-let orderStep=0;
+"use strict";
 
-function toggleStatus(){
- isActive=!isActive;
+/*
+ Konfigurasi Supabase AntarDesa.
+ Gunakan publishable key, bukan secret key.
+*/
 
- document.getElementById("courierStatus")
- .textContent=isActive
- ? "Status: Aktif (Demo)"
- : "Status: Tidak Aktif (Demo)";
+const SUPABASE_URL =
+ "https://gswlkajcizcvrhcfabtg.supabase.co";
 
- document.getElementById("statusButton")
- .textContent=isActive
- ? "Nonaktifkan Status"
- : "Aktifkan Status";
+const SUPABASE_PUBLISHABLE_KEY =
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+const accessScreen =
+ document.getElementById("accessScreen");
+
+const accessMessage =
+ document.getElementById("accessMessage");
+
+const accessLink =
+ document.getElementById("accessLink");
+
+const retryButton =
+ document.getElementById("retryButton");
+
+const dashboard =
+ document.getElementById("dashboard");
+
+const logoutButton =
+ document.getElementById("logoutButton");
+
+let supabaseClient = null;
+let accessApproved = false;
+let checkingAccess = false;
+
+/*
+ Menampilkan halaman pemeriksaan atau penolakan.
+*/
+
+function showAccessScreen(message, options = {}) {
+
+ accessApproved = false;
+
+ dashboard.style.display = "none";
+ accessScreen.style.display = "block";
+
+ accessMessage.textContent = message;
+ accessLink.hidden = !options.showLogin;
+ retryButton.hidden = !options.showRetry;
 }
 
-function updateOrder(){
- if(!isActive){
+/*
+ Menampilkan dashboard setelah akses valid.
+*/
+
+function allowAccess() {
+
+ accessApproved = true;
+
+ accessScreen.style.display = "none";
+ dashboard.style.display = "block";
+}
+
+/*
+ Pemeriksaan sesi dan peran resmi Kurir.
+*/
+
+async function verifyCourierAccess() {
+
+ if (checkingAccess) {
+  return;
+ }
+
+ checkingAccess = true;
+
+ showAccessScreen("Sedang memeriksa hak akses Kurir...");
+
+ try {
+
+  if (
+   !window.supabase ||
+   !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
+  ) {
+   showAccessScreen(
+    "Konfigurasi Supabase belum siap.",
+    { showRetry: true }
+   );
+   return;
+  }
+
+  if (!supabaseClient) {
+
+   supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+   );
+
+  }
+
+  // Memvalidasi identitas pengguna.
+  const { data: authData, error: authError } =
+   await supabaseClient.auth.getUser();
+
+  if (authError || !authData?.user) {
+   window.location.replace("login.html");
+   return;
+  }
+
+  // Membaca peran resmi dari user_roles.
+  const { data: userRole, error: roleError } =
+   await supabaseClient
+    .from("user_roles")
+    .select("role,is_verified")
+    .eq("user_id", authData.user.id)
+    .single();
+
+  if (roleError) {
+
+   console.error(
+    "Gagal membaca peran Kurir:",
+    roleError.message
+   );
+
+   showAccessScreen(
+    "Hak akses belum dapat diperiksa. Periksa koneksi lalu coba lagi.",
+    { showRetry: true }
+   );
+
+   return;
+  }
+
+  // Hanya Kurir terverifikasi yang diperbolehkan.
+  if (
+   !userRole ||
+   userRole.role !== "kurir" ||
+   userRole.is_verified !== true
+  ) {
+
+   showAccessScreen(
+    "Akses ditolak. Dashboard ini hanya untuk Kurir AntarDesa yang sudah disetujui.",
+    { showLogin: true }
+   );
+
+   return;
+  }
+
+  allowAccess();
+
+ } catch (error) {
+
+  console.error(
+   "Pemeriksaan akses Kurir gagal:",
+   error.message
+  );
+
+  showAccessScreen(
+   "Terjadi kendala saat memeriksa akses Kurir.",
+   { showRetry: true }
+  );
+
+ } finally {
+
+  checkingAccess = false;
+
+ }
+
+}
+
+/*
+ Fitur demo hanya bekerja setelah akses disetujui.
+*/
+
+let isActive = false;
+let orderStep = 0;
+
+function toggleStatus() {
+
+ if (!accessApproved) {
+  return;
+ }
+
+ isActive = !isActive;
+
+ document.getElementById("courierStatus")
+  .textContent = isActive
+   ? "Status: Aktif (Demo)"
+   : "Status: Tidak Aktif (Demo)";
+
+ document.getElementById("statusButton")
+  .textContent = isActive
+   ? "Nonaktifkan Status"
+   : "Aktifkan Status";
+
+}
+
+function updateOrder() {
+
+ if (!accessApproved) {
+  return;
+ }
+
+ if (!isActive) {
   alert("Aktifkan status kurir terlebih dahulu.");
   return;
  }
 
- const status=document.getElementById("orderStatus");
- const button=document.getElementById("orderButton");
+ const status =
+  document.getElementById("orderStatus");
 
- if(orderStep===0){
-  orderStep=1;
-  status.textContent="Status: Diterima (Demo)";
-  button.textContent="Mulai Pengantaran";
-  document.getElementById("activeCount").textContent="1";
+ const button =
+  document.getElementById("orderButton");
+
+ if (orderStep === 0) {
+
+  orderStep = 1;
+
+  status.textContent =
+   "Status: Diterima (Demo)";
+
+  button.textContent =
+   "Mulai Pengantaran";
+
+  document.getElementById("activeCount")
+   .textContent = "1";
+
+ } else if (orderStep === 1) {
+
+  orderStep = 2;
+
+  status.textContent =
+   "Status: Dalam Pengantaran (Demo)";
+
+  button.textContent =
+   "Selesaikan Pesanan";
+
+ } else if (orderStep === 2) {
+
+  orderStep = 3;
+
+  status.textContent =
+   "Status: Selesai (Demo)";
+
+  button.textContent =
+   "Pesanan Selesai";
+
+  button.disabled = true;
+
+  document.getElementById("activeCount")
+   .textContent = "0";
+
+  document.getElementById("doneCount")
+   .textContent = "1";
+
  }
- else if(orderStep===1){
-  orderStep=2;
-  status.textContent="Status: Dalam Pengantaran (Demo)";
-  button.textContent="Selesaikan Pesanan";
- }
- else if(orderStep===2){
-  orderStep=3;
-  status.textContent="Status: Selesai (Demo)";
-  button.textContent="Pesanan Selesai";
-  button.disabled=true;
-  document.getElementById("activeCount").textContent="0";
-  document.getElementById("doneCount").textContent="1";
- }
+
 }
+
+/*
+ Logout mengakhiri sesi Supabase.
+*/
+
+logoutButton.addEventListener("click", async function () {
+
+ if (!supabaseClient) {
+  return;
+ }
+
+ logoutButton.disabled = true;
+
+ showAccessScreen("Sedang keluar dari akun...");
+
+ try {
+
+  const { error } =
+   await supabaseClient.auth.signOut();
+
+  if (error) {
+   throw error;
+  }
+
+  window.location.replace("login.html");
+
+ } catch (error) {
+
+  console.error(
+   "Logout Kurir gagal:",
+   error.message
+  );
+
+  showAccessScreen(
+   "Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.",
+   { showRetry: true }
+  );
+
+ } finally {
+
+  logoutButton.disabled = false;
+
+ }
+
+});
+
+retryButton.addEventListener("click", function () {
+ verifyCourierAccess();
+});
+
+// Pemeriksaan akses dilakukan sebelum dashboard tampil.
+verifyCourierAccess();
+
 </script>
 
 </body>
