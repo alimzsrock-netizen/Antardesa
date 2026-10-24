@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Pelanggan | AntarDesa</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+header{
+ background:#16805d;
+ color:white;
+ padding:25px 20px;
+ border-radius:0 0 24px 24px;
+}
+header h1{margin:0}
+header p{font-size:13px}
+main{
+ max-width:650px;
+ margin:auto;
+ padding:20px 16px 90px;
+}
+.card{
+ background:white;
+ padding:18px;
+ border-radius:15px;
+ border:1px solid #e2e9e4;
+ margin-bottom:20px;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:10px;
+}
+.service{
+ background:white;
+ border:1px solid #e2e9e4;
+ border-radius:12px;
+ padding:18px 5px;
+ text-align:center;
+ font-size:12px;
+ color:#1c3028;
+ cursor:pointer;
+}
+.service span{
+ display:block;
+ font-size:28px;
+ margin-bottom:10px;
+}
+nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ display:flex;
+ justify-content:space-around;
+ background:white;
+ border-top:1px solid #ddd;
+ padding:14px;
+}
+nav a{
+ text-decoration:none;
+ color:#16805d;
+ font-size:13px;
+}
+.notice{
+ color:#61746b;
+ font-size:13px;
+ line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>AntarDesa.</h1>
+<p>Selamat datang, Pelanggan 👋</p>
+</header>
+
+<main>
+
+<div class="card">
+<h2>Halo, Warga Desa!</h2>
+<p class="notice">
+Mau kirim barang atau membutuhkan bantuan
+hari ini? Pilih layanan yang tersedia.
+</p>
+</div>
+
+<h3>Layanan AntarDesa</h3>
+
+<div class="grid">
+
+<button class="service" onclick="layanan('Antar Paket')">
+<span>📦</span>Antar Paket
+</button>
+
+<button class="service" onclick="layanan('Titip Belanja')">
+<span>🛒</span>Titip Belanja
+</button>
+
+<button class="service" onclick="layanan('Antar Makan')">
+<span>🍜</span>Antar Makan
+</button>
+
+<button class="service" onclick="layanan('Pasar Desa')">
+<span>🏪</span>Pasar Desa
+</button>
+
+<button class="service" onclick="layanan('Sekalian Jalan')">
+<span>🛵</span>Sekalian Jalan
+</button>
+
+<button class="service" onclick="layanan('Angkut Desa')">
+<span>🚚</span>Angkut Desa
+</button>
+
+</div>
+
+<br>
+
+<div class="card">
+<h3>Aktivitas Pesanan</h3>
+<p class="notice">
+Belum ada pesanan aktif.
+</p>
+<p class="notice">
+Sistem pesanan online akan dihubungkan
+setelah database Supabase siap.
+</p>
+</div>
+
+<div class="card">
+<h3>Informasi</h3>
+<p class="notice">
+AntarDesa v0.2.0 masih dalam tahap
+pengembangan. Seluruh layanan pada
+halaman ini merupakan simulasi.
+</p>
+</div>
+
+</main>
+
+<nav>
+<a href="pelanggan.html">⌂ Beranda</a>
+<a href="index.html">▤ Pesanan Demo</a>
+<a href="login.html">♙ Masuk</a>
+</nav>
+
+<script>
+function layanan(nama){
+ alert(
+  "Layanan " + nama +
+  " sedang dikembangkan. " +
+  "Belum menerima pesanan nyata."
+ );
+}
+</script>
+
+</body>
+</html>
