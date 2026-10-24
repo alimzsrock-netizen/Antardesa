@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Security Test | AntarDesa DEV</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f8f5;
+    color: #20392b;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+  }
+
+  h1 {
+    color: #16805d;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    background: #16805d;
+    color: white;
+    border: 0;
+    border-radius: 10px;
+    margin: 12px 0;
+    font-weight: bold;
+  }
+
+  button:disabled {
+    opacity: .6;
+  }
+
+  pre {
+    background: white;
+    border: 1px solid #dce6df;
+    border-radius: 10px;
+    padding: 15px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+    font-size: 13px;
+  }
+
+  .warning {
+    color: #9b4d12;
+    font-size: 13px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>AntarDesa Security Test</h1>
+
+<p>Pengujian khusus lingkungan DEV menggunakan akun Pelanggan.</p>
+
+<p class="warning">
+  Pastikan kamu login menggunakan akun pengujian
+  yang memiliki peran pelanggan.
+</p>
+
+<button id="runButton" disabled>
+  Jalankan Pengujian
+</button>
+
+<pre id="output">Memeriksa koneksi...</pre>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<script>
+"use strict";
+
+const SUPABASE_URL =
+  "https://gswlkajcizcvrhcfabtg.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+const output = document.getElementById("output");
+const button = document.getElementById("runButton");
+
+function print(text) {
+  output.textContent += "\n" + text;
+}
+
+function result(name, passed) {
+  print(
+    (passed ? "LULUS: " : "PERLU DIPERIKSA: ") + name
+  );
+}
+
+async function initialize() {
+  if (
+    !window.supabase ||
+    !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
+  ) {
+    output.textContent =
+      "Konfigurasi Supabase belum lengkap.";
+    return;
+  }
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  output.textContent = "Memeriksa sesi login...";
+
+  const {
+    data: { user },
+    error
+  } = await client.auth.getUser();
+
+  if (error || !user) {
+    output.textContent =
+      "Belum login. Buka login.html terlebih dahulu, " +
+      "login sebagai pelanggan, lalu kembali ke halaman ini.";
+    return;
+  }
+
+  const { data: roles, error: roleError } =
+    await client
+      .from("user_roles")
+      .select("role,is_verified")
+      .eq("user_id", user.id)
+      .single();
+
+  if (
+    roleError ||
+    !roles ||
+    roles.role !== "pelanggan" ||
+    roles.is_verified !== false
+  ) {
+    output.textContent =
+      "Pengujian dihentikan: akun ini bukan pelanggan " +
+      "dengan is_verified=false. Jangan jalankan tes " +
+      "menggunakan akun Mitra atau Admin.";
+    return;
+  }
+
+  output.textContent =
+    "Sesi pelanggan terverifikasi.\n" +
+    "Peran: pelanggan\n" +
+    "Status khusus: belum diverifikasi\n";
+
+  button.disabled = false;
+
+  button.addEventListener("click", async function() {
+    button.disabled = true;
+    output.textContent = "Memulai pengujian...\n";
+
+    try {
+      // TES 1: Pelanggan membaca peran sendiri.
+
+      const ownRole = await client
+        .from("user_roles")
+        .select("role,is_verified")
+        .eq("user_id", user.id)
+        .single();
+
+      result(
+        "Membaca peran sendiri",
+        !ownRole.error &&
+        ownRole.data?.role === "pelanggan" &&
+        ownRole.data?.is_verified === false
+      );
+
+      // TES 2: Pelanggan mencoba mengubah diri menjadi Admin.
+      // Seharusnya ditolak oleh izin database.
+
+      const changeRole = await client
+        .from("user_roles")
+        .update({
+          role: "admin",
+          is_verified: true
+        })
+        .eq("user_id", user.id)
+        .select("role");
+
+      result(
+        "Perubahan peran menjadi Admin ditolak",
+        Boolean(changeRole.error) &&
+        (!changeRole.data || changeRole.data.length === 0)
+      );
+
+      // TES 3: Pastikan peran tetap pelanggan.
+
+      const verifyRole = await client
+        .from("user_roles")
+        .select("role,is_verified")
+        .eq("user_id", user.id)
+        .single();
+
+      result(
+        "Peran tetap pelanggan setelah percobaan",
+        !verifyRole.error &&
+        verifyRole.data?.role === "pelanggan" &&
+        verifyRole.data?.is_verified === false
+      );
+
+      // TES 4: Pelanggan mencoba membuat produk.
+      // Produk ini tidak boleh berhasil tersimpan.
+
+      const productTest = await client
+        .from("products")
+        .insert({
+          merchant_id: user.id,
+          name: "ANTARDESA_SECURITY_TEST_DENIED",
+          description: "Pengujian penolakan RLS",
+          category: "Lainnya",
+          price: 1000,
+          stock: 1,
+          is_active: false
+        })
+        .select("id");
+
+      result(
+        "Pelanggan ditolak saat menambahkan produk",
+        Boolean(productTest.error) &&
+        (!productTest.data || productTest.data.length === 0)
+      );
+
+      // TES 5: Pelanggan tetap boleh membaca
+      // katalog produk yang aktif.
+
+      const catalog = await client
+        .from("products")
+        .select("id,name")
+        .eq("is_active", true)
+        .limit(1);
+
+      result(
+        "Katalog produk aktif dapat dibaca",
+        !catalog.error && Array.isArray(catalog.data)
+      );
+
+      print("\nPengujian selesai.");
+      print(
+        "Jika ada PERLU DIPERIKSA, jangan lanjutkan " +
+        "pengaktifan fitur Mitra."
+      );
+
+    } catch (error) {
+      print("Pengujian terhenti: " + error.message);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+initialize().catch(function(error) {
+  output.textContent =
+    "Gagal memulai pengujian: " + error.message;
+});
+</script>
+
+</body>
+</html>
