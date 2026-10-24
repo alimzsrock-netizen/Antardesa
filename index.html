@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntarDesa</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7f6;
+      color: #202b25;
+    }
+
+    header {
+      background: #16805d;
+      color: white;
+      padding: 28px 20px;
+      border-radius: 0 0 25px 25px;
+    }
+
+    header h1 { margin: 0; }
+
+    header p {
+      font-size: 13px;
+      opacity: .9;
+    }
+
+    main { padding: 20px; }
+
+    .welcome {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .service {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 5px;
+      text-align: center;
+      font-size: 12px;
+      border: 1px solid #e5e9e6;
+    }
+
+    .service span {
+      display: block;
+      font-size: 29px;
+      margin-bottom: 12px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 12px;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>AntarDesa.</h1>
+  <p>Dekatkan Jarak, Mudahkan Urusan.</p>
+</header>
+
+<main>
+  <div class="welcome">
+    <h3>Selamat Datang! 👋</h3>
+    <p>Apa yang kamu butuhkan hari ini?</p>
+  </div>
+
+  <h3>Layanan Kami</h3>
+
+  <div class="grid">
+    <div class="service">
+      <span>📦</span>Antar Paket
+    </div>
+
+    <div class="service">
+      <span>🛒</span>Titip Belanja
+    </div>
+
+    <div class="service">
+      <span>🍜</span>Antar Makan
+    </div>
+
+    <div class="service">
+      <span>🏪</span>Pasar Desa
+    </div>
+
+    <div class="service">
+      <span>🛵</span>Sekalian Jalan
+    </div>
+
+    <div class="service">
+      <span>🚚</span>Angkut Desa
+    </div>
+  </div>
+</main>
+
+<footer>
+  AntarDesa v0.0.1
+  <p>Platform Digital Masyarakat Desa</p>
+</footer>
+
+</body>
+</html>
