@@ -4,68 +4,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Daftar | AntarDesa</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
 .auth-container {
- max-width: 430px;
- margin: 35px auto;
- padding: 20px;
+  max-width: 430px;
+  margin: 35px auto;
+  padding: 20px;
 }
 
 .logo {
- text-align: center;
- color: #16805d;
- margin-bottom: 25px;
+  text-align: center;
+  color: #16805d;
+  margin-bottom: 25px;
 }
 
 .logo p {
- color: #61746b;
- font-size: 13px;
+  color: #61746b;
+  font-size: 13px;
 }
 
 .card {
- background: white;
- border: 1px solid #e2e9e4;
- border-radius: 18px;
- padding: 24px;
+  background: white;
+  border: 1px solid #e2e9e4;
+  border-radius: 18px;
+  padding: 24px;
 }
 
 label {
- display: block;
- margin: 15px 0 7px;
- font-size: 13px;
- font-weight: bold;
+  display: block;
+  margin: 15px 0 7px;
+  font-size: 13px;
+  font-weight: bold;
 }
 
-input,select {
- width: 100%;
- padding: 13px;
- border: 1px solid #ccd9d0;
- border-radius: 10px;
- font-size: 15px;
- background: white;
+input, select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccd9d0;
+  border-radius: 10px;
+  font-size: 15px;
+  background: white;
 }
 
 button {
- width: 100%;
- padding: 14px;
- margin-top: 22px;
- background: #16805d;
- color: white;
- border: none;
- border-radius: 10px;
- font-weight: bold;
+  width: 100%;
+  padding: 14px;
+  margin-top: 22px;
+  background: #16805d;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
 }
 
 .note {
- text-align: center;
- font-size: 13px;
- margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  margin-top: 20px;
 }
 
-a { color: #16805d; }
+#message {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+a {
+  color: #16805d;
+}
 </style>
 </head>
 
@@ -73,95 +90,257 @@ a { color: #16805d; }
 
 <main class="auth-container">
 
-<div class="logo">
-<h1>AntarDesa.</h1>
-<p>Dekatkan Jarak, Mudahkan Urusan.</p>
-</div>
+  <div class="logo">
+    <h1>AntarDesa.</h1>
+    <p>Dekatkan Jarak, Mudahkan Urusan.</p>
+  </div>
 
-<div class="card">
+  <div class="card">
 
-<h2>Buat Akun Baru</h2>
-<p>Gabung bersama AntarDesa.</p>
+    <h2>Buat Akun Baru</h2>
+    <p>Gabung bersama AntarDesa.</p>
 
-<form id="registerForm">
+    <form id="registerForm">
 
-<label for="fullname">Nama Lengkap</label>
-<input id="fullname" type="text"
-placeholder="Masukkan nama lengkap"
-autocomplete="off" required>
+      <label for="fullname">Nama Lengkap</label>
+      <input
+        id="fullname"
+        type="text"
+        placeholder="Masukkan nama lengkap"
+        autocomplete="name"
+        maxlength="100"
+        required
+      >
 
-<label for="email">Email</label>
-<input id="email" type="email"
-placeholder="Masukkan email"
-autocomplete="off" required>
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="Masukkan email"
+        autocomplete="email"
+        required
+      >
 
-<label for="phone">Nomor HP</label>
-<input id="phone" type="tel"
-placeholder="Contoh: 08xxxxxxxxxx"
-autocomplete="off" required>
+      <label for="phone">Nomor HP</label>
+      <input
+        id="phone"
+        type="tel"
+        placeholder="Contoh: 08xxxxxxxxxx"
+        autocomplete="tel"
+        pattern="08[0-9]{8,11}"
+        title="Gunakan nomor Indonesia, diawali 08, sepanjang 10–13 digit."
+        required
+      >
 
-<label for="role">Daftar Sebagai</label>
-<select id="role" required>
-<option value="">Pilih jenis akun</option>
-<option value="pelanggan">Pelanggan</option>
-<option value="kurir">Kurir</option>
-<option value="mitra">Mitra Usaha</option>
-</select>
+      <label for="role">Daftar Sebagai</label>
+      <select id="role" required>
+        <option value="">Pilih jenis akun</option>
+        <option value="pelanggan">Pelanggan</option>
+        <option value="kurir">Kurir</option>
+        <option value="mitra">Mitra Usaha</option>
+      </select>
 
-<label for="password">Password</label>
-<input id="password" type="password"
-placeholder="Minimal 8 karakter"
-minlength="8"
-autocomplete="new-password" required>
+      <p style="font-size:12px;color:#61746b">
+        Pilihan Mitra dan Kurir merupakan permintaan jenis akun.
+        Akses khusus akan diberikan setelah proses verifikasi.
+      </p>
 
-<label for="confirm">Konfirmasi Password</label>
-<input id="confirm" type="password"
-placeholder="Ulangi password"
-minlength="8"
-autocomplete="new-password" required>
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Minimal 8 karakter"
+        minlength="8"
+        autocomplete="new-password"
+        required
+      >
 
-<button type="submit">Daftar Sekarang</button>
+      <label for="confirm">Konfirmasi Password</label>
+      <input
+        id="confirm"
+        type="password"
+        placeholder="Ulangi password"
+        minlength="8"
+        autocomplete="new-password"
+        required
+      >
 
-</form>
+      <button type="submit" id="registerButton">
+        Daftar Sekarang
+      </button>
 
-<p class="note">
-Sudah punya akun?
-<a href="login.html">Masuk</a>
-</p>
+    </form>
 
-<p class="note">
-<a href="index.html">← Kembali ke Beranda</a>
-</p>
+    <p id="message" role="status" aria-live="polite"></p>
 
-<p class="note" style="color:#777">
-AntarDesa v0.2.0 • Tampilan Demo
-</p>
+    <p class="note">
+      Sudah punya akun?
+      <a href="login.html">Masuk</a>
+    </p>
 
-</div>
+    <p class="note">
+      <a href="index.html">← Kembali ke Beranda</a>
+    </p>
+
+    <p class="note" style="color:#777">
+      AntarDesa v0.2.0
+    </p>
+
+  </div>
 </main>
 
+<!-- Supabase JavaScript SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <script>
-document.getElementById("registerForm")
-.addEventListener("submit", function(e) {
- e.preventDefault();
+"use strict";
 
- const password =
- document.getElementById("password").value;
+/*
+  Supabase AntarDesa
+  Gunakan hanya publishable key.
+  Jangan gunakan secret key atau service_role.
+*/
 
- const confirm =
- document.getElementById("confirm").value;
+const SUPABASE_URL =
+  "https://gswlkajcizcvrhcfabtg.supabase.co";
 
- if(password !== confirm) {
-  alert("Konfirmasi password tidak sama.");
-  return;
- }
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
 
- alert(
-  "Registrasi belum diaktifkan. " +
-  "Ini hanya tampilan demo."
- );
+const DEV_LOGIN_URL =
+  "https://dev.antardesa.pages.dev/login.html";
 
- this.reset();
+const form = document.getElementById("registerForm");
+const button = document.getElementById("registerButton");
+const message = document.getElementById("message");
+
+function showMessage(text, isError = false) {
+  message.textContent = text;
+  message.style.color = isError ? "#b42318" : "#16805d";
+}
+
+let supabaseClient = null;
+
+if (
+  SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_") &&
+  window.supabase
+) {
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+} else {
+  button.disabled = true;
+  showMessage(
+    "Koneksi Supabase belum siap. Periksa konfigurasi aplikasi.",
+    true
+  );
+}
+
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  if (!supabaseClient) {
+    showMessage("Koneksi Supabase belum tersedia.", true);
+    return;
+  }
+
+  const fullname =
+    document.getElementById("fullname").value.trim();
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const phone =
+    document.getElementById("phone").value.trim();
+
+  const requestedRole =
+    document.getElementById("role").value;
+
+  const password =
+    document.getElementById("password").value;
+
+  const confirm =
+    document.getElementById("confirm").value;
+
+  if (password !== confirm) {
+    showMessage("Konfirmasi password tidak sama.", true);
+    return;
+  }
+
+  if (password.length < 8) {
+    showMessage("Password minimal 8 karakter.", true);
+    return;
+  }
+
+  if (!["pelanggan", "kurir", "mitra"].includes(requestedRole)) {
+    showMessage("Pilih jenis akun yang tersedia.", true);
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Mendaftarkan...";
+  showMessage("Sedang membuat akun AntarDesa...");
+
+  try {
+    const { data, error } =
+      await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: DEV_LOGIN_URL,
+          data: {
+            full_name: fullname,
+            phone: phone,
+            requested_role: requestedRole
+          }
+        }
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    if (data.session) {
+      // Pengamanan tambahan apabila Confirm Email
+      // tidak sengaja dinonaktifkan di dashboard.
+      await supabaseClient.auth.signOut();
+    }
+
+    form.reset();
+
+    showMessage(
+      "Permintaan pendaftaran diterima. Jika alamat email " +
+      "dapat didaftarkan, periksa kotak masuk atau folder Spam " +
+      "untuk tautan konfirmasi. Setelah verifikasi, silakan login."
+    );
+
+  } catch (error) {
+    console.error("Pendaftaran gagal:", error.message);
+
+    if (error.message.toLowerCase().includes("rate limit")) {
+      showMessage(
+        "Terlalu banyak percobaan. Tunggu beberapa saat sebelum mencoba lagi.",
+        true
+      );
+    } else if (
+      error.message.toLowerCase().includes("password")
+    ) {
+      showMessage(
+        "Password belum memenuhi persyaratan keamanan Supabase.",
+        true
+      );
+    } else {
+      showMessage(
+        "Pendaftaran belum berhasil. Periksa data dan koneksi internet, lalu coba lagi.",
+        true
+      );
+    }
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "Daftar Sekarang";
+  }
 });
 </script>
 
