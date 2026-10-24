@@ -1,11 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Masuk | AntarDesa</title>
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 .auth-container {
   max-width: 420px;
@@ -26,7 +28,9 @@
   margin-bottom: 25px;
 }
 
-.logo h1 { margin-bottom: 5px; }
+.logo h1 {
+  margin-bottom: 5px;
+}
 
 .logo p {
   color: #61746b;
@@ -41,6 +45,7 @@ label {
 }
 
 input {
+  box-sizing: border-box;
   width: 100%;
   padding: 13px;
   border: 1px solid #ccd9d0;
@@ -58,6 +63,12 @@ button {
   border-radius: 10px;
   font-weight: bold;
   font-size: 15px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
 }
 
 .note {
@@ -66,7 +77,16 @@ button {
   margin-top: 20px;
 }
 
-a { color: #16805d; }
+#message {
+  margin-top: 15px;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+a {
+  color: #16805d;
+}
 </style>
 </head>
 
@@ -74,60 +94,176 @@ a { color: #16805d; }
 
 <main class="auth-container">
 
-<div class="logo">
-<h1>AntarDesa.</h1>
-<p>Dekatkan Jarak, Mudahkan Urusan.</p>
-</div>
+  <div class="logo">
+    <h1>AntarDesa.</h1>
+    <p>Dekatkan Jarak, Mudahkan Urusan.</p>
+  </div>
 
-<div class="auth-card">
+  <div class="auth-card">
 
-<h2>Selamat Datang 👋</h2>
-<p>Masuk ke akun AntarDesa</p>
+    <h2>Selamat Datang 👋</h2>
+    <p>Masuk ke akun AntarDesa</p>
 
-<form id="loginForm">
+    <form id="loginForm">
 
-<label for="email">Email</label>
-<input
-type="email"
-id="email"
-placeholder="Masukkan email"
-autocomplete="off"
-required>
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Masukkan email"
+        autocomplete="email"
+        required
+      >
 
-<label for="password">Password</label>
-<input
-type="password"
-id="password"
-placeholder="Masukkan password"
-autocomplete="off"
-required>
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Masukkan password"
+        autocomplete="current-password"
+        required
+      >
 
-<button type="submit">Masuk</button>
+      <button type="submit" id="loginButton">
+        Masuk
+      </button>
 
-</form>
+    </form>
 
-<p class="note">
-Belum punya akun?
-<a href="register.html">Daftar sekarang</a>
-</p>
+    <p id="message" role="status" aria-live="polite"></p>
 
-<p class="note">
-<a href="index.html">← Kembali ke Beranda</a>
-</p>
+    <p class="note">
+      Belum punya akun?
+      <a href="register.html">Daftar sekarang</a>
+    </p>
 
-<p class="note" style="color:#777">
-AntarDesa v0.2.0 • Tampilan Demo
-</p>
+    <p class="note">
+      <a href="index.html">← Kembali ke Beranda</a>
+    </p>
 
-</div>
+    <p class="note" style="color:#777">
+      AntarDesa v0.2.0
+    </p>
+
+  </div>
+
 </main>
 
+<!-- Supabase JavaScript SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <script>
+"use strict";
+
+/*
+  Konfigurasi Supabase AntarDesa
+  Hanya gunakan publishable key.
+  Jangan pernah memasukkan secret key.
+*/
+
+const SUPABASE_URL =
+  "https://gswlkajcizcvrhcfabtg.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+const message = document.getElementById("message");
+const loginButton = document.getElementById("loginButton");
+
+function showMessage(text, isError = false) {
+  message.textContent = text;
+  message.style.color = isError ? "#b42318" : "#16805d";
+}
+
+const isConfigured =
+  SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_");
+
+let supabaseClient = null;
+
+if (isConfigured && window.supabase) {
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+} else {
+  loginButton.disabled = true;
+  showMessage(
+    "Koneksi Supabase belum siap. Periksa konfigurasi aplikasi.",
+    true
+  );
+}
+
 document.getElementById("loginForm")
-.addEventListener("submit", function(e) {
-  e.preventDefault();
-  alert("Login belum diaktifkan. Ini hanya tampilan demo.");
-});
+  .addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    if (!supabaseClient) {
+      showMessage("Koneksi Supabase belum tersedia.", true);
+      return;
+    }
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    loginButton.disabled = true;
+    loginButton.textContent = "Memproses...";
+
+    showMessage("Sedang memeriksa akun...");
+
+    try {
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data.session) {
+        showMessage(
+          "Login belum berhasil. Periksa apakah email sudah dikonfirmasi.",
+          true
+        );
+        return;
+      }
+
+      showMessage("Login berhasil! Mengalihkan halaman...");
+
+      window.location.replace("pelanggan.html");
+
+    } catch (error) {
+
+      console.error("Login gagal:", error.message);
+
+      if (error.message === "Invalid login credentials") {
+        showMessage(
+          "Email atau password salah, atau akun belum tersedia.",
+          true
+        );
+      } else if (error.message.toLowerCase().includes("email not confirmed")) {
+        showMessage(
+          "Silakan konfirmasi alamat email melalui pesan dari Supabase.",
+          true
+        );
+      } else {
+        showMessage(
+          "Login gagal. Periksa koneksi internet atau coba lagi.",
+          true
+        );
+      }
+
+    } finally {
+      loginButton.disabled = false;
+      loginButton.textContent = "Masuk";
+    }
+
+  });
 </script>
 
 </body>
