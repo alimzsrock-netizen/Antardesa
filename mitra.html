@@ -1,207 +1,426 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard Mitra | AntarDesa</title>
 <link rel="stylesheet" href="style.css">
+
 <style>
-header{
- background:#16805d;color:white;
- padding:24px 20px;
- border-radius:0 0 22px 22px;
+:root {
+  --green: #16805d;
+  --green-dark: #106747;
+  --red: #dc2626;
+  --border: #e2e9e4;
+  --muted: #61746b;
 }
-header h1{margin:0}
-header p{font-size:13px}
-main{max-width:650px;margin:auto;padding:20px 16px 90px}
-.card{
- background:white;border:1px solid #e2e9e4;
- border-radius:15px;padding:18px;margin-bottom:18px;
+
+* {
+  box-sizing: border-box;
 }
-.muted{font-size:13px;color:#61746b;line-height:1.6}
-label{display:block;font-size:13px;font-weight:bold;margin:13px 0 6px}
-input,select{
- width:100%;padding:12px;border:1px solid #ccd9d0;
- border-radius:9px;font:inherit;background:white;
+
+body {
+  margin: 0;
+  background: #f5f8f6;
+  color: #20352a;
+  font-family: Arial, sans-serif;
 }
-button{
- border:0;border-radius:10px;padding:12px;
- cursor:pointer;font-weight:bold;
+
+header {
+  background: var(--green);
+  color: white;
+  padding: 24px 20px;
+  border-radius: 0 0 22px 22px;
 }
-.primary{background:#16805d;color:white;width:100%;margin-top:15px}
-.secondary{background:#e8f4ee;color:#16805d}
-.product{
- border:1px solid #e2e9e4;border-radius:11px;
- padding:13px;margin-top:10px;
+
+header h1 {
+  margin: 0;
 }
-.product strong{display:block;margin-bottom:6px}
-.product small{color:#61746b}
-nav{
- position:fixed;bottom:0;left:0;right:0;
- display:flex;justify-content:space-around;
- background:white;border-top:1px solid #ddd;padding:14px;
+
+header p {
+  font-size: 13px;
+  margin-bottom: 0;
 }
-nav a{text-decoration:none;color:#16805d;font-size:13px}
+
+main {
+  max-width: 650px;
+  margin: auto;
+  padding: 20px 16px 100px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.muted {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 13px 0 6px;
+}
+
+input, select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd9d0;
+  border-radius: 9px;
+  font: inherit;
+  background: white;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+button:focus-visible {
+  outline: 3px solid #85c9a8;
+  outline-offset: 2px;
+}
+
+.primary {
+  background: var(--green);
+  color: white;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.primary:hover {
+  background: var(--green-dark);
+}
+
+.secondary {
+  background: #e8f4ee;
+  color: var(--green);
+}
+
+.product {
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 14px;
+  margin-top: 10px;
+  background: #fff;
+}
+
+.product strong {
+  display: block;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+
+.product small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.product-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.delete-button {
+  background: var(--red);
+  color: white;
+  width: 100%;
+}
+
+.empty {
+  padding: 14px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  background: white;
+  border-top: 1px solid #ddd;
+  padding: 14px 8px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--green);
+  font-size: 13px;
+}
+
+.notice {
+  background: #fff8e6;
+  border: 1px solid #f2dfad;
+  color: #755b19;
+  padding: 11px;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.5;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-<h1>AntarDesa.</h1>
-<p>Dashboard Mitra Usaha 🏪</p>
+  <h1>AntarDesa.</h1>
+  <p>Dashboard Mitra Usaha 🏪</p>
 </header>
 
 <main>
-<div class="card">
-<h2>Kelola Toko</h2>
-<p class="muted">Atur status toko dan tambahkan produk yang ingin dijual.</p>
-<p><strong>Status toko:</strong> <span id="storeStatus">Buka (Demo)</span></p>
-<button class="secondary" id="toggleStore" onclick="toggleStore()">Tutup Toko</button>
-</div>
 
-<div class="card">
-<h3>Tambah Produk</h3>
-<form id="productForm">
-<label for="productName">Nama produk</label>
-<input id="productName" maxlength="80" placeholder="Contoh: Beras 5 kg" required>
+  <section class="card">
+    <h2>Kelola Toko</h2>
+    <p class="muted">
+      Atur status toko dan tambahkan produk yang ingin dijual.
+    </p>
 
-<label for="category">Kategori</label>
-<select id="category" required>
-<option value="">Pilih kategori</option>
-<option>Sembako</option>
-<option>Makanan dan Minuman</option>
-<option>Sayur dan Buah</option>
-<option>Kebutuhan Rumah Tangga</option>
-<option>Lainnya</option>
-</select>
+    <p>
+      <strong>Status toko:</strong>
+      <span id="storeStatus">Buka (Demo)</span>
+    </p>
 
-<label for="price">Harga (Rp)</label>
-<input id="price" type="number" min="1" max="100000000" step="1" placeholder="Contoh: 65000" required>
+    <button
+      class="secondary"
+      id="toggleStore"
+      type="button"
+    >Tutup Toko</button>
+  </section>
 
-<label for="stock">Stok tersedia</label>
-<input id="stock" type="number" min="0" max="100000" step="1" placeholder="Contoh: 20" required>
+  <section class="card">
+    <h3>Tambah Produk</h3>
 
-<button class="primary" type="submit">Tambah Produk Demo</button>
-</form>
-<p class="muted">Data produk hanya tersimpan sementara di halaman ini.</p>
-</div>
+    <form id="productForm">
+      <label for="productName">Nama produk</label>
+      <input
+        id="productName"
+        maxlength="80"
+        placeholder="Contoh: Beras 5 kg"
+        required
+      >
 
-<div class="card">
-<h3>Daftar Produk</h3>
-<p class="muted" id="productCount">Jumlah produk: 0</p>
-<div id="productList" class="muted">Belum ada produk.</div>
-</div>
+      <label for="category">Kategori</label>
+      <select id="category" required>
+        <option value="">Pilih kategori</option>
+        <option value="Sembako">Sembako</option>
+        <option value="Makanan dan Minuman">Makanan dan Minuman</option>
+        <option value="Sayur dan Buah">Sayur dan Buah</option>
+        <option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
 
-<div class="card">
-<h3>Pesanan Masuk</h3>
-<p class="muted">Belum ada pesanan masuk.</p>
-<p class="muted">Pesanan pelanggan akan ditampilkan setelah sistem database dan pemesanan terhubung.</p>
-</div>
+      <label for="price">Harga (Rp)</label>
+      <input
+        id="price"
+        type="number"
+        min="1"
+        max="100000000"
+        step="1"
+        placeholder="Contoh: 65000"
+        required
+      >
 
-<div class="card">
-<p class="muted">AntarDesa v0.2.0 · Dashboard simulasi</p>
-</div>
+      <label for="stock">Stok tersedia</label>
+      <input
+        id="stock"
+        type="number"
+        min="0"
+        max="100000"
+        step="1"
+        placeholder="Contoh: 20"
+        required
+      >
+
+      <button class="primary" type="submit">
+        + Tambah Produk
+      </button>
+    </form>
+
+    <p class="muted">
+      Ini masih versi demo. Produk belum tersimpan ke database.
+    </p>
+  </section>
+
+  <section class="card">
+    <h3>Daftar Produk</h3>
+    <p class="muted" id="productCount">Jumlah produk: 0</p>
+    <div id="productList" aria-live="polite">
+      <p class="empty">Belum ada produk.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Pesanan Masuk</h3>
+    <p class="muted">Belum ada pesanan masuk.</p>
+    <p class="muted">
+      Pesanan pelanggan akan tampil setelah sistem database
+      dan pemesanan terhubung.
+    </p>
+  </section>
+
+  <section class="card">
+    <p class="muted">AntarDesa v0.2.1 · Dashboard simulasi</p>
+    <div class="notice">
+      Data produk dan status toko saat ini hanya tersimpan
+      selama halaman masih aktif. Muat ulang halaman akan
+      menghapus data demo.
+    </div>
+  </section>
+
 </main>
 
 <nav>
-<a href="mitra.html">⌂ Toko</a>
-<a href="pelanggan.html">▦ Pelanggan</a>
-<a href="login.html">♙ Masuk</a>
+  <a href="mitra.html">⌂ Toko</a>
+  <a href="pelanggan.html">▦ Pelanggan</a>
+  <a href="login.html">♙ Masuk</a>
 </nav>
 
 <script>
-let storeOpen=true;
-const products=[];
+"use strict";
 
-function toggleStore(){
- storeOpen=!storeOpen;
- document.getElementById("storeStatus").textContent=
- storeOpen?"Buka (Demo)":"Tutup (Demo)";
- document.getElementById("toggleStore").textContent=
- storeOpen?"Tutup Toko":"Buka Toko";
-}
+let storeOpen = true;
+let products = [];
+let nextProductId = 1;
 
-document.getElementById("productForm").addEventListener("submit",function(e){
- e.preventDefault();
+const productForm = document.getElementById("productForm");
+const productList = document.getElementById("productList");
+const productCount = document.getElementById("productCount");
+const storeStatus = document.getElementById("storeStatus");
+const toggleStoreButton = document.getElementById("toggleStore");
 
- const name=document.getElementById("productName").value.trim();
- const category=document.getElementById("category").value;
- const price=Number(document.getElementById("price").value);
- const stock=Number(document.getElementById("stock").value);
+toggleStoreButton.addEventListener("click", function () {
+  storeOpen = !storeOpen;
 
- if(!name||!category||!Number.isSafeInteger(price)||price<1||
- !Number.isSafeInteger(stock)||stock<0){
-  alert("Periksa kembali data produk.");
-  return;
- }
+  storeStatus.textContent = storeOpen
+    ? "Buka (Demo)"
+    : "Tutup (Demo)";
 
- products.push({name,category,price,stock});
- renderProducts();
- this.reset();
+  toggleStoreButton.textContent = storeOpen
+    ? "Tutup Toko"
+    : "Buka Toko";
 });
 
-function renderProducts(){
- const list=document.getElementById("productList");
- list.replaceChildren();
+productForm.addEventListener("submit", function (event) {
+  event.preventDefault();
 
- document.getElementById("productCount").textContent=
- "Jumlah produk: "+products.length;
+  const name = document.getElementById("productName").value.trim();
+  const category = document.getElementById("category").value;
+  const priceValue = document.getElementById("price").value;
+  const stockValue = document.getElementById("stock").value;
 
- if(products.length===0){
-  list.textContent="Belum ada produk.";
-  return;
- }
+  const price = Number(priceValue);
+  const stock = Number(stockValue);
 
- products.forEach(function(p,index){
-  const card=document.createElement("div");
-  card.className="product";
+  if (
+    !name ||
+    !category ||
+    priceValue === "" ||
+    stockValue === "" ||
+    !Number.isSafeInteger(price) ||
+    price < 1 ||
+    price > 100000000 ||
+    !Number.isSafeInteger(stock) ||
+    stock < 0 ||
+    stock > 100000
+  ) {
+    alert("Periksa kembali nama, kategori, harga, dan stok produk.");
+    return;
+  }
 
-  const title=document.createElement("strong");
-  title.textContent=p.name;
-
-  const info=document.createElement("small");
-  info.textContent=p.category+" · Rp "+
-  p.price.toLocaleString("id-ID")+" · Stok: "+p.stock;
-
-  const deleteButton=document.createElement("button");
-  deleteButton.type="button";
-  deleteButton.textContent="🗑️ Hapus";
-  deleteButton.style.marginTop="10px";
-  deleteButton.style.padding="8px 12px";
-  deleteButton.style.border="none";
-  deleteButton.style.borderRadius="8px";
-  deleteButton.style.backgroundColor="#dc2626";
-  deleteButton.style.color="#ffffff";
-  deleteButton.style.cursor="pointer";
-
-  deleteButton.addEventListener("click",function(){
-   if(confirm('Hapus produk "'+p.name+'"?')){
-    products.splice(index,1);
-    renderProducts();
-   }
+  products.push({
+    id: nextProductId++,
+    name: name,
+    category: category,
+    price: price,
+    stock: stock
   });
 
-  card.append(title,info,deleteButton);
-  list.append(card);
- });
+  renderProducts();
+  productForm.reset();
+});
+
+function renderProducts() {
+  productList.replaceChildren();
+
+  productCount.textContent = "Jumlah produk: " + products.length;
+
+  if (products.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "empty";
+    emptyMessage.textContent = "Belum ada produk.";
+    productList.appendChild(emptyMessage);
+    return;
+  }
+
+  products.forEach(function (product) {
+    const card = document.createElement("div");
+    card.className = "product";
+
+    const title = document.createElement("strong");
+    title.textContent = product.name;
+
+    const info = document.createElement("small");
+    info.textContent =
+      product.category +
+      " · Rp " +
+      product.price.toLocaleString("id-ID") +
+      " · Stok: " +
+      product.stock;
+
+    const actions = document.createElement("div");
+    actions.className = "product-actions";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "delete-button";
+    deleteButton.textContent = "🗑️ Hapus";
+
+    deleteButton.addEventListener("click", function () {
+      const confirmed = window.confirm(
+        'Apakah kamu yakin ingin menghapus produk "' +
+        product.name +
+        '"?'
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      products = products.filter(function (item) {
+        return item.id !== product.id;
+      });
+
+      renderProducts();
+    });
+
+    actions.appendChild(deleteButton);
+    card.append(title, info, actions);
+    productList.appendChild(card);
+  });
 }
 
- products.forEach(function(p){
-  const card=document.createElement("div");
-  card.className="product";
-
-  const title=document.createElement("strong");
-  title.textContent=p.name;
-
-  const info=document.createElement("small");
-  info.textContent=p.category+" · Rp "+
-  p.price.toLocaleString("id-ID")+" · Stok: "+p.stock;
-
-  card.append(title,info);
-  list.append(card);
- });
-}
+renderProducts();
 </script>
+
 </body>
 </html>
