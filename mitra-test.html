@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uji Mitra | AntarDesa DEV</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 18px;
+  background: #f4f8f5;
+  color: #263c30;
+}
+
+h1 { color: #16805d; }
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: #16805d;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+button:disabled { opacity: .6; }
+
+pre {
+  background: white;
+  padding: 16px;
+  border: 1px solid #dce6df;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+</style>
+</head>
+
+<body>
+
+<h1>AntarDesa: Uji Akses Mitra</h1>
+
+<p>Gunakan hanya akun Mitra pengujian yang sudah disetujui.</p>
+
+<button id="testButton" disabled>
+  Jalankan Pengujian
+</button>
+
+<pre id="output">Memeriksa sesi...</pre>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<script>
+"use strict";
+
+const SUPABASE_URL =
+  "https://gswlkajcizcvrhcfabtg.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+const output = document.getElementById("output");
+const button = document.getElementById("testButton");
+
+function print(text) {
+  output.textContent += "\n" + text;
+}
+
+function report(name, passed) {
+  print((passed ? "LULUS: " : "GAGAL: ") + name);
+}
+
+async function initialize() {
+  if (
+    !window.supabase ||
+    !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
+  ) {
+    output.textContent = "Konfigurasi Supabase belum lengkap.";
+    return;
+  }
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  const { data: authData, error: authError } =
+    await client.auth.getUser();
+
+  const user = authData?.user;
+
+  if (authError || !user) {
+    output.textContent =
+      "Belum login. Login sebagai Mitra dahulu.";
+    return;
+  }
+
+  const { data: role, error: roleError } =
+    await client
+      .from("user_roles")
+      .select("role,is_verified")
+      .eq("user_id", user.id)
+      .single();
+
+  if (
+    roleError ||
+    role?.role !== "mitra" ||
+    role?.is_verified !== true
+  ) {
+    output.textContent =
+      "Pengujian dihentikan. Akun ini bukan Mitra terverifikasi.";
+    return;
+  }
+
+  output.textContent =
+    "Akun Mitra terverifikasi.\nSiap menguji izin produk.";
+
+  button.disabled = false;
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    output.textContent = "Pengujian dimulai...\n";
+
+    let testProductId = null;
+
+    try {
+      // 1. Tambah produk pengujian nonaktif.
+      const inserted = await client
+        .from("products")
+        .insert({
+          merchant_id: user.id,
+          name: "ANTARDESA_MITRA_TEST_TEMP",
+          description: "Produk sementara untuk pengujian",
+          category: "Lainnya",
+          price: 1000,
+          stock: 1,
+          is_active: false
+        })
+        .select("id,name")
+        .single();
+
+      if (inserted.error || !inserted.data) {
+        report("Mitra dapat menambah produk sendiri", false);
+        print("Detail: " + (inserted.error?.message || "Tidak ada data"));
+        return;
+      }
+
+      testProductId = inserted.data.id;
+      report("Mitra dapat menambah produk sendiri", true);
+
+      // 2. Baca produk sendiri yang tidak aktif.
+      const read = await client
+        .from("products")
+        .select("id,name")
+        .eq("id", testProductId)
+        .single();
+
+      report(
+        "Mitra dapat membaca produk sendiri",
+        !read.error && read.data?.id === testProductId
+      );
+
+      // 3. Ubah stok produk sendiri.
+      const updated = await client
+        .from("products")
+        .update({ stock: 2 })
+        .eq("id", testProductId)
+        .select("id,stock")
+        .single();
+
+      report(
+        "Mitra dapat mengubah produk sendiri",
+        !updated.error &&
+        updated.data?.stock === 2
+      );
+
+    } catch (error) {
+      print("Pengujian terhenti: " + error.message);
+
+    } finally {
+      // Selalu mencoba membersihkan produk pengujian.
+      if (testProductId) {
+        const deleted = await client
+          .from("products")
+          .delete()
+          .eq("id", testProductId)
+          .select("id");
+
+        report(
+          "Produk pengujian berhasil dihapus",
+          !deleted.error &&
+          deleted.data?.some(
+            item => item.id === testProductId
+          )
+        );
+
+        if (deleted.error || !deleted.data?.some(
+          item => item.id === testProductId
+        )) {
+          print(
+            "PERHATIAN: Periksa dan hapus produk " +
+            "ANTARDESA_MITRA_TEST_TEMP secara manual " +
+            "melalui Supabase Dashboard."
+          );
+        }
+      }
+
+      print("\nPengujian selesai.");
+      button.disabled = false;
+    }
+  });
+}
+
+initialize().catch(error => {
+  output.textContent = "Error: " + error.message;
+});
+</script>
+
+</body>
+</html>
