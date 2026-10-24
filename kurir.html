@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Kurir | AntarDesa</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+header{
+ background:#16805d;
+ color:white;
+ padding:25px 20px;
+ border-radius:0 0 24px 24px;
+}
+header h1{margin:0}
+header p{font-size:13px}
+main{
+ max-width:650px;
+ margin:auto;
+ padding:20px 16px 90px;
+}
+.card{
+ background:white;
+ border:1px solid #e2e9e4;
+ border-radius:15px;
+ padding:18px;
+ margin-bottom:18px;
+}
+.stats{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+}
+.stat{
+ background:#f4f7f5;
+ padding:18px;
+ border-radius:12px;
+}
+.stat strong{
+ display:block;
+ font-size:27px;
+ color:#16805d;
+}
+.muted{
+ color:#61746b;
+ font-size:13px;
+ line-height:1.6;
+}
+button{
+ border:0;
+ border-radius:10px;
+ padding:13px;
+ font-weight:bold;
+ cursor:pointer;
+}
+.primary{
+ background:#16805d;
+ color:white;
+ width:100%;
+}
+.secondary{
+ background:#e8f4ee;
+ color:#16805d;
+ width:100%;
+}
+.status{
+ font-size:13px;
+ font-weight:bold;
+ color:#16805d;
+}
+nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ background:white;
+ border-top:1px solid #ddd;
+ display:flex;
+ justify-content:space-around;
+ padding:14px;
+}
+nav a{
+ text-decoration:none;
+ color:#16805d;
+ font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>AntarDesa.</h1>
+<p>Dashboard Mitra Kurir 🛵</p>
+</header>
+
+<main>
+
+<div class="card">
+<h2>Halo, Mitra Kurir!</h2>
+<p class="muted">
+Kelola aktivitas pengantaran melalui
+dashboard AntarDesa.
+</p>
+
+<p class="status" id="courierStatus">
+Status: Tidak Aktif (Demo)
+</p>
+
+<button class="secondary" id="statusButton"
+onclick="toggleStatus()">
+Aktifkan Status
+</button>
+</div>
+
+<div class="stats">
+<div class="stat">
+<strong id="activeCount">0</strong>
+<span class="muted">Pesanan Aktif</span>
+</div>
+
+<div class="stat">
+<strong id="doneCount">0</strong>
+<span class="muted">Pesanan Selesai</span>
+</div>
+</div>
+
+<br>
+
+<div class="card">
+<h3>Permintaan Pengantaran</h3>
+
+<p><strong>📦 Antar Paket (Demo)</strong></p>
+<p class="muted">
+Penjemputan: Pasar Desa<br>
+Tujuan: Balai Desa<br>
+Barang: Paket contoh
+</p>
+
+<p class="status" id="orderStatus">
+Status: Menunggu
+</p>
+
+<button class="primary" id="orderButton"
+onclick="updateOrder()">
+Terima Pesanan Demo
+</button>
+
+<p class="muted">
+Pesanan ini hanya contoh dan tidak
+terhubung dengan pelanggan asli.
+</p>
+</div>
+
+<div class="card">
+<h3>Informasi</h3>
+<p class="muted">
+AntarDesa v0.2.0 masih dalam tahap
+pengembangan. Data akan hilang jika
+halaman dimuat ulang.
+</p>
+</div>
+
+</main>
+
+<nav>
+<a href="kurir.html">⌂ Dashboard</a>
+<a href="index.html">▤ Beranda Demo</a>
+<a href="login.html">♙ Masuk</a>
+</nav>
+
+<script>
+let isActive=false;
+let orderStep=0;
+
+function toggleStatus(){
+ isActive=!isActive;
+
+ document.getElementById("courierStatus")
+ .textContent=isActive
+ ? "Status: Aktif (Demo)"
+ : "Status: Tidak Aktif (Demo)";
+
+ document.getElementById("statusButton")
+ .textContent=isActive
+ ? "Nonaktifkan Status"
+ : "Aktifkan Status";
+}
+
+function updateOrder(){
+ if(!isActive){
+  alert("Aktifkan status kurir terlebih dahulu.");
+  return;
+ }
+
+ const status=document.getElementById("orderStatus");
+ const button=document.getElementById("orderButton");
+
+ if(orderStep===0){
+  orderStep=1;
+  status.textContent="Status: Diterima (Demo)";
+  button.textContent="Mulai Pengantaran";
+  document.getElementById("activeCount").textContent="1";
+ }
+ else if(orderStep===1){
+  orderStep=2;
+  status.textContent="Status: Dalam Pengantaran (Demo)";
+  button.textContent="Selesaikan Pesanan";
+ }
+ else if(orderStep===2){
+  orderStep=3;
+  status.textContent="Status: Selesai (Demo)";
+  button.textContent="Pesanan Selesai";
+  button.disabled=true;
+  document.getElementById("activeCount").textContent="0";
+  document.getElementById("doneCount").textContent="1";
+ }
+}
+</script>
+
+</body>
+</html>
