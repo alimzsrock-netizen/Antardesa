@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masuk | AntarDesa</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.auth-container {
+  max-width: 420px;
+  margin: 45px auto;
+  padding: 22px;
+}
+
+.auth-card {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  border: 1px solid #e2e9e4;
+}
+
+.logo {
+  text-align: center;
+  color: #16805d;
+  margin-bottom: 25px;
+}
+
+.logo h1 { margin-bottom: 5px; }
+
+.logo p {
+  color: #61746b;
+  font-size: 13px;
+}
+
+label {
+  display: block;
+  margin: 15px 0 7px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccd9d0;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  background: #16805d;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.note {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+a { color: #16805d; }
+</style>
+</head>
+
+<body>
+
+<main class="auth-container">
+
+<div class="logo">
+<h1>AntarDesa.</h1>
+<p>Dekatkan Jarak, Mudahkan Urusan.</p>
+</div>
+
+<div class="auth-card">
+
+<h2>Selamat Datang 👋</h2>
+<p>Masuk ke akun AntarDesa</p>
+
+<form id="loginForm">
+
+<label for="email">Email</label>
+<input
+type="email"
+id="email"
+placeholder="Masukkan email"
+autocomplete="off"
+required>
+
+<label for="password">Password</label>
+<input
+type="password"
+id="password"
+placeholder="Masukkan password"
+autocomplete="off"
+required>
+
+<button type="submit">Masuk</button>
+
+</form>
+
+<p class="note">
+Belum punya akun?
+<a href="register.html">Daftar sekarang</a>
+</p>
+
+<p class="note">
+<a href="index.html">← Kembali ke Beranda</a>
+</p>
+
+<p class="note" style="color:#777">
+AntarDesa v0.2.0 • Tampilan Demo
+</p>
+
+</div>
+</main>
+
+<script>
+document.getElementById("loginForm")
+.addEventListener("submit", function(e) {
+  e.preventDefault();
+  alert("Login belum diaktifkan. Ini hanya tampilan demo.");
+});
+</script>
+
+</body>
+</html>
