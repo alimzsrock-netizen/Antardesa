@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daftar | AntarDesa</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.auth-container {
+ max-width: 430px;
+ margin: 35px auto;
+ padding: 20px;
+}
+
+.logo {
+ text-align: center;
+ color: #16805d;
+ margin-bottom: 25px;
+}
+
+.logo p {
+ color: #61746b;
+ font-size: 13px;
+}
+
+.card {
+ background: white;
+ border: 1px solid #e2e9e4;
+ border-radius: 18px;
+ padding: 24px;
+}
+
+label {
+ display: block;
+ margin: 15px 0 7px;
+ font-size: 13px;
+ font-weight: bold;
+}
+
+input,select {
+ width: 100%;
+ padding: 13px;
+ border: 1px solid #ccd9d0;
+ border-radius: 10px;
+ font-size: 15px;
+ background: white;
+}
+
+button {
+ width: 100%;
+ padding: 14px;
+ margin-top: 22px;
+ background: #16805d;
+ color: white;
+ border: none;
+ border-radius: 10px;
+ font-weight: bold;
+}
+
+.note {
+ text-align: center;
+ font-size: 13px;
+ margin-top: 20px;
+}
+
+a { color: #16805d; }
+</style>
+</head>
+
+<body>
+
+<main class="auth-container">
+
+<div class="logo">
+<h1>AntarDesa.</h1>
+<p>Dekatkan Jarak, Mudahkan Urusan.</p>
+</div>
+
+<div class="card">
+
+<h2>Buat Akun Baru</h2>
+<p>Gabung bersama AntarDesa.</p>
+
+<form id="registerForm">
+
+<label for="fullname">Nama Lengkap</label>
+<input id="fullname" type="text"
+placeholder="Masukkan nama lengkap"
+autocomplete="off" required>
+
+<label for="email">Email</label>
+<input id="email" type="email"
+placeholder="Masukkan email"
+autocomplete="off" required>
+
+<label for="phone">Nomor HP</label>
+<input id="phone" type="tel"
+placeholder="Contoh: 08xxxxxxxxxx"
+autocomplete="off" required>
+
+<label for="role">Daftar Sebagai</label>
+<select id="role" required>
+<option value="">Pilih jenis akun</option>
+<option value="pelanggan">Pelanggan</option>
+<option value="kurir">Kurir</option>
+<option value="mitra">Mitra Usaha</option>
+</select>
+
+<label for="password">Password</label>
+<input id="password" type="password"
+placeholder="Minimal 8 karakter"
+minlength="8"
+autocomplete="new-password" required>
+
+<label for="confirm">Konfirmasi Password</label>
+<input id="confirm" type="password"
+placeholder="Ulangi password"
+minlength="8"
+autocomplete="new-password" required>
+
+<button type="submit">Daftar Sekarang</button>
+
+</form>
+
+<p class="note">
+Sudah punya akun?
+<a href="login.html">Masuk</a>
+</p>
+
+<p class="note">
+<a href="index.html">← Kembali ke Beranda</a>
+</p>
+
+<p class="note" style="color:#777">
+AntarDesa v0.2.0 • Tampilan Demo
+</p>
+
+</div>
+</main>
+
+<script>
+document.getElementById("registerForm")
+.addEventListener("submit", function(e) {
+ e.preventDefault();
+
+ const password =
+ document.getElementById("password").value;
+
+ const confirm =
+ document.getElementById("confirm").value;
+
+ if(password !== confirm) {
+  alert("Konfirmasi password tidak sama.");
+  return;
+ }
+
+ alert(
+  "Registrasi belum diaktifkan. " +
+  "Ini hanya tampilan demo."
+ );
+
+ this.reset();
+});
+</script>
+
+</body>
+</html>
