@@ -2,117 +2,161 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AntarDesa</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f7f6;
-      color: #202b25;
-    }
-
-    header {
-      background: #16805d;
-      color: white;
-      padding: 28px 20px;
-      border-radius: 0 0 25px 25px;
-    }
-
-    header h1 { margin: 0; }
-
-    header p {
-      font-size: 13px;
-      opacity: .9;
-    }
-
-    main { padding: 20px; }
-
-    .welcome {
-      background: white;
-      padding: 18px;
-      border-radius: 15px;
-      margin-bottom: 25px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .service {
-      background: white;
-      border-radius: 14px;
-      padding: 18px 5px;
-      text-align: center;
-      font-size: 12px;
-      border: 1px solid #e5e9e6;
-    }
-
-    .service span {
-      display: block;
-      font-size: 29px;
-      margin-bottom: 12px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px;
-      font-size: 12px;
-      color: gray;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#16805d">
+<title>AntarDesa v0.1.0</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7f5;color:#1c3028;font:15px Arial,sans-serif}
+header{background:#16805d;color:white;padding:24px 20px 32px;border-radius:0 0 24px 24px}
+header h1{margin:0;font-size:27px}
+header p{margin:7px 0 0;font-size:13px}
+main{max-width:650px;margin:auto;padding:18px 16px 90px}
+.panel{background:white;border:1px solid #e3ebe6;border-radius:16px;padding:18px;margin-bottom:18px}
+.panel h2{margin:0 0 8px;font-size:19px}
+.muted{color:#61746b;font-size:13px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.service{background:white;border:1px solid #e0e9e3;border-radius:14px;padding:16px 4px;min-height:102px;font:inherit;font-size:12px;color:inherit;cursor:pointer}
+.service span{display:block;font-size:28px;margin-bottom:10px}
+.primary{background:#16805d;color:white;border:0;border-radius:11px;padding:13px 16px;font-weight:bold;width:100%}
+.secondary{background:white;color:#16805d;border:1px solid #16805d;border-radius:11px;padding:12px;width:100%}
+label{display:block;font-weight:bold;font-size:13px;margin:14px 0 6px}
+input,textarea{width:100%;padding:12px;border:1px solid #cbd9d0;border-radius:10px;font:inherit}
+textarea{min-height:95px}
+.hidden{display:none!important}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dde7df;display:flex;justify-content:space-around;padding:12px}
+nav button{background:none;border:0;font:inherit;font-size:12px;color:#486657}
+nav button.active{color:#16805d;font-weight:bold}
+.order{padding:12px;border:1px solid #e0e9e3;border-radius:10px;margin:10px 0;line-height:1.6}
+</style>
 </head>
 <body>
 
 <header>
-  <h1>AntarDesa.</h1>
-  <p>Dekatkan Jarak, Mudahkan Urusan.</p>
+<h1>AntarDesa.</h1>
+<p>Dekatkan Jarak, Mudahkan Urusan. 🛵</p>
 </header>
 
 <main>
-  <div class="welcome">
-    <h3>Selamat Datang! 👋</h3>
-    <p>Apa yang kamu butuhkan hari ini?</p>
-  </div>
+<section id="home" class="page">
+<div class="panel">
+<h2>Selamat datang! 👋</h2>
+<p class="muted">Apa yang kamu butuhkan hari ini?</p>
+</div>
 
-  <h3>Layanan Kami</h3>
+<h3>Layanan kami</h3>
+<div class="grid">
+<button class="service" onclick="choose('Antar Paket')"><span>📦</span>Antar Paket</button>
+<button class="service" onclick="choose('Titip Belanja')"><span>🛒</span>Titip Belanja</button>
+<button class="service" onclick="choose('Antar Makan')"><span>🍜</span>Antar Makan</button>
+<button class="service" onclick="choose('Pasar Desa')"><span>🏪</span>Pasar Desa</button>
+<button class="service" onclick="choose('Sekalian Jalan')"><span>🛵</span>Sekalian Jalan</button>
+<button class="service" onclick="choose('Angkut Desa')"><span>🚚</span>Angkut Desa</button>
+</div>
+<p class="muted">Versi 0.1.0 • Simulasi, belum menerima pesanan nyata.</p>
+</section>
 
-  <div class="grid">
-    <div class="service">
-      <span>📦</span>Antar Paket
-    </div>
+<section id="formpage" class="page hidden">
+<div class="panel">
+<button class="secondary" onclick="show('home')">← Kembali</button>
+<h2 id="formtitle" style="margin-top:18px">Buat pesanan</h2>
+<p class="muted">Gunakan data contoh saja. Jangan masukkan informasi pribadi asli.</p>
+<form id="orderform">
+<label for="name">Nama panggilan</label>
+<input id="name" maxlength="40" required placeholder="Contoh: Budi">
+<label for="pickup">Lokasi penjemputan</label>
+<input id="pickup" maxlength="120" required placeholder="Contoh: Pasar Kecamatan">
+<label for="destination">Tujuan pengantaran</label>
+<input id="destination" maxlength="120" required placeholder="Contoh: Desa A">
+<label for="detail">Detail kebutuhan</label>
+<textarea id="detail" maxlength="500" required placeholder="Jelaskan barang atau titipan"></textarea>
+<button class="primary" type="submit">Simulasikan pesanan</button>
+</form>
+</div>
+</section>
 
-    <div class="service">
-      <span>🛒</span>Titip Belanja
-    </div>
+<section id="orders" class="page hidden">
+<div class="panel">
+<h2>Pesanan simulasi</h2>
+<p class="muted">Data sementara. Akan hilang jika halaman dimuat ulang.</p>
+<div id="orderlist">Belum ada pesanan.</div>
+</div>
+</section>
 
-    <div class="service">
-      <span>🍜</span>Antar Makan
-    </div>
-
-    <div class="service">
-      <span>🏪</span>Pasar Desa
-    </div>
-
-    <div class="service">
-      <span>🛵</span>Sekalian Jalan
-    </div>
-
-    <div class="service">
-      <span>🚚</span>Angkut Desa
-    </div>
-  </div>
+<section id="profile" class="page hidden">
+<div class="panel">
+<h2>Profil</h2>
+<p>AntarDesa v0.1.0</p>
+<p class="muted">Sistem akun pelanggan, kurir, warung, dan administrator akan dikembangkan berikutnya.</p>
+</div>
+</section>
 </main>
 
-<footer>
-  AntarDesa v0.0.1
-  <p>Platform Digital Masyarakat Desa</p>
-</footer>
+<nav aria-label="Navigasi utama">
+<button id="navhome" class="active" onclick="show('home')">⌂<br>Beranda</button>
+<button id="navorders" onclick="show('orders')">▤<br>Pesanan</button>
+<button id="navprofile" onclick="show('profile')">♙<br>Profil</button>
+</nav>
 
+<script>
+let selected='';
+const orders=[];
+
+function show(id){
+ document.querySelectorAll('.page').forEach(p=>{
+  p.classList.toggle('hidden',p.id!==id);
+ });
+ document.querySelectorAll('nav button').forEach(b=>{
+  b.classList.toggle('active',b.id==='nav'+id);
+ });
+ window.scrollTo(0,0);
+}
+
+function choose(service){
+ selected=service;
+ document.getElementById('formtitle').textContent=service;
+ document.getElementById('orderform').reset();
+ show('formpage');
+}
+
+document.getElementById('orderform').addEventListener('submit',function(e){
+ e.preventDefault();
+ const get=id=>document.getElementById(id).value.trim();
+ if(!['name','pickup','destination','detail'].every(get))return;
+
+ orders.unshift({
+  service:selected,
+  name:get('name'),
+  pickup:get('pickup'),
+  destination:get('destination'),
+  detail:get('detail')
+ });
+
+ const list=document.getElementById('orderlist');
+ list.replaceChildren();
+
+ orders.forEach((o,i)=>{
+  const card=document.createElement('div');
+  card.className='order';
+  [
+   `${i+1}. ${o.service}`,
+   `Pemesan: ${o.name}`,
+   `Dari: ${o.pickup}`,
+   `Ke: ${o.destination}`,
+   `Detail: ${o.detail}`,
+   'Status: Simulasi'
+  ].forEach((line,j)=>{
+   const el=document.createElement(j===0?'strong':'div');
+   el.textContent=line;
+   card.append(el);
+  });
+  list.append(card);
+ });
+
+ this.reset();
+ show('orders');
+});
+</script>
 </body>
 </html>
