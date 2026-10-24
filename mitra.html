@@ -153,6 +153,40 @@ function renderProducts(){
   return;
  }
 
+ products.forEach(function(p,index){
+  const card=document.createElement("div");
+  card.className="product";
+
+  const title=document.createElement("strong");
+  title.textContent=p.name;
+
+  const info=document.createElement("small");
+  info.textContent=p.category+" · Rp "+
+  p.price.toLocaleString("id-ID")+" · Stok: "+p.stock;
+
+  const deleteButton=document.createElement("button");
+  deleteButton.type="button";
+  deleteButton.textContent="🗑️ Hapus";
+  deleteButton.style.marginTop="10px";
+  deleteButton.style.padding="8px 12px";
+  deleteButton.style.border="none";
+  deleteButton.style.borderRadius="8px";
+  deleteButton.style.backgroundColor="#dc2626";
+  deleteButton.style.color="#ffffff";
+  deleteButton.style.cursor="pointer";
+
+  deleteButton.addEventListener("click",function(){
+   if(confirm('Hapus produk "'+p.name+'"?')){
+    products.splice(index,1);
+    renderProducts();
+   }
+  });
+
+  card.append(title,info,deleteButton);
+  list.append(card);
+ });
+}
+
  products.forEach(function(p){
   const card=document.createElement("div");
   card.className="product";
