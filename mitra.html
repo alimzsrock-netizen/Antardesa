@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Mitra | AntarDesa</title>
+<link rel="stylesheet" href="style.css">
+<style>
+header{
+ background:#16805d;color:white;
+ padding:24px 20px;
+ border-radius:0 0 22px 22px;
+}
+header h1{margin:0}
+header p{font-size:13px}
+main{max-width:650px;margin:auto;padding:20px 16px 90px}
+.card{
+ background:white;border:1px solid #e2e9e4;
+ border-radius:15px;padding:18px;margin-bottom:18px;
+}
+.muted{font-size:13px;color:#61746b;line-height:1.6}
+label{display:block;font-size:13px;font-weight:bold;margin:13px 0 6px}
+input,select{
+ width:100%;padding:12px;border:1px solid #ccd9d0;
+ border-radius:9px;font:inherit;background:white;
+}
+button{
+ border:0;border-radius:10px;padding:12px;
+ cursor:pointer;font-weight:bold;
+}
+.primary{background:#16805d;color:white;width:100%;margin-top:15px}
+.secondary{background:#e8f4ee;color:#16805d}
+.product{
+ border:1px solid #e2e9e4;border-radius:11px;
+ padding:13px;margin-top:10px;
+}
+.product strong{display:block;margin-bottom:6px}
+.product small{color:#61746b}
+nav{
+ position:fixed;bottom:0;left:0;right:0;
+ display:flex;justify-content:space-around;
+ background:white;border-top:1px solid #ddd;padding:14px;
+}
+nav a{text-decoration:none;color:#16805d;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>AntarDesa.</h1>
+<p>Dashboard Mitra Usaha 🏪</p>
+</header>
+
+<main>
+<div class="card">
+<h2>Kelola Toko</h2>
+<p class="muted">Atur status toko dan tambahkan produk yang ingin dijual.</p>
+<p><strong>Status toko:</strong> <span id="storeStatus">Buka (Demo)</span></p>
+<button class="secondary" id="toggleStore" onclick="toggleStore()">Tutup Toko</button>
+</div>
+
+<div class="card">
+<h3>Tambah Produk</h3>
+<form id="productForm">
+<label for="productName">Nama produk</label>
+<input id="productName" maxlength="80" placeholder="Contoh: Beras 5 kg" required>
+
+<label for="category">Kategori</label>
+<select id="category" required>
+<option value="">Pilih kategori</option>
+<option>Sembako</option>
+<option>Makanan dan Minuman</option>
+<option>Sayur dan Buah</option>
+<option>Kebutuhan Rumah Tangga</option>
+<option>Lainnya</option>
+</select>
+
+<label for="price">Harga (Rp)</label>
+<input id="price" type="number" min="1" max="100000000" step="1" placeholder="Contoh: 65000" required>
+
+<label for="stock">Stok tersedia</label>
+<input id="stock" type="number" min="0" max="100000" step="1" placeholder="Contoh: 20" required>
+
+<button class="primary" type="submit">Tambah Produk Demo</button>
+</form>
+<p class="muted">Data produk hanya tersimpan sementara di halaman ini.</p>
+</div>
+
+<div class="card">
+<h3>Daftar Produk</h3>
+<p class="muted" id="productCount">Jumlah produk: 0</p>
+<div id="productList" class="muted">Belum ada produk.</div>
+</div>
+
+<div class="card">
+<h3>Pesanan Masuk</h3>
+<p class="muted">Belum ada pesanan masuk.</p>
+<p class="muted">Pesanan pelanggan akan ditampilkan setelah sistem database dan pemesanan terhubung.</p>
+</div>
+
+<div class="card">
+<p class="muted">AntarDesa v0.2.0 · Dashboard simulasi</p>
+</div>
+</main>
+
+<nav>
+<a href="mitra.html">⌂ Toko</a>
+<a href="pelanggan.html">▦ Pelanggan</a>
+<a href="login.html">♙ Masuk</a>
+</nav>
+
+<script>
+let storeOpen=true;
+const products=[];
+
+function toggleStore(){
+ storeOpen=!storeOpen;
+ document.getElementById("storeStatus").textContent=
+ storeOpen?"Buka (Demo)":"Tutup (Demo)";
+ document.getElementById("toggleStore").textContent=
+ storeOpen?"Tutup Toko":"Buka Toko";
+}
+
+document.getElementById("productForm").addEventListener("submit",function(e){
+ e.preventDefault();
+
+ const name=document.getElementById("productName").value.trim();
+ const category=document.getElementById("category").value;
+ const price=Number(document.getElementById("price").value);
+ const stock=Number(document.getElementById("stock").value);
+
+ if(!name||!category||!Number.isSafeInteger(price)||price<1||
+ !Number.isSafeInteger(stock)||stock<0){
+  alert("Periksa kembali data produk.");
+  return;
+ }
+
+ products.push({name,category,price,stock});
+ renderProducts();
+ this.reset();
+});
+
+function renderProducts(){
+ const list=document.getElementById("productList");
+ list.replaceChildren();
+
+ document.getElementById("productCount").textContent=
+ "Jumlah produk: "+products.length;
+
+ if(products.length===0){
+  list.textContent="Belum ada produk.";
+  return;
+ }
+
+ products.forEach(function(p){
+  const card=document.createElement("div");
+  card.className="product";
+
+  const title=document.createElement("strong");
+  title.textContent=p.name;
+
+  const info=document.createElement("small");
+  info.textContent=p.category+" · Rp "+
+  p.price.toLocaleString("id-ID")+" · Stok: "+p.stock;
+
+  card.append(title,info);
+  list.append(card);
+ });
+}
+</script>
+</body>
+</html>
