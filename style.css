@@ -1,0 +1,21 @@
+
+/* AntarDesa v0.2.0 */
+/* File desain utama */
+
+:root {
+  --primary: #16805d;
+  --background: #f4f7f5;
+  --text: #1c3028;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+}
