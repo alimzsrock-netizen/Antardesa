@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uji Keamanan Kurir | AntarDesa</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ padding:20px;
+ background:#f3f7f4;
+ font-family:system-ui,sans-serif;
+ color:#1c2922;
+}
+main{
+ max-width:520px;
+ margin:auto;
+ background:white;
+ padding:22px;
+ border-radius:15px;
+ border:1px solid #dce7df;
+}
+h1{font-size:21px}
+p{line-height:1.6}
+label{display:block;font-weight:700;margin-top:18px}
+input{
+ width:100%;
+ padding:13px;
+ border:1px solid #b9cbbf;
+ border-radius:9px;
+ margin-top:8px;
+ font-size:15px;
+}
+button{
+ width:100%;
+ margin-top:16px;
+ padding:14px;
+ border:0;
+ border-radius:9px;
+ background:#116b45;
+ color:white;
+ font-weight:700;
+}
+button:disabled{opacity:.55}
+#result{
+ margin-top:18px;
+ padding:14px;
+ border-radius:9px;
+ background:#edf3ef;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.good{background:#e1f6e8!important;color:#155d35}
+.bad{background:#fff0ef!important;color:#8d2119}
+small{color:#66756c}
+</style>
+</head>
+
+<body>
+<main>
+<h1>🔐 Uji Keamanan Kurir B</h1>
+
+<p>
+Halaman ini menguji apakah akun yang sedang login
+dapat membaca detail pengantaran dari sebuah ID pesanan.
+Isi alamat tidak akan ditampilkan.
+</p>
+
+<div id="account">Memeriksa akun...</div>
+
+<label for="orderId">ID pesanan milik Kurir A</label>
+<input
+ id="orderId"
+ type="text"
+ placeholder="Tempel UUID lengkap"
+ autocomplete="off"
+ spellcheck="false"
+>
+
+<small>
+Gunakan ID pesanan lengkap, bukan ID penugasan kurir.
+</small>
+
+<button id="testBtn" type="button" disabled>
+Jalankan Pengujian
+</button>
+
+<div id="result" role="status" aria-live="polite">
+Menunggu pengujian.
+</div>
+</main>
+
+<script>
+(async()=>{
+"use strict";
+
+const URL="https://gswlkajcizcvrhcfabtg.supabase.co";
+const KEY="sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+const $=id=>document.getElementById(id);
+
+const db=window.supabase.createClient(URL,KEY);
+
+const uuidPattern=
+ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function report(text,type=""){
+ $("result").textContent=text;
+ $("result").className=type;
+}
+
+try{
+ const {data,error}=await db.auth.getUser();
+
+ if(error) throw error;
+
+ if(!data.user){
+  $("account").textContent=
+   "Belum login. Silakan login sebagai Kurir B terlebih dahulu.";
+  report("PENGUJIAN BELUM DAPAT DIJALANKAN.","bad");
+  return;
+ }
+
+ const {data:role,error:roleError}=await db
+  .from("user_roles")
+  .select("role,is_verified")
+  .eq("user_id",data.user.id)
+  .maybeSingle();
+
+ if(roleError) throw roleError;
+
+ if(!role || role.role!=="kurir" || role.is_verified!==true){
+  $("account").textContent=
+   "Akun saat ini bukan kurir terverifikasi.";
+  report("PENGUJIAN DIBATALKAN.","bad");
+  return;
+ }
+
+ $("account").textContent=
+  "Akun kurir terverifikasi terdeteksi.\n"+
+  "ID akun: "+data.user.id;
+
+ $("testBtn").disabled=false;
+
+ $("testBtn").addEventListener("click",async()=>{
+  const orderId=$("orderId").value.trim();
+
+  if(!uuidPattern.test(orderId)){
+   report("ID pesanan tidak valid. Periksa UUID lengkap.","bad");
+   return;
+  }
+
+  $("testBtn").disabled=true;
+  report("Memeriksa izin akses melalui database...");
+
+  try{
+   const {data,error}=await db.rpc(
+    "get_antardesa_delivery_details",
+    {p_order_id:orderId}
+   );
+
+   if(error){
+    report(
+     "RPC MENGEMBALIKAN ERROR.\n"+
+     "Pengujian belum dinyatakan lulus.\n"+
+     "Pesan: "+error.message,
+     "bad"
+    );
+    return;
+   }
+
+   if(Array.isArray(data) && data.length===0){
+    report(
+     "AKSES DITOLAK (0 BARIS).\n"+
+     "Database tidak mengembalikan detail penerima.\n"+
+     "Hasil sesuai apabila akun ini benar-benar Kurir B "+
+     "dan pesanan tersebut ditugaskan kepada Kurir A.",
+     "good"
+    );
+   }else{
+    report(
+     "PERINGATAN KEAMANAN!\n"+
+     "RPC mengembalikan "+
+     (Array.isArray(data)?data.length:"hasil tidak terduga")+
+     " baris.\n"+
+     "Isi data sengaja tidak ditampilkan.\n"+
+     "Pastikan akun yang login benar-benar Kurir B.",
+     "bad"
+    );
+   }
+
+  }catch(err){
+   report(
+    "PENGUJIAN GAGAL.\n"+(err.message||"Kesalahan tidak diketahui."),
+    "bad"
+   );
+  }finally{
+   $("testBtn").disabled=false;
+  }
+ });
+
+}catch(err){
+ $("account").textContent="Gagal memeriksa akun.";
+ report(err.message||"Terjadi kesalahan.","bad");
+}
+})();
+</script>
+</body>
+</html>
