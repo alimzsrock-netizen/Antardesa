@@ -1,87 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Dashboard Mitra | AntarDesa</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Mitra | AntarDesa</title><link rel="stylesheet" href="style.css">
+<style>
 :root{--green:#16805d;--green-dark:#106747;--red:#dc2626;--border:#e2e9e4;--muted:#61746b}*{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:#20352a;font-family:Arial,sans-serif}header{background:var(--green);color:white;padding:24px 20px;border-radius:0 0 22px 22px}header h1{margin:0}header p{font-size:13px;margin-bottom:0}main{max-width:650px;margin:auto;padding:20px 16px 110px}.card{background:white;border:1px solid var(--border);border-radius:15px;padding:18px;margin-bottom:18px}.muted{font-size:13px;color:var(--muted);line-height:1.6}label{display:block;font-size:13px;font-weight:bold;margin:13px 0 6px}input,select,textarea{display:block;width:100%;padding:12px;border:1px solid #ccd9d0;border-radius:9px;font:inherit;background:white}textarea{min-height:85px;resize:vertical}button{border:0;border-radius:10px;padding:12px;cursor:pointer;font-weight:bold;font-size:14px}button:disabled{opacity:.6;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #85c9a8;outline-offset:2px}.primary{background:var(--green);color:white;width:100%;margin-top:15px}.primary:hover{background:var(--green-dark)}.secondary{background:#e8f4ee;color:var(--green)}.delete-button{background:var(--red);color:white;width:100%}.product,.order{border:1px solid var(--border);border-radius:11px;padding:14px;margin-top:10px;background:white;overflow-wrap:anywhere}.product strong,.order strong{display:block;margin-bottom:6px;overflow-wrap:anywhere}.product small,.order small{display:block;color:var(--muted);line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}.product img{width:100%;max-height:220px;object-fit:cover;border-radius:9px;margin-bottom:10px}.product-actions{display:flex;gap:8px;margin-top:12px}.order-item{border-top:1px solid var(--border);margin-top:10px;padding-top:10px;font-size:13px;line-height:1.6;white-space:pre-wrap}.status{display:inline-block;border-radius:20px;padding:5px 9px;background:#e8f4ee;color:var(--green);font-size:12px;font-weight:bold;margin-bottom:10px}.status.pending{background:#fff4d6;color:#805900}.status.rejected,.status.cancelled{background:#fee2e2;color:#991b1b}.status.preparing{background:#e0f2fe;color:#075985}.status.ready{background:#dcfce7;color:#166534}.order-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.order-actions.single{grid-template-columns:1fr}.accept-button,.prepare-button{background:var(--green);color:white}.reject-button{background:var(--red);color:white}.ready-button{background:#075985;color:white}.empty{padding:14px 0;color:var(--muted);font-size:14px}.notice{background:#fff8e6;border:1px solid #f2dfad;color:#755b19;padding:11px;border-radius:9px;font-size:12px;line-height:1.5}.message{font-size:13px;line-height:1.5;margin-top:12px;overflow-wrap:anywhere}.message.error{color:#b91c1c}.message.success{color:#106747}nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;gap:8px;background:white;border-top:1px solid #ddd;padding:14px 8px;padding-bottom:max(14px,env(safe-area-inset-bottom));z-index:10}nav a,nav button{text-decoration:none;color:var(--green);font-size:13px;font-weight:normal;background:transparent;padding:0}.merchant-delivery-detail{margin-top:12px;padding:14px;border:1px solid #cde5d5;border-radius:10px;background:#f4faf6;overflow-wrap:anywhere}.merchant-delivery-detail h4{margin:0 0 12px;color:var(--green-dark)}.merchant-delivery-line{margin:10px 0;font-size:13px;line-height:1.6;white-space:pre-wrap}.merchant-delivery-line strong{display:block;margin-bottom:3px}.merchant-detail-button{width:100%;margin-top:12px;background:#e8f4ee;color:var(--green-dark)}.merchant-delivery-error{color:#b91c1c;font-size:13px;line-height:1.6}.gps-box{border:1px solid #cde5d5;border-radius:10px;background:#f4faf6;padding:13px;margin-top:12px}.gps-box p{margin:7px 0;overflow-wrap:anywhere}.gps-actions{display:grid;gap:8px}.gps-actions .secondary{width:100%}#dashboard{display:none}#accessScreen{max-width:460px;margin:55px auto;padding:24px;text-align:center}#accessScreen a{display:inline-block;margin-top:12px;color:var(--green)}#accessScreen p{line-height:1.6}[hidden]{display:none!important}
 </style>
- </head>
- <body>
-  <section id="accessScreen" role="status" aria-live="polite">
-   <h2>AntarDesa 🏪</h2>
-   <p id="accessMessage">Sedang memeriksa hak akses Mitra...</p>
-   <a id="accessLink" href="login.html" hidden>Kembali ke Login</a>
-   <button id="retryLogout" class="primary" type="button" hidden>Coba Keluar Lagi</button>
-  </section>
-  <div id="dashboard">
-   <header>
-    <h1>AntarDesa.</h1>
-    <p>Dashboard Mitra Usaha 🏪</p>
-   </header>
-   <main>
-    <section class="card">
-     <h2>Kelola Toko</h2>
-     <p class="muted">Kelola produk yang tersimpan di database AntarDesa.</p>
-     <p><strong>Status toko:</strong> <span id="storeStatus">Buka (Demo)</span></p>
-     <button class="secondary" id="toggleStore" type="button">Tutup Toko</button>
-     <p class="muted">Status buka/tutup masih simulasi dan belum memengaruhi katalog pelanggan.</p>
-    </section>
-    <section class="card" id="lokasiToko">
-     <h3>📍 Lokasi GPS Toko</h3>
-     <p class="muted">Datang ke titik pengambilan pesanan di toko, aktifkan lokasi HP, kemudian tekan tombol di bawah. Lokasi hanya diambil setelah Anda menekan tombol. Pastikan posisi yang diperoleh benar sebelum menyimpan.</p>
-     <div class="gps-actions">
-      <button class="secondary" id="getStoreGps" type="button">◎ Ambil Lokasi GPS Sekarang</button>
-     </div>
-     <div class="gps-box" id="gpsResult" hidden>
-      <p><strong>Latitude:</strong> <span id="gpsLatitude">-</span></p>
-      <p><strong>Longitude:</strong> <span id="gpsLongitude">-</span></p>
-      <p><strong>Perkiraan akurasi:</strong> <span id="gpsAccuracy">-</span></p>
-      <p class="muted">GPS menunjukkan lokasi perangkat, bukan otomatis posisi toko. Jangan simpan jika Anda sedang berada jauh dari toko.</p>
-      <a id="gpsMapLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Lihat titik di peta</a>
-     </div>
-     <label for="storeLocationNote">Petunjuk lokasi toko (opsional)</label><textarea id="storeLocationNote" maxlength="500" placeholder="Contoh: Sebelah balai desa, pagar hijau"></textarea>
-     <button class="primary" id="saveStoreGps" type="button" disabled>Simpan Lokasi Toko</button>
-     <p id="gpsMessage" class="message" role="status" aria-live="polite">Belum mengambil lokasi. Lokasi lama belum dapat ditampilkan pada versi ini.</p>
-    </section>
-    <section class="card">
-     <h3>Tambah Produk</h3>
-     <form id="productForm">
-      <label for="productName">Nama produk</label><input id="productName" maxlength="80" placeholder="Contoh: Beras 5 kg" required><label for="description">Deskripsi</label><textarea id="description" maxlength="1000" placeholder="Keterangan produk (opsional)"></textarea><label for="category">Kategori</label><select id="category" required><option value="">Pilih kategori</option><option value="Sembako">Sembako</option><option value="Makanan dan Minuman">Makanan dan Minuman</option><option value="Sayur dan Buah">Sayur dan Buah</option><option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option><option value="Lainnya">Lainnya</option></select><label for="price">Harga (Rp)</label><input id="price" type="number" min="1" max="100000000" step="1" placeholder="Contoh: 65000" required><label for="stock">Stok tersedia</label><input id="stock" type="number" min="0" max="100000" step="1" placeholder="Contoh: 20" required><label for="imageUrl">URL gambar (opsional)</label><input id="imageUrl" type="url" maxlength="2000" placeholder="https://contoh.com/foto.jpg">
-      <button class="primary" id="saveProduct" type="submit">+ Simpan Produk</button>
-     </form>
-     <p id="formMessage" class="message" role="status" aria-live="polite"></p>
-     <p class="muted">Produk baru disimpan sebagai produk aktif. Gunakan URL gambar HTTPS jika tersedia.</p>
-    </section>
-    <section class="card">
-     <h3>Daftar Produk Saya</h3>
-     <p class="muted" id="productCount">Memuat produk...</p>
-     <button id="refreshProducts" class="secondary" type="button">↻ Muat Ulang Produk</button>
-     <p id="listMessage" class="message" role="status" aria-live="polite"></p>
-     <div id="productList" aria-live="polite"></div>
-    </section>
-    <section class="card" id="pesananMasuk">
-     <h3>📋 Pesanan Masuk</h3>
-     <p class="muted">Menampilkan maksimal 20 pesanan terbaru untuk toko Anda. Pesanan pending dapat diterima atau ditolak. Pesanan accepted dapat mulai disiapkan. Pesanan preparing dapat ditandai siap dikirim. Detail pengantaran dapat dilihat melalui tombol khusus pada pesanan yang didukung.</p>
-     <button id="refreshIncomingOrders" class="secondary" type="button">↻ Muat Ulang Pesanan</button>
-     <p id="incomingStatus" class="message" role="status" aria-live="polite">Belum dimuat.</p>
-     <div id="incomingOrders" aria-live="polite"></div>
-     <p class="muted">Perubahan status terhubung ke database. Penugasan Kurir dan penyelesaian pengiriman diproses melalui alur Kurir. Pembayaran belum diaktifkan.</p>
-    </section>
-    <section class="card">
-     <p class="muted">AntarDesa v0.2.9 · Lokasi GPS Mitra</p>
-     <div class="notice">Penolakan pesanan pending mengembalikan stok melalui database. Detail penerima dibaca melalui RPC khusus Mitra. Lokasi GPS disimpan melalui RPC khusus Mitra terverifikasi. Checkout V3 belum menghitung ongkir GPS. Status toko masih demo.</div>
-    </section>
-   </main>
-   <nav aria-label="Navigasi Mitra">
-    <a href="mitra.html">⌂ Toko</a><a href="#lokasiToko">📍 GPS</a><a href="#pesananMasuk">▤ Pesanan</a><a href="pelanggan.html">▦ Pelanggan</a>
-    <button id="logoutButton" type="button">♙ Keluar</button>
-   </nav>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script>
+</head>
+<body>
+<section id="accessScreen" role="status" aria-live="polite"><h2>AntarDesa 🏪</h2><p id="accessMessage">Sedang memeriksa hak akses Mitra...</p><a id="accessLink" href="login.html" hidden>Kembali ke Login</a><button id="retryLogout" class="primary" type="button" hidden>Coba Keluar Lagi</button></section>
+<div id="dashboard">
+<header><h1>AntarDesa.</h1><p>Dashboard Mitra Usaha 🏪</p></header>
+<main>
+<section class="card"><h2>Kelola Toko</h2><p class="muted">Kelola produk yang tersimpan di database AntarDesa.</p><p><strong>Status toko:</strong> <span id="storeStatus">Buka (Demo)</span></p><button class="secondary" id="toggleStore" type="button">Tutup Toko</button><p class="muted">Status buka/tutup masih simulasi dan belum memengaruhi katalog pelanggan.</p></section>
+<section class="card" id="lokasiToko"><h3>📍 Lokasi GPS Toko</h3><p class="muted">Datang ke titik pengambilan pesanan di toko, aktifkan lokasi HP, kemudian tekan tombol di bawah. Lokasi hanya diambil setelah Anda menekan tombol. Pastikan posisi yang diperoleh benar sebelum menyimpan.</p><div class="gps-actions"><button class="secondary" id="getStoreGps" type="button">◎ Ambil Lokasi GPS Sekarang</button></div><div class="gps-box" id="gpsResult" hidden><p><strong>Latitude:</strong> <span id="gpsLatitude">-</span></p><p><strong>Longitude:</strong> <span id="gpsLongitude">-</span></p><p><strong>Perkiraan akurasi:</strong> <span id="gpsAccuracy">-</span></p><p class="muted">GPS menunjukkan lokasi perangkat, bukan otomatis posisi toko. Jangan simpan jika Anda sedang berada jauh dari toko.</p><a id="gpsMapLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Lihat titik di peta</a></div><label for="storeLocationNote">Petunjuk lokasi toko (opsional)</label><textarea id="storeLocationNote" maxlength="500" placeholder="Contoh: Sebelah balai desa, pagar hijau"></textarea><button class="primary" id="saveStoreGps" type="button" disabled>Simpan Lokasi Toko</button><p id="gpsMessage" class="message" role="status" aria-live="polite">Belum mengambil lokasi. Lokasi lama belum dapat ditampilkan pada versi ini.</p></section>
+<section class="card"><h3>Tambah Produk</h3><form id="productForm"><label for="productName">Nama produk</label><input id="productName" maxlength="80" placeholder="Contoh: Beras 5 kg" required><label for="description">Deskripsi</label><textarea id="description" maxlength="1000" placeholder="Keterangan produk (opsional)"></textarea><label for="category">Kategori</label><select id="category" required><option value="">Pilih kategori</option><option value="Sembako">Sembako</option><option value="Makanan dan Minuman">Makanan dan Minuman</option><option value="Sayur dan Buah">Sayur dan Buah</option><option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option><option value="Lainnya">Lainnya</option></select><label for="price">Harga (Rp)</label><input id="price" type="number" min="1" max="100000000" step="1" placeholder="Contoh: 65000" required><label for="stock">Stok tersedia</label><input id="stock" type="number" min="0" max="100000" step="1" placeholder="Contoh: 20" required><label for="imageUrl">URL gambar (opsional)</label><input id="imageUrl" type="url" maxlength="2000" placeholder="https://contoh.com/foto.jpg"><button class="primary" id="saveProduct" type="submit">+ Simpan Produk</button></form><p id="formMessage" class="message" role="status" aria-live="polite"></p><p class="muted">Produk baru disimpan sebagai produk aktif. Gunakan URL gambar HTTPS jika tersedia.</p></section>
+<section class="card"><h3>Daftar Produk Saya</h3><p class="muted" id="productCount">Memuat produk...</p><button id="refreshProducts" class="secondary" type="button">↻ Muat Ulang Produk</button><p id="listMessage" class="message" role="status" aria-live="polite"></p><div id="productList" aria-live="polite"></div></section>
+<section class="card" id="pesananMasuk"><h3>📋 Pesanan Masuk</h3><p class="muted">Menampilkan maksimal 20 pesanan terbaru untuk toko Anda. Pesanan pending dapat diterima atau ditolak. Pesanan accepted dapat mulai disiapkan. Pesanan preparing dapat ditandai siap dikirim. Detail pengantaran dapat dilihat melalui tombol khusus pada pesanan yang didukung.</p><button id="refreshIncomingOrders" class="secondary" type="button">↻ Muat Ulang Pesanan</button><p id="incomingStatus" class="message" role="status" aria-live="polite">Belum dimuat.</p><div id="incomingOrders" aria-live="polite"></div><p class="muted">Perubahan status terhubung ke database. Penugasan Kurir dan penyelesaian pengiriman diproses melalui alur Kurir. Pembayaran belum diaktifkan.</p></section>
+<section class="card"><p class="muted">AntarDesa v0.2.9 · Lokasi GPS Mitra</p><div class="notice">Penolakan pesanan pending mengembalikan stok melalui database. Detail penerima dibaca melalui RPC khusus Mitra. Lokasi GPS disimpan melalui RPC khusus Mitra terverifikasi. Checkout V3 belum menghitung ongkir GPS. Status toko masih demo.</div></section>
+</main><nav aria-label="Navigasi Mitra"><a href="mitra.html">⌂ Toko</a><a href="#lokasiToko">📍 GPS</a><a href="#pesananMasuk">▤ Pesanan</a><a href="pelanggan.html">▦ Pelanggan</a><button id="logoutButton" type="button">♙ Keluar</button></nav></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
 "use strict";
 /* ANTARDESA v0.2.9: seluruh fitur v0.2.8 + GPS toko. Publishable key saja. */
 const SUPABASE_URL="https://gswlkajcizcvrhcfabtg.supabase.co";
@@ -117,5 +56,5 @@ async function respondToOrder(order,decision){if(!merchantId||incomingLoading||r
 async function advanceOrder(order,nextStatus){if(!merchantId||incomingLoading||respondingOrderId)return;const allowed=(order.status==="accepted"&&nextStatus==="preparing")||(order.status==="preparing"&&nextStatus==="ready");if(!allowed)return;const isPreparing=nextStatus==="preparing";const question=isPreparing?"Mulai siapkan pesanan #"+order.id.slice(0,8)+"?\n\nStatus akan menjadi Sedang Disiapkan.":"Tandai pesanan #"+order.id.slice(0,8)+" sebagai Siap Dikirim?\n\nPastikan produk sudah benar-benar disiapkan.";if(!window.confirm(question))return;respondingOrderId=order.id;disableOrderActions();setMessage("incomingStatus",isPreparing?"Sedang mengubah status menjadi Sedang Disiapkan...":"Sedang mengubah status menjadi Siap Dikirim...");let responseError=null;try{const {data,error}=await supabaseClient.rpc("advance_antardesa_order",{p_order_id:order.id,p_next_status:nextStatus});if(error)throw error;if(data!==nextStatus)throw new Error("Respons status database tidak sesuai. Periksa pesanan.")}catch(error){responseError=error;console.error("Persiapan pesanan:",error)}finally{respondingOrderId=null}await loadIncomingOrders();if(responseError){setMessage("incomingStatus","Perubahan status belum dapat dipastikan: "+responseError.message+". Periksa status terbaru sebelum mencoba lagi.","error");return}setMessage("incomingStatus",isPreparing?"Pesanan sekarang Sedang Disiapkan. Tombol Siap Dikirim tersedia.":"Pesanan berhasil ditandai Siap Dikirim. Menunggu tahap penugasan Kurir.","success")}
 verifyMerchantAccess();
 </script>
- </body>
+</body>
 </html>
