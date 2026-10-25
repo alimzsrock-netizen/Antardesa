@@ -5,27 +5,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Dashboard Pelanggan | AntarDesa</title>
-
 <link rel="stylesheet" href="style.css">
 
 <style>
-header{
+* { box-sizing:border-box; }
+
+body {
+ margin:0;
+ background:#f5f8f6;
+ color:#20352a;
+ font-family:Arial,sans-serif;
+}
+
+header {
  background:#16805d;
  color:white;
  padding:25px 20px;
  border-radius:0 0 24px 24px;
 }
 
-header h1{margin:0}
-header p{font-size:13px}
+header h1 { margin:0; }
+header p { font-size:13px; }
 
-main{
+main {
  max-width:650px;
  margin:auto;
- padding:20px 16px 90px;
+ padding:20px 16px 100px;
 }
 
-.card{
+.card {
  background:white;
  padding:18px;
  border-radius:15px;
@@ -33,13 +41,13 @@ main{
  margin-bottom:20px;
 }
 
-.grid{
+.grid {
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
  gap:10px;
 }
 
-.service{
+.service {
  background:white;
  border:1px solid #e2e9e4;
  border-radius:12px;
@@ -50,13 +58,141 @@ main{
  cursor:pointer;
 }
 
-.service span{
+.service span {
  display:block;
  font-size:28px;
  margin-bottom:10px;
 }
 
-nav{
+.notice {
+ color:#61746b;
+ font-size:13px;
+ line-height:1.6;
+}
+
+.catalog-controls {
+ display:grid;
+ gap:10px;
+ margin:15px 0;
+}
+
+input,select {
+ width:100%;
+ padding:12px;
+ border:1px solid #ccd9d0;
+ border-radius:9px;
+ background:white;
+ font:inherit;
+}
+
+button { cursor:pointer; }
+
+button:disabled {
+ opacity:.6;
+ cursor:not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+ outline:3px solid #85c9a8;
+ outline-offset:2px;
+}
+
+.refresh {
+ border:0;
+ border-radius:9px;
+ padding:12px;
+ background:#e8f4ee;
+ color:#16805d;
+ font-weight:bold;
+}
+
+.catalog-grid {
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:12px;
+}
+
+.product {
+ border:1px solid #e2e9e4;
+ border-radius:12px;
+ overflow:hidden;
+ background:white;
+ min-width:0;
+}
+
+.product-image {
+ width:100%;
+ height:125px;
+ object-fit:cover;
+ display:block;
+ background:#edf3ee;
+}
+
+.product-placeholder {
+ height:125px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#edf3ee;
+ font-size:36px;
+}
+
+.product-content {
+ padding:12px;
+}
+
+.product-name {
+ display:block;
+ font-size:14px;
+ overflow-wrap:anywhere;
+ margin-bottom:7px;
+}
+
+.product-category {
+ font-size:11px;
+ color:#61746b;
+}
+
+.product-price {
+ display:block;
+ color:#16805d;
+ font-weight:bold;
+ margin:10px 0 6px;
+ font-size:15px;
+}
+
+.product-stock {
+ font-size:12px;
+ color:#61746b;
+}
+
+.product-stock.empty-stock {
+ color:#b91c1c;
+ font-weight:bold;
+}
+
+.product-description {
+ font-size:12px;
+ color:#61746b;
+ line-height:1.5;
+ overflow-wrap:anywhere;
+ white-space:pre-wrap;
+}
+
+.catalog-status {
+ color:#61746b;
+ font-size:13px;
+ line-height:1.6;
+ margin:12px 0;
+}
+
+.catalog-status.error {
+ color:#b91c1c;
+}
+
+nav {
  position:fixed;
  bottom:0;
  left:0;
@@ -68,10 +204,10 @@ nav{
  border-top:1px solid #ddd;
  padding:14px;
  padding-bottom:max(14px,env(safe-area-inset-bottom));
+ z-index:10;
 }
 
-nav a,
-nav button{
+nav a,nav button {
  text-decoration:none;
  color:#16805d;
  font-size:13px;
@@ -83,73 +219,47 @@ nav button{
  cursor:pointer;
 }
 
-.notice{
- color:#61746b;
- font-size:13px;
- line-height:1.6;
-}
+#dashboard { display:none; }
 
-/* Dashboard disembunyikan sebelum pemeriksaan akses. */
-#dashboard{
- display:none;
-}
-
-#accessScreen{
+#accessScreen {
  max-width:460px;
  margin:55px auto;
  padding:24px;
  text-align:center;
 }
 
-#accessScreen p{
- line-height:1.6;
-}
-
-#accessScreen a{
- color:#16805d;
-}
-
-/* Ditampilkan hanya saat dibutuhkan. */
-#accessLink[hidden]{
+#accessScreen p { line-height:1.6; }
+#accessScreen a { color:#16805d; }
+#accessLink[hidden],#retryButton[hidden] {
  display:none;
 }
 
-#retryButton{
+#retryButton {
  margin-top:12px;
  padding:12px 18px;
  background:#16805d;
  color:white;
  border:0;
  border-radius:9px;
- cursor:pointer;
-}
-
-#retryButton[hidden]{
- display:none;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Gerbang pemeriksaan akses -->
 <section id="accessScreen" role="status" aria-live="polite">
  <h2>AntarDesa 🏡</h2>
-
  <p id="accessMessage">
   Sedang memeriksa sesi dan hak akses...
  </p>
-
  <a id="accessLink" href="login.html" hidden>
   Kembali ke Login
  </a>
-
  <button id="retryButton" type="button" hidden>
   Coba Lagi
  </button>
 </section>
 
-<!-- Dashboard tidak terlihat sebelum akses dinyatakan valid. -->
 <div id="dashboard">
 
  <header>
@@ -159,19 +269,17 @@ nav button{
 
  <main>
 
-  <div class="card">
+  <section class="card">
    <h2>Halo, Warga Desa!</h2>
-
    <p class="notice">
     Mau kirim barang atau membutuhkan bantuan
     hari ini? Pilih layanan yang tersedia.
    </p>
-  </div>
+  </section>
 
   <h3>Layanan AntarDesa</h3>
 
   <div class="grid">
-
    <button class="service" type="button"
     onclick="layanan('Antar Paket')">
     <span>📦</span>Antar Paket
@@ -201,33 +309,80 @@ nav button{
     onclick="layanan('Angkut Desa')">
     <span>🚚</span>Angkut Desa
    </button>
-
   </div>
 
   <br>
 
-  <div class="card">
-   <h3>Aktivitas Pesanan</h3>
+  <section class="card" id="pasarDesa">
+   <h3>🏪 Pasar Desa</h3>
 
    <p class="notice">
-    Belum ada pesanan aktif.
+    Jelajahi produk aktif yang ditambahkan oleh
+    Mitra AntarDesa.
    </p>
 
+   <div class="catalog-controls">
+    <label for="searchProduct">Cari produk</label>
+    <input
+     id="searchProduct"
+     type="search"
+     maxlength="100"
+     placeholder="Cari nama atau deskripsi produk..."
+    >
+
+    <label for="filterCategory">Kategori</label>
+    <select id="filterCategory">
+     <option value="">Semua kategori</option>
+     <option value="Sembako">Sembako</option>
+     <option value="Makanan dan Minuman">
+      Makanan dan Minuman
+     </option>
+     <option value="Sayur dan Buah">Sayur dan Buah</option>
+     <option value="Kebutuhan Rumah Tangga">
+      Kebutuhan Rumah Tangga
+     </option>
+     <option value="Lainnya">Lainnya</option>
+    </select>
+
+    <button
+     id="refreshCatalog"
+     class="refresh"
+     type="button"
+    >↻ Muat Ulang Katalog</button>
+   </div>
+
+   <p
+    id="catalogStatus"
+    class="catalog-status"
+    role="status"
+    aria-live="polite"
+   >Katalog belum dimuat.</p>
+
+   <div id="catalogList" class="catalog-grid"></div>
+
+   <p class="notice">
+    Katalog sudah terhubung ke database.
+    Pemesanan dan pembayaran belum diaktifkan.
+   </p>
+  </section>
+
+  <section class="card">
+   <h3>Aktivitas Pesanan</h3>
+   <p class="notice">Belum ada pesanan aktif.</p>
    <p class="notice">
     Sistem pesanan online akan dihubungkan
-    setelah database Supabase siap.
+    pada tahap pengembangan berikutnya.
    </p>
-  </div>
+  </section>
 
-  <div class="card">
+  <section class="card">
    <h3>Informasi</h3>
-
    <p class="notice">
-    AntarDesa v0.2.0 masih dalam tahap
-    pengembangan. Seluruh layanan pada
-    halaman ini merupakan simulasi.
+    AntarDesa v0.2.3.
+    Katalog Pasar Desa terhubung dengan Supabase.
+    Layanan lainnya masih dalam tahap simulasi.
    </p>
-  </div>
+  </section>
 
  </main>
 
@@ -241,16 +396,15 @@ nav button{
 
 </div>
 
-<!-- Supabase JavaScript SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
 "use strict";
 
 /*
- Konfigurasi Supabase AntarDesa.
- Hanya gunakan publishable key.
- Jangan memasukkan secret key.
+ ANTARDESA TAHAP 7.1.42C
+ Katalog Pelanggan dari Supabase.
+ Gunakan publishable key, bukan secret key.
 */
 
 const SUPABASE_URL =
@@ -259,33 +413,26 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
 
-const accessScreen =
- document.getElementById("accessScreen");
+const $ = id => document.getElementById(id);
 
-const accessMessage =
- document.getElementById("accessMessage");
-
-const accessLink =
- document.getElementById("accessLink");
-
-const retryButton =
- document.getElementById("retryButton");
-
-const dashboard =
- document.getElementById("dashboard");
-
-const logoutButton =
- document.getElementById("logoutButton");
+const accessScreen = $("accessScreen");
+const accessMessage = $("accessMessage");
+const accessLink = $("accessLink");
+const retryButton = $("retryButton");
+const dashboard = $("dashboard");
+const logoutButton = $("logoutButton");
 
 let supabaseClient = null;
 let accessApproved = false;
 let checkingAccess = false;
+let catalogLoading = false;
+let catalogLoaded = false;
+let catalogProducts = [];
 
 function showAccessScreen(message, options = {}) {
  accessApproved = false;
  dashboard.style.display = "none";
  accessScreen.style.display = "block";
-
  accessMessage.textContent = message;
  accessLink.hidden = !options.showLogin;
  retryButton.hidden = !options.showRetry;
@@ -298,58 +445,46 @@ function allowAccess() {
 }
 
 /*
- Semua peran resmi yang valid boleh memakai
- halaman Pelanggan.
-
- Akun calon Mitra/Kurir masih memiliki
- peran resmi pelanggan sampai disetujui.
+ Pelanggan boleh mengakses dashboard.
+ Mitra dan Kurir yang sudah terverifikasi
+ juga boleh memakai halaman Pelanggan.
 */
 
 function hasCustomerAccess(userRole) {
- if (!userRole) {
-  return false;
- }
+ if (!userRole) return false;
 
- if (userRole.role === "pelanggan") {
-  return true;
- }
+ if (userRole.role === "pelanggan") return true;
 
  if (
   userRole.role === "mitra" &&
   userRole.is_verified === true
- ) {
-  return true;
- }
+ ) return true;
 
  if (
   userRole.role === "kurir" &&
   userRole.is_verified === true
- ) {
-  return true;
- }
+ ) return true;
 
  return false;
 }
 
 async function verifyCustomerAccess() {
-
- if (checkingAccess) {
-  return;
- }
+ if (checkingAccess) return;
 
  checkingAccess = true;
 
- showAccessScreen("Sedang memeriksa sesi dan hak akses...");
+ showAccessScreen(
+  "Sedang memeriksa sesi dan hak akses..."
+ );
 
  try {
-
   if (
    !window.supabase ||
    !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
   ) {
    showAccessScreen(
     "Konfigurasi Supabase belum siap.",
-    { showRetry: true }
+    { showRetry:true }
    );
    return;
   }
@@ -361,8 +496,7 @@ async function verifyCustomerAccess() {
    );
   }
 
-  // Validasi identitas pengguna melalui Supabase Auth.
-  const { data: authData, error: authError } =
+  const { data:authData, error:authError } =
    await supabaseClient.auth.getUser();
 
   if (authError || !authData?.user) {
@@ -370,23 +504,19 @@ async function verifyCustomerAccess() {
    return;
   }
 
-  // Ambil peran resmi dari database yang dilindungi RLS.
-  const { data: userRole, error: roleError } =
+  const { data:userRole, error:roleError } =
    await supabaseClient
     .from("user_roles")
     .select("role,is_verified")
-    .eq("user_id", authData.user.id)
+    .eq("user_id",authData.user.id)
     .single();
 
   if (roleError) {
-   console.error(
-    "Gagal membaca peran:",
-    roleError.message
-   );
+   console.error("Gagal membaca peran:",roleError);
 
    showAccessScreen(
-    "Hak akses belum dapat diperiksa. Periksa koneksi lalu coba lagi.",
-    { showRetry: true }
+    "Hak akses belum dapat diperiksa. Periksa koneksi.",
+    { showRetry:true }
    );
    return;
   }
@@ -394,97 +524,279 @@ async function verifyCustomerAccess() {
   if (!hasCustomerAccess(userRole)) {
    showAccessScreen(
     "Akses ditolak. Peran akun tidak valid atau belum tersedia.",
-    { showLogin: true }
+    { showLogin:true }
    );
    return;
   }
 
   allowAccess();
+  await loadCatalog();
 
  } catch (error) {
-
-  console.error(
-   "Pemeriksaan akses gagal:",
-   error.message
-  );
+  console.error("Pemeriksaan akses gagal:",error);
 
   showAccessScreen(
    "Terjadi kendala saat memeriksa akses.",
-   { showRetry: true }
+   { showRetry:true }
   );
-
  } finally {
   checkingAccess = false;
  }
-
 }
 
 /*
- Fitur demo hanya dapat digunakan ketika
- pemeriksaan akses telah berhasil.
+ Fitur layanan demo.
+ Pasar Desa diarahkan ke katalog nyata,
+ tetapi belum menerima transaksi.
 */
 
 function layanan(nama) {
+ if (!accessApproved) return;
 
- if (!accessApproved) {
+ if (nama === "Pasar Desa") {
+  $("pasarDesa").scrollIntoView({
+   behavior:"smooth",
+   block:"start"
+  });
   return;
  }
 
  alert(
   "Layanan " + nama +
-  " sedang dikembangkan. " +
-  "Belum menerima pesanan nyata."
+  " sedang dikembangkan. Belum menerima pesanan nyata."
  );
-
 }
 
 /*
- Logout mengakhiri sesi Supabase.
+ Katalog hanya membaca produk aktif.
+ Tidak ada operasi insert/update/delete
+ pada halaman Pelanggan.
 */
 
-logoutButton.addEventListener("click", async function () {
+async function loadCatalog() {
+ if (
+  !accessApproved ||
+  !supabaseClient ||
+  catalogLoading
+ ) return;
 
- if (!supabaseClient) {
+ catalogLoading = true;
+ $("refreshCatalog").disabled = true;
+ $("catalogStatus").className = "catalog-status";
+ $("catalogStatus").textContent =
+  "Sedang mengambil produk dari Supabase...";
+
+ try {
+  const { data,error } = await supabaseClient
+   .from("products")
+   .select(
+    "id,name,description,category,price,stock,image_url,is_active,created_at"
+   )
+   .eq("is_active",true)
+   .order("created_at",{ ascending:false })
+   .limit(100);
+
+  if (error) throw error;
+
+  catalogProducts = data || [];
+  catalogLoaded = true;
+  renderCatalog();
+
+ } catch (error) {
+  console.error("Gagal memuat katalog:",error);
+
+  $("catalogStatus").className =
+   "catalog-status error";
+
+  $("catalogStatus").textContent =
+   "Gagal memuat katalog: " + error.message;
+
+  if (!catalogLoaded) {
+   $("catalogList").replaceChildren();
+  }
+
+ } finally {
+  catalogLoading = false;
+  $("refreshCatalog").disabled = false;
+ }
+}
+
+function renderCatalog() {
+ if (!accessApproved || !catalogLoaded) return;
+
+ const keyword = $("searchProduct")
+  .value.trim().toLocaleLowerCase("id-ID");
+
+ const category = $("filterCategory").value;
+
+ const filtered = catalogProducts.filter(product => {
+  const searchable = (
+   (product.name || "") + " " +
+   (product.description || "") + " " +
+   (product.category || "")
+  ).toLocaleLowerCase("id-ID");
+
+  const matchesKeyword = searchable.includes(keyword);
+  const matchesCategory =
+   !category || product.category === category;
+
+  return matchesKeyword && matchesCategory;
+ });
+
+ const list = $("catalogList");
+ list.replaceChildren();
+
+ $("catalogStatus").className = "catalog-status";
+
+ $("catalogStatus").textContent =
+  "Menampilkan " + filtered.length +
+  " dari " + catalogProducts.length +
+  " produk aktif (maksimal 100 produk terbaru).";
+
+ if (filtered.length === 0) {
+  const empty = document.createElement("p");
+  empty.className = "notice";
+
+  empty.textContent = catalogProducts.length === 0
+   ? "Belum ada produk aktif dari Mitra."
+   : "Tidak ada produk yang cocok dengan pencarian.";
+
+  list.appendChild(empty);
   return;
  }
 
- logoutButton.disabled = true;
+ filtered.forEach(product => {
+  const card = document.createElement("article");
+  card.className = "product";
 
+  let visual;
+
+  if (
+   product.image_url &&
+   /^https:\/\//i.test(product.image_url)
+  ) {
+   visual = document.createElement("img");
+   visual.className = "product-image";
+   visual.src = product.image_url;
+   visual.alt = "Foto " + product.name;
+   visual.loading = "lazy";
+   visual.referrerPolicy = "no-referrer";
+
+   visual.onerror = () => {
+    const placeholder =
+     createProductPlaceholder();
+    visual.replaceWith(placeholder);
+   };
+  } else {
+   visual = createProductPlaceholder();
+  }
+
+  const content = document.createElement("div");
+  content.className = "product-content";
+
+  const categoryText = document.createElement("small");
+  categoryText.className = "product-category";
+  categoryText.textContent =
+   product.category || "Lainnya";
+
+  const name = document.createElement("strong");
+  name.className = "product-name";
+  name.textContent = product.name;
+
+  const price = document.createElement("span");
+  price.className = "product-price";
+  price.textContent =
+   "Rp " + Number(product.price).toLocaleString("id-ID");
+
+  const stock = document.createElement("span");
+  stock.className = "product-stock";
+
+  if (Number(product.stock) <= 0) {
+   stock.classList.add("empty-stock");
+   stock.textContent = "Stok habis";
+  } else {
+   stock.textContent = "Stok: " + product.stock;
+  }
+
+  const description = document.createElement("p");
+  description.className = "product-description";
+  description.textContent = product.description || "";
+
+  content.append(
+   categoryText,
+   name,
+   price,
+   stock,
+   description
+  );
+
+  card.append(visual,content);
+  list.appendChild(card);
+ });
+}
+
+function createProductPlaceholder() {
+ const placeholder = document.createElement("div");
+ placeholder.className = "product-placeholder";
+ placeholder.textContent = "🛍️";
+ placeholder.setAttribute(
+  "aria-label",
+  "Produk tanpa foto"
+ );
+ return placeholder;
+}
+
+$("searchProduct").addEventListener(
+ "input",
+ renderCatalog
+);
+
+$("filterCategory").addEventListener(
+ "change",
+ renderCatalog
+);
+
+$("refreshCatalog").addEventListener(
+ "click",
+ loadCatalog
+);
+
+/*
+ Logout Supabase.
+*/
+
+logoutButton.addEventListener("click",async function() {
+ if (!supabaseClient || logoutButton.disabled) return;
+
+ logoutButton.disabled = true;
  showAccessScreen("Sedang keluar dari akun...");
 
  try {
-
   const { error } =
    await supabaseClient.auth.signOut();
 
-  if (error) {
-   throw error;
-  }
+  if (error) throw error;
 
   window.location.replace("login.html");
 
  } catch (error) {
-
-  console.error("Logout gagal:", error.message);
+  console.error("Logout gagal:",error);
 
   showAccessScreen(
    "Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.",
-   { showRetry: true }
+   { showRetry:true }
   );
 
  } finally {
   logoutButton.disabled = false;
  }
-
 });
 
-retryButton.addEventListener("click", function () {
+retryButton.addEventListener("click",function() {
  verifyCustomerAccess();
 });
 
-// Pemeriksaan dijalankan sebelum dashboard ditampilkan.
 verifyCustomerAccess();
-
 </script>
 
 </body>
