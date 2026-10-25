@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uji Penolakan Pesanan | AntarDesa</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:18px;background:#f4f8f5;color:#20352a;font-family:Arial,sans-serif}
+main{max-width:650px;margin:auto}
+section{background:white;border:1px solid #dae5dd;border-radius:14px;padding:18px;margin:14px 0}
+p{line-height:1.6}
+button{border:0;border-radius:9px;padding:12px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.primary{background:#b91c1c;color:white;width:100%}
+.secondary{background:#e8f4ee;color:#106747}
+.order{border:1px solid #dae5dd;border-radius:10px;padding:13px;margin-top:12px}
+.warning{background:#fff7df;padding:12px;border-radius:9px;font-size:13px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f8f5;padding:12px;border-radius:9px;font-size:12px}
+.error{color:#b91c1c}
+.success{color:#106747}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>AntarDesa 🧪</h1>
+<p>Tahap 7.1.45C-2: Pengujian Penolakan Pesanan</p>
+
+<section id="authScreen">
+ <p id="authStatus">Memeriksa akun Mitra...</p>
+ <a href="login.html">Login</a>
+</section>
+
+<div id="testScreen" hidden>
+<section>
+ <h2>Pesanan Pending</h2>
+ <p class="warning">
+  PERHATIAN: Menolak pesanan akan benar-benar
+  mengubah status database dan mengembalikan stok.
+  Pilih hanya pesanan pengujian.
+ </p>
+ <button id="refresh" class="secondary" type="button">
+  ↻ Muat Ulang
+ </button>
+ <p id="message" role="status"></p>
+ <div id="orders"></div>
+</section>
+
+<section>
+ <h2>Hasil Pengujian</h2>
+ <pre id="result">Belum ada pengujian.</pre>
+</section>
+</div>
+
+<p><a href="mitra.html">Kembali ke Dashboard Mitra</a></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+"use strict";
+
+const client = window.supabase.createClient(
+ "https://gswlkajcizcvrhcfabtg.supabase.co",
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63"
+);
+
+const $ = id => document.getElementById(id);
+
+let merchantId = null;
+let busy = false;
+
+const money = n =>
+ "Rp " + Number(n).toLocaleString("id-ID");
+
+function showResult(value){
+ $("result").textContent =
+  typeof value === "string"
+   ? value
+   : JSON.stringify(value,null,2);
+}
+
+async function init(){
+ try{
+  const {data,error} = await client.auth.getUser();
+
+  if(error || !data?.user){
+   $("authStatus").textContent =
+    "Silakan login sebagai Mitra terlebih dahulu.";
+   return;
+  }
+
+  const id = data.user.id;
+
+  const {data:role,error:roleError} = await client
+   .from("user_roles")
+   .select("role,is_verified")
+   .eq("user_id",id)
+   .single();
+
+  if(
+   roleError ||
+   role?.role !== "mitra" ||
+   role?.is_verified !== true
+  ){
+   $("authStatus").textContent =
+    "Akses ditolak. Diperlukan akun Mitra terverifikasi.";
+   return;
+  }
+
+  merchantId = id;
+  $("authScreen").hidden = true;
+  $("testScreen").hidden = false;
+
+  await loadOrders();
+
+ }catch(e){
+  $("authStatus").textContent = "Error: " + e.message;
+ }
+}
+
+async function loadOrders(){
+ if(!merchantId || busy) return;
+
+ $("refresh").disabled = true;
+ $("message").textContent = "Memuat pesanan...";
+ $("message").className = "";
+ $("orders").replaceChildren();
+
+ try{
+  const {data,error} = await client
+   .from("orders")
+   .select("id,status,total_amount,created_at")
+   .eq("merchant_id",merchantId)
+   .eq("status","pending")
+   .order("created_at",{ascending:false})
+   .limit(20);
+
+  if(error) throw error;
+
+  if(!data?.length){
+   $("message").textContent =
+    "Tidak ada pesanan pending. Buat satu pesanan pengujian melalui Pelanggan terlebih dahulu.";
+   return;
+  }
+
+  $("message").textContent =
+   data.length + " pesanan pending ditemukan.";
+
+  for(const order of data){
+   const card = document.createElement("div");
+   card.className = "order";
+
+   const info = document.createElement("p");
+   info.style.whiteSpace = "pre-wrap";
+   info.textContent =
+    "ID: " + order.id +
+    "\nStatus: " + order.status +
+    "\nTotal: " + money(order.total_amount);
+
+   const button = document.createElement("button");
+   button.type = "button";
+   button.className = "primary";
+   button.textContent = "TOLAK PESANAN INI";
+
+   button.addEventListener("click",()=>{
+    rejectOrder(order.id);
+   });
+
+   card.append(info,button);
+   $("orders").appendChild(card);
+  }
+
+ }catch(e){
+  $("message").textContent = "Error: " + e.message;
+  $("message").className = "error";
+ }finally{
+  $("refresh").disabled = false;
+ }
+}
+
+async function snapshot(orderId){
+ const {data:order,error:orderError} = await client
+  .from("orders")
+  .select("id,status")
+  .eq("id",orderId)
+  .eq("merchant_id",merchantId)
+  .single();
+
+ if(orderError) throw orderError;
+
+ const {data:items,error:itemsError} = await client
+  .from("order_items")
+  .select("product_id,product_name,quantity")
+  .eq("order_id",orderId);
+
+ if(itemsError) throw itemsError;
+
+ if(!items?.length){
+  throw new Error("Rincian pesanan tidak ditemukan.");
+ }
+
+ const ids = [...new Set(items.map(x=>x.product_id))];
+
+ const {data:products,error:productsError} = await client
+  .from("products")
+  .select("id,name,stock")
+  .eq("merchant_id",merchantId)
+  .in("id",ids);
+
+ if(productsError) throw productsError;
+
+ if(products.length !== ids.length){
+  throw new Error("Data stok produk tidak lengkap.");
+ }
+
+ return {
+  status:order.status,
+  items,
+  stocks:products.map(p=>({
+   id:p.id,
+   name:p.name,
+   stock:p.stock
+  }))
+ };
+}
+
+async function rejectOrder(orderId){
+ if(busy) return;
+
+ const confirmed = window.confirm(
+  "Yakin TOLAK pesanan berikut?\n\n" +
+  orderId +
+  "\n\nStatus akan berubah menjadi rejected dan stok dikembalikan."
+ );
+
+ if(!confirmed) return;
+
+ busy = true;
+ $("refresh").disabled = true;
+
+ $("orders").querySelectorAll("button").forEach(
+  button=>button.disabled=true
+ );
+
+ const report = {
+  order_id:orderId,
+  result:"PENGUJIAN DIMULAI"
+ };
+
+ try{
+  showResult("Mengambil kondisi awal...");
+
+  const before = await snapshot(orderId);
+  report.before = before;
+
+  if(before.status !== "pending"){
+   throw new Error("Pesanan bukan lagi pending.");
+  }
+
+  // PANGGILAN PERTAMA: TOLAK
+
+  const first = await client.rpc(
+   "respond_antardesa_order",
+   {
+    p_order_id:orderId,
+    p_decision:"rejected"
+   }
+  );
+
+  if(first.error) throw first.error;
+
+  report.first_rpc = first.data;
+
+  const afterFirst = await snapshot(orderId);
+  report.after_first = afterFirst;
+
+  // PANGGILAN KEDUA: TOLAK LAGI
+
+  const second = await client.rpc(
+   "respond_antardesa_order",
+   {
+    p_order_id:orderId,
+    p_decision:"rejected"
+   }
+  );
+
+  if(second.error) throw second.error;
+
+  report.second_rpc = second.data;
+
+  const afterSecond = await snapshot(orderId);
+  report.after_second = afterSecond;
+
+  // PANGGILAN KETIGA: COBA TERIMA
+  // Seharusnya ditolak oleh fungsi database.
+
+  const conflicting = await client.rpc(
+   "respond_antardesa_order",
+   {
+    p_order_id:orderId,
+    p_decision:"accepted"
+   }
+  );
+
+  report.accept_after_reject_blocked =
+   Boolean(conflicting.error);
+
+  report.conflicting_error =
+   conflicting.error?.message || null;
+
+  const afterConflict = await snapshot(orderId);
+  report.after_conflict = afterConflict;
+
+  // PERIKSA STOK SECARA TERPISAH PER PRODUK.
+
+  const initialStocks = new Map(
+   before.stocks.map(p=>[p.id,p.stock])
+  );
+
+  const firstStocks = new Map(
+   afterFirst.stocks.map(p=>[p.id,p.stock])
+  );
+
+  const secondStocks = new Map(
+   afterSecond.stocks.map(p=>[p.id,p.stock])
+  );
+
+  const finalStocks = new Map(
+   afterConflict.stocks.map(p=>[p.id,p.stock])
+  );
+
+  const expectedReturn = new Map();
+
+  for(const item of before.items){
+   expectedReturn.set(
+    item.product_id,
+    (expectedReturn.get(item.product_id)||0) +
+    item.quantity
+   );
+  }
+
+  const restoredOnce = [...initialStocks.keys()].every(id=>{
+   const expected =
+    initialStocks.get(id) + (expectedReturn.get(id)||0);
+
+   return (
+    firstStocks.get(id) === expected &&
+    secondStocks.get(id) === expected &&
+    finalStocks.get(id) === expected
+   );
+  });
+
+  report.stock_restored_once = restoredOnce;
+
+  report.expected_stock = [...initialStocks.keys()].map(id=>({
+   product_id:id,
+   before:initialStocks.get(id),
+   quantity_returned:expectedReturn.get(id)||0,
+   expected_after:
+    initialStocks.get(id)+(expectedReturn.get(id)||0),
+   actual_after:firstStocks.get(id),
+   after_repeat:secondStocks.get(id),
+   after_conflict:finalStocks.get(id)
+  }));
+
+  const passed =
+   first.data === "rejected" &&
+   second.data === "rejected" &&
+   afterFirst.status === "rejected" &&
+   afterSecond.status === "rejected" &&
+   afterConflict.status === "rejected" &&
+   restoredOnce &&
+   Boolean(conflicting.error);
+
+  report.result = passed ? "LULUS" : "PERLU DIPERIKSA";
+
+  showResult(report);
+
+  $("message").textContent = passed
+   ? "LULUS: Stok kembali tepat satu kali. Status rejected tetap terkunci."
+   : "Hasil belum sesuai. Periksa laporan pengujian.";
+
+  $("message").className = passed ? "success" : "error";
+
+ }catch(e){
+  report.result = "PENGUJIAN TERHENTI";
+  report.error = e.message;
+
+  showResult(report);
+
+  $("message").textContent =
+   "Pengujian terhenti: " + e.message;
+  $("message").className = "error";
+
+ }finally{
+  busy = false;
+  $("refresh").disabled = false;
+  await loadOrders();
+ }
+}
+
+$("refresh").addEventListener("click",loadOrders);
+
+init();
+</script>
+</body>
+</html>
