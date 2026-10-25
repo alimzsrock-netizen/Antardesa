@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uji Persiapan Pesanan | AntarDesa</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f4f8f5;color:#20352a;margin:0;padding:18px}
+main{max-width:650px;margin:auto}
+section{background:white;border:1px solid #dae5dd;border-radius:14px;padding:18px;margin:14px 0}
+button{border:0;border-radius:9px;padding:12px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.primary{background:#16805d;color:white;width:100%}
+.secondary{background:#e8f4ee;color:#106747}
+.order{border:1px solid #dae5dd;border-radius:10px;padding:13px;margin-top:12px;overflow-wrap:anywhere}
+.warning{background:#fff7df;padding:12px;border-radius:9px;line-height:1.6}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f8f5;padding:12px;border-radius:9px;font-size:12px}
+.error{color:#b91c1c}
+.success{color:#106747}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>AntarDesa 🧪</h1>
+<p>Tahap 7.1.46B: Uji Persiapan Pesanan</p>
+
+<section id="authScreen">
+ <p id="authStatus">Memeriksa akun Mitra...</p>
+ <a href="login.html">Login</a>
+</section>
+
+<div id="testScreen" hidden>
+<section>
+ <h2>Pesanan Diterima</h2>
+ <p class="warning">
+  Pilih hanya pesanan pengujian berstatus accepted.
+  Pengujian ini benar-benar akan mengubah status
+  menjadi preparing, kemudian ready.
+  Stok seharusnya tidak berubah.
+ </p>
+ <button id="refresh" class="secondary">↻ Muat Ulang</button>
+ <p id="message" role="status"></p>
+ <div id="orders"></div>
+</section>
+
+<section>
+ <h2>Laporan Pengujian</h2>
+ <pre id="result">Belum ada pengujian.</pre>
+</section>
+</div>
+
+<p><a href="mitra.html">Kembali ke Dashboard Mitra</a></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+"use strict";
+
+const client = window.supabase.createClient(
+ "https://gswlkajcizcvrhcfabtg.supabase.co",
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63"
+);
+
+const $ = id => document.getElementById(id);
+let merchantId = null;
+let busy = false;
+
+function report(value){
+ $("result").textContent =
+  typeof value === "string"
+   ? value
+   : JSON.stringify(value,null,2);
+}
+
+async function init(){
+ try{
+  const {data,error} = await client.auth.getUser();
+
+  if(error || !data?.user){
+   $("authStatus").textContent =
+    "Silakan login sebagai Mitra.";
+   return;
+  }
+
+  const id = data.user.id;
+
+  const {data:role,error:roleError} = await client
+   .from("user_roles")
+   .select("role,is_verified")
+   .eq("user_id",id)
+   .single();
+
+  if(
+   roleError ||
+   role?.role !== "mitra" ||
+   role?.is_verified !== true
+  ){
+   $("authStatus").textContent =
+    "Akses ditolak. Diperlukan Mitra terverifikasi.";
+   return;
+  }
+
+  merchantId = id;
+  $("authScreen").hidden = true;
+  $("testScreen").hidden = false;
+  await loadOrders();
+
+ }catch(e){
+  $("authStatus").textContent = "Error: " + e.message;
+ }
+}
+
+async function loadOrders(){
+ if(!merchantId || busy) return;
+
+ $("refresh").disabled = true;
+ $("message").textContent = "Memuat pesanan...";
+ $("orders").replaceChildren();
+
+ try{
+  const {data,error} = await client
+   .from("orders")
+   .select("id,status,total_amount,created_at")
+   .eq("merchant_id",merchantId)
+   .eq("status","accepted")
+   .order("created_at",{ascending:false})
+   .limit(20);
+
+  if(error) throw error;
+
+  if(!data?.length){
+   $("message").textContent =
+    "Belum ada pesanan accepted. Buat pesanan pengujian lalu terima melalui Dashboard Mitra.";
+   return;
+  }
+
+  $("message").textContent =
+   data.length + " pesanan accepted ditemukan.";
+
+  for(const order of data){
+   const card = document.createElement("div");
+   card.className = "order";
+
+   const info = document.createElement("p");
+   info.style.whiteSpace = "pre-wrap";
+   info.textContent =
+    "ID: " + order.id +
+    "\nStatus: " + order.status +
+    "\nTotal: Rp " +
+    Number(order.total_amount).toLocaleString("id-ID");
+
+   const button = document.createElement("button");
+   button.className = "primary";
+   button.textContent = "JALANKAN UJI PERSIAPAN";
+   button.addEventListener("click",()=>testOrder(order.id));
+
+   card.append(info,button);
+   $("orders").appendChild(card);
+  }
+
+ }catch(e){
+  $("message").textContent = "Error: " + e.message;
+  $("message").className = "error";
+ }finally{
+  $("refresh").disabled = false;
+ }
+}
+
+async function snapshot(orderId){
+ const {data:order,error:orderError} = await client
+  .from("orders")
+  .select("id,status")
+  .eq("id",orderId)
+  .eq("merchant_id",merchantId)
+  .single();
+
+ if(orderError) throw orderError;
+
+ const {data:items,error:itemsError} = await client
+  .from("order_items")
+  .select("product_id,quantity")
+  .eq("order_id",orderId);
+
+ if(itemsError) throw itemsError;
+ if(!items?.length) throw new Error("Rincian pesanan kosong.");
+
+ const ids = [...new Set(items.map(x=>x.product_id))];
+
+ const {data:products,error:productsError} = await client
+  .from("products")
+  .select("id,stock")
+  .eq("merchant_id",merchantId)
+  .in("id",ids);
+
+ if(productsError) throw productsError;
+ if(products.length !== ids.length){
+  throw new Error("Data stok produk tidak lengkap.");
+ }
+
+ return {
+  status:order.status,
+  stocks:products
+   .map(p=>({id:p.id,stock:p.stock}))
+   .sort((a,b)=>a.id.localeCompare(b.id))
+ };
+}
+
+async function callAdvance(id,status){
+ return await client.rpc(
+  "advance_antardesa_order",
+  {
+   p_order_id:id,
+   p_next_status:status
+  }
+ );
+}
+
+async function testOrder(id){
+ if(busy) return;
+
+ if(!confirm(
+  "Jalankan uji pada pesanan " + id +
+  "?\n\nStatus akhirnya akan menjadi ready."
+ )) return;
+
+ busy = true;
+ $("refresh").disabled = true;
+ $("orders").querySelectorAll("button")
+  .forEach(b=>b.disabled=true);
+
+ const result = {order_id:id,result:"DIMULAI"};
+
+ try{
+  const before = await snapshot(id);
+  result.before = before;
+
+  if(before.status !== "accepted"){
+   throw new Error("Status awal bukan accepted.");
+  }
+
+  // Percobaan melompati tahapan harus gagal.
+  const skip = await callAdvance(id,"ready");
+  result.skip_accepted_to_ready_blocked =
+   Boolean(skip.error);
+
+  if(!skip.error){
+   throw new Error(
+    "BAHAYA: accepted berhasil langsung menjadi ready."
+   );
+  }
+
+  const afterSkip = await snapshot(id);
+  result.after_skip = afterSkip;
+
+  if(afterSkip.status !== "accepted"){
+   throw new Error("Status berubah saat uji lompatan.");
+  }
+
+  // Tahap pertama.
+  const first = await callAdvance(id,"preparing");
+  if(first.error) throw first.error;
+  result.first_rpc = first.data;
+
+  const afterFirst = await snapshot(id);
+  result.after_preparing = afterFirst;
+
+  // Ulangi status yang sama.
+  const repeat = await callAdvance(id,"preparing");
+  if(repeat.error) throw repeat.error;
+  result.repeat_rpc = repeat.data;
+
+  const afterRepeat = await snapshot(id);
+  result.after_repeat = afterRepeat;
+
+  // Tahap kedua.
+  const second = await callAdvance(id,"ready");
+  if(second.error) throw second.error;
+  result.second_rpc = second.data;
+
+  const afterSecond = await snapshot(id);
+  result.after_ready = afterSecond;
+
+  // Tidak boleh mundur.
+  const backward = await callAdvance(id,"preparing");
+  result.backward_blocked = Boolean(backward.error);
+
+  const finalState = await snapshot(id);
+  result.final_state = finalState;
+
+  const originalStocks = JSON.stringify(before.stocks);
+
+  const stockUnchanged = [
+   afterSkip,
+   afterFirst,
+   afterRepeat,
+   afterSecond,
+   finalState
+  ].every(s=>JSON.stringify(s.stocks)===originalStocks);
+
+  result.stock_unchanged = stockUnchanged;
+
+  const passed =
+   result.skip_accepted_to_ready_blocked &&
+   first.data === "preparing" &&
+   afterFirst.status === "preparing" &&
+   repeat.data === "preparing" &&
+   afterRepeat.status === "preparing" &&
+   second.data === "ready" &&
+   afterSecond.status === "ready" &&
+   result.backward_blocked &&
+   finalState.status === "ready" &&
+   stockUnchanged;
+
+  result.result = passed ? "LULUS" : "PERLU DIPERIKSA";
+  report(result);
+
+  $("message").textContent = passed
+   ? "LULUS: Urutan status aman dan stok tidak berubah."
+   : "Hasil tidak sesuai. Periksa laporan.";
+  $("message").className = passed ? "success" : "error";
+
+ }catch(e){
+  result.result = "PENGUJIAN TERHENTI";
+  result.error = e.message;
+  report(result);
+  $("message").textContent = "Error: " + e.message;
+  $("message").className = "error";
+
+ }finally{
+  busy = false;
+  $("refresh").disabled = false;
+  await loadOrders();
+ }
+}
+
+$("refresh").addEventListener("click",loadOrders);
+init();
+</script>
+</body>
+</html>
