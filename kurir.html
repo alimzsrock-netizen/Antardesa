@@ -1,587 +1,827 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#116b45">
-  <title>Dashboard Kurir | AntarDesa</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --green: #116b45;
-      --green-dark: #0b4d32;
-      --bg: #f3f7f4;
-      --text: #1c2922;
-      --muted: #66756c;
-      --border: #dce7df;
-      --white: #fff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#116b45">
+<title>Dashboard Kurir | AntarDesa</title>
 
-    * { box-sizing: border-box; }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    header {
-      background: var(--green);
-      color: white;
-      padding: 20px 16px;
-    }
-
-    .header-inner, main {
-      max-width: 900px;
-      margin: auto;
-    }
-
-    header h1 { margin: 0 0 5px; font-size: 24px; }
-    header p { margin: 0; opacity: .9; font-size: 14px; }
-
-    main { padding: 16px; }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      margin-bottom: 18px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 15px;
-      background: var(--green);
-      color: white;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: white;
-      color: var(--green-dark);
-      border: 1px solid var(--border);
-    }
-
-    button.danger { background: #b42318; }
-    button:disabled { opacity: .55; cursor: wait; }
-
-    section { margin-bottom: 24px; }
-    h2 { font-size: 19px; margin: 0 0 12px; }
-
-    .card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 8px #183b2410;
-      overflow-wrap: anywhere;
-    }
-
-    .card h3 { font-size: 16px; margin: 0 0 10px; }
-    .detail { font-size: 14px; line-height: 1.8; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .status {
-      display: inline-block;
-      background: #e4f5eb;
-      color: var(--green-dark);
-      border-radius: 20px;
-      padding: 5px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .card button { margin-top: 12px; width: 100%; }
-    .notice {
-      background: white;
-      border: 1px solid var(--border);
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .notice.error {
-      background: #fff0ef;
-      border-color: #f4c7c3;
-      color: #8d2119;
-    }
-
-    .notice.success {
-      background: #e7f7ec;
-      border-color: #b9e4c7;
-      color: #155d35;
-    }
-
-    .hidden { display: none !important; }
-
-    footer {
-      text-align: center;
-      padding: 12px 16px 28px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-  </style>
+<style>
+:root{
+ --green:#116b45;
+ --green-dark:#0b4d32;
+ --bg:#f3f7f4;
+ --text:#1c2922;
+ --muted:#66756c;
+ --border:#dce7df;
+ --white:#fff;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:system-ui,-apple-system,sans-serif;
+}
+header{
+ background:var(--green);
+ color:white;
+ padding:20px 16px;
+}
+.header-inner,main{
+ max-width:900px;
+ margin:auto;
+}
+header h1{margin:0 0 5px;font-size:24px}
+header p{margin:0;opacity:.9;font-size:14px}
+main{padding:16px}
+.toolbar{
+ display:flex;
+ flex-wrap:wrap;
+ gap:9px;
+ margin-bottom:18px;
+}
+button{
+ border:0;
+ border-radius:10px;
+ padding:12px 15px;
+ background:var(--green);
+ color:white;
+ font-weight:700;
+ font-size:14px;
+ cursor:pointer;
+}
+button.secondary{
+ background:white;
+ color:var(--green-dark);
+ border:1px solid var(--border);
+}
+button.danger{background:#b42318}
+button:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible{
+ outline:3px solid #85c9a8;
+ outline-offset:2px;
+}
+section{margin-bottom:24px}
+h2{font-size:19px;margin:0 0 12px}
+.card{
+ background:var(--white);
+ border:1px solid var(--border);
+ border-radius:14px;
+ padding:16px;
+ margin-bottom:12px;
+ box-shadow:0 2px 8px #183b2410;
+ overflow-wrap:anywhere;
+}
+.card h3{font-size:16px;margin:0 0 10px}
+.detail{font-size:14px;line-height:1.8}
+.muted{color:var(--muted);font-size:13px}
+.status{
+ display:inline-block;
+ background:#e4f5eb;
+ color:var(--green-dark);
+ border-radius:20px;
+ padding:5px 10px;
+ font-size:12px;
+ font-weight:700;
+ margin-bottom:10px;
+}
+.card button{margin-top:12px;width:100%}
+.notice{
+ background:white;
+ border:1px solid var(--border);
+ padding:14px;
+ border-radius:12px;
+ margin-bottom:15px;
+ font-size:14px;
+ line-height:1.6;
+ overflow-wrap:anywhere;
+}
+.notice.error{
+ background:#fff0ef;
+ border-color:#f4c7c3;
+ color:#8d2119;
+}
+.notice.success{
+ background:#e7f7ec;
+ border-color:#b9e4c7;
+ color:#155d35;
+}
+.hidden{display:none!important}
+.delivery-details{
+ margin-top:12px;
+ padding:14px;
+ background:#f4faf6;
+ border:1px solid #cde5d5;
+ border-radius:10px;
+ overflow-wrap:anywhere;
+}
+.delivery-details h4{
+ margin:0 0 10px;
+ color:var(--green-dark);
+}
+.delivery-details .line{
+ font-size:14px;
+ line-height:1.6;
+ margin:8px 0;
+ white-space:pre-wrap;
+}
+.delivery-details .line strong{
+ display:block;
+}
+.delivery-error{
+ margin-top:10px;
+ color:#b42318;
+ font-size:13px;
+ line-height:1.5;
+}
+footer{
+ text-align:center;
+ padding:12px 16px 28px;
+ color:var(--muted);
+ font-size:12px;
+}
+</style>
 </head>
 
 <body>
+
 <header>
-  <div class="header-inner">
-    <h1>🚚 AntarDesa Kurir</h1>
-    <p>Dashboard pengambilan dan pengiriman pesanan</p>
-  </div>
+<div class="header-inner">
+<h1>🚚 AntarDesa Kurir</h1>
+<p>Dashboard pengambilan dan pengiriman pesanan</p>
+</div>
 </header>
 
 <main>
-  <div id="message" class="notice" role="status">
-    Memeriksa akun kurir...
-  </div>
+<div id="message" class="notice" role="status" aria-live="polite">
+ Memeriksa akun kurir...
+</div>
 
-  <div id="dashboard" class="hidden">
-    <div class="toolbar">
-      <button id="refreshBtn" type="button">↻ Muat Ulang</button>
-      <button id="logoutBtn" type="button" class="secondary">Keluar</button>
-    </div>
+<div id="dashboard" class="hidden">
+<div class="toolbar">
+<button id="refreshBtn" type="button">↻ Muat Ulang</button>
+<button id="logoutBtn" type="button" class="secondary">Keluar</button>
+</div>
 
-    <section>
-      <h2>📦 Pesanan Tersedia</h2>
-      <p class="muted">
-        Pesanan berstatus siap dikirim dan belum memiliki kurir.
-      </p>
-      <div id="availableList"></div>
-    </section>
+<section>
+<h2>📦 Pesanan Tersedia</h2>
+<p class="muted">
+ Pesanan berstatus siap dikirim dan belum memiliki kurir.
+ Detail penerima baru dapat dilihat setelah pesanan berhasil diambil.
+</p>
+<div id="availableList"></div>
+</section>
 
-    <section>
-      <h2>🛵 Pengiriman Saya</h2>
-      <div id="activeList"></div>
-    </section>
+<section>
+<h2>🛵 Pengiriman Saya</h2>
+<div id="activeList"></div>
+</section>
 
-    <section>
-      <h2>✅ Riwayat Pengiriman Selesai</h2>
-      <div id="historyList"></div>
-    </section>
-  </div>
+<section>
+<h2>✅ Riwayat Pengiriman Selesai</h2>
+<div id="historyList"></div>
+</section>
+</div>
 </main>
 
 <footer>AntarDesa · Hubungkan desa, dekatkan layanan.</footer>
 
 <script>
 (() => {
-  "use strict";
+"use strict";
 
-  const SUPABASE_URL =
-    "https://gswlkajcizcvrhcfabtg.supabase.co";
+/*
+ ANTARDESA
+ TAHAP 7.1.52C
 
-  const SUPABASE_KEY =
-    "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+ Dashboard Kurir:
+ - Pesanan tersedia
+ - Ambil pesanan
+ - Detail pengantaran melalui RPC
+ - Selesaikan pengiriman
+ - Riwayat pengiriman
+*/
 
-  const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
+const SUPABASE_URL =
+ "https://gswlkajcizcvrhcfabtg.supabase.co";
+
+const SUPABASE_KEY =
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+const $ = id => document.getElementById(id);
+
+let db = null;
+let currentUser = null;
+let busy = false;
+
+function showMessage(message,type=""){
+ const el=$("message");
+ el.textContent=message;
+ el.className="notice"+(type?" "+type:"");
+ el.classList.remove("hidden");
+}
+
+function hideMessage(){
+ $("message").classList.add("hidden");
+}
+
+function makeElement(tag,className,text){
+ const el=document.createElement(tag);
+ if(className) el.className=className;
+ if(text!==undefined) el.textContent=text;
+ return el;
+}
+
+function formatMoney(value){
+ return new Intl.NumberFormat("id-ID",{
+  style:"currency",
+  currency:"IDR",
+  maximumFractionDigits:0
+ }).format(Number(value)||0);
+}
+
+function formatDate(value){
+ if(!value) return "-";
+ const date=new Date(value);
+ if(Number.isNaN(date.getTime())) return "-";
+ return new Intl.DateTimeFormat("id-ID",{
+  dateStyle:"medium",
+  timeStyle:"short"
+ }).format(date);
+}
+
+function shortId(value){
+ return value?String(value).slice(0,8)+"…":"-";
+}
+
+function emptyMessage(container,message){
+ container.replaceChildren(
+  makeElement("p","muted",message)
+ );
+}
+
+function createCard(title,details,status){
+ const card=makeElement("article","card");
+
+ card.appendChild(
+  makeElement("h3","",title)
+ );
+
+ if(status){
+  card.appendChild(
+   makeElement("div","status",status)
+  );
+ }
+
+ const detail=makeElement("div","detail");
+
+ details.forEach(([label,value])=>{
+  const line=makeElement("div");
+  line.appendChild(
+   makeElement("strong","",label+": ")
+  );
+  line.appendChild(
+   document.createTextNode(String(value??"-"))
+  );
+  detail.appendChild(line);
+ });
+
+ card.appendChild(detail);
+ return card;
+}
+
+/* AKSES AKUN */
+
+async function checkCourier(){
+ if(!db){
+  throw new Error("Koneksi Supabase belum tersedia.");
+ }
+
+ const {data,error}=await db.auth.getUser();
+
+ if(error) throw error;
+
+ if(!data?.user){
+  window.location.replace("login.html");
+  return false;
+ }
+
+ currentUser=data.user;
+
+ const {data:roleData,error:roleError}=await db
+  .from("user_roles")
+  .select("role,is_verified")
+  .eq("user_id",currentUser.id)
+  .maybeSingle();
+
+ if(roleError) throw roleError;
+
+ if(
+  !roleData ||
+  roleData.role!=="kurir" ||
+  roleData.is_verified!==true
+ ){
+  $("dashboard").classList.add("hidden");
+  showMessage(
+   "Akses ditolak. Halaman ini hanya untuk akun kurir yang sudah diverifikasi.",
+   "error"
+  );
+  return false;
+ }
+
+ $("dashboard").classList.remove("hidden");
+ hideMessage();
+ return true;
+}
+
+/* PESANAN TERSEDIA */
+
+async function loadAvailable(){
+ const container=$("availableList");
+
+ emptyMessage(
+  container,
+  "Memuat pesanan tersedia..."
+ );
+
+ const {data,error}=await db.rpc(
+  "list_antardesa_ready_deliveries"
+ );
+
+ if(error) throw error;
+
+ container.replaceChildren();
+
+ if(!data?.length){
+  emptyMessage(
+   container,
+   "Belum ada pesanan siap dikirim."
+  );
+  return;
+ }
+
+ data.forEach(order=>{
+  const card=createCard(
+   "Pesanan #"+shortId(order.order_id),
+   [
+    ["ID pesanan",order.order_id],
+    ["ID mitra",shortId(order.merchant_id)],
+    ["Jumlah item",order.item_count],
+    ["Total pesanan",formatMoney(order.total_amount)],
+    ["Dibuat",formatDate(order.created_at)]
+   ],
+   "Siap diambil"
   );
 
-  const $ = id => document.getElementById(id);
-
-  let currentUser = null;
-  let busy = false;
-
-  function showMessage(message, type = "") {
-    const el = $("message");
-    el.textContent = message;
-    el.className = "notice" + (type ? " " + type : "");
-    el.classList.remove("hidden");
-  }
-
-  function hideMessage() {
-    $("message").classList.add("hidden");
-  }
-
-  function makeElement(tag, className, text) {
-    const el = document.createElement(tag);
-    if (className) el.className = className;
-    if (text !== undefined) el.textContent = text;
-    return el;
-  }
-
-  function formatMoney(value) {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0
-    }).format(Number(value) || 0);
-  }
-
-  function formatDate(value) {
-    if (!value) return "-";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "-";
-    return new Intl.DateTimeFormat("id-ID", {
-      dateStyle: "medium",
-      timeStyle: "short"
-    }).format(date);
-  }
-
-  function shortId(value) {
-    return value ? String(value).slice(0, 8) + "…" : "-";
-  }
-
-  function emptyMessage(container, message) {
-    container.replaceChildren(makeElement("p", "muted", message));
-  }
-
-  function createCard(title, details, status) {
-    const card = makeElement("article", "card");
-    card.appendChild(makeElement("h3", "", title));
-
-    if (status) {
-      card.appendChild(makeElement("div", "status", status));
-    }
-
-    const detail = makeElement("div", "detail");
-    details.forEach(([label, value]) => {
-      const line = makeElement("div");
-      const strong = makeElement("strong", "", label + ": ");
-      line.appendChild(strong);
-      line.appendChild(document.createTextNode(String(value)));
-      detail.appendChild(line);
-    });
-
-    card.appendChild(detail);
-    return card;
-  }
-
-  async function checkCourier() {
-    const { data, error } = await db.auth.getUser();
-
-    if (error) throw error;
-
-    if (!data.user) {
-      window.location.href = "login.html";
-      return false;
-    }
-
-    currentUser = data.user;
-
-    const { data: roleData, error: roleError } = await db
-      .from("user_roles")
-      .select("role,is_verified")
-      .eq("user_id", currentUser.id)
-      .maybeSingle();
-
-    if (roleError) throw roleError;
-
-    if (
-      !roleData ||
-      roleData.role !== "kurir" ||
-      roleData.is_verified !== true
-    ) {
-      showMessage(
-        "Akses ditolak. Halaman ini hanya untuk akun kurir yang sudah diverifikasi.",
-        "error"
-      );
-      return false;
-    }
-
-    $("dashboard").classList.remove("hidden");
-    hideMessage();
-    return true;
-  }
-
-  async function loadAvailable() {
-    const container = $("availableList");
-    emptyMessage(container, "Memuat pesanan tersedia...");
-
-    const { data, error } = await db.rpc(
-      "list_antardesa_ready_deliveries"
-    );
-
-    if (error) throw error;
-
-    container.replaceChildren();
-
-    if (!data || data.length === 0) {
-      emptyMessage(container, "Belum ada pesanan siap dikirim.");
-      return;
-    }
-
-    data.forEach(order => {
-      const card = createCard(
-        "Pesanan #" + shortId(order.order_id),
-        [
-          ["ID pesanan", order.order_id],
-          ["ID mitra", shortId(order.merchant_id)],
-          ["Jumlah item", order.item_count],
-          ["Total pesanan", formatMoney(order.total_amount)],
-          ["Dibuat", formatDate(order.created_at)]
-        ],
-        "Siap diambil"
-      );
-
-      const button = makeElement(
-        "button",
-        "",
-        "Ambil Pesanan"
-      );
-
-      button.type = "button";
-      button.addEventListener("click", () => claimOrder(
-        order.order_id,
-        button
-      ));
-
-      card.appendChild(button);
-      container.appendChild(card);
-    });
-  }
-
-  async function loadMyDeliveries() {
-    const active = $("activeList");
-    const history = $("historyList");
-
-    emptyMessage(active, "Memuat pengiriman kamu...");
-    emptyMessage(history, "Memuat riwayat...");
-
-    const { data, error } = await db.rpc(
-      "list_my_antardesa_deliveries"
-    );
-
-    if (error) throw error;
-
-    active.replaceChildren();
-    history.replaceChildren();
-
-    const rows = data || [];
-    const activeRows = rows.filter(
-      item => item.order_status === "delivering"
-    );
-    const completedRows = rows.filter(
-      item => item.order_status === "completed"
-    );
-
-    if (activeRows.length === 0) {
-      emptyMessage(active, "Kamu belum memiliki pengiriman aktif.");
-    }
-
-    if (completedRows.length === 0) {
-      emptyMessage(history, "Belum ada pengiriman yang selesai.");
-    }
-
-    activeRows.forEach(order => {
-      const card = createCard(
-        "Pengiriman #" + shortId(order.order_id),
-        [
-          ["ID pesanan", order.order_id],
-          ["ID mitra", shortId(order.merchant_id)],
-          ["Jumlah item", order.item_count],
-          ["Total pesanan", formatMoney(order.total_amount)],
-          ["Diambil pada", formatDate(order.assigned_at)]
-        ],
-        "Sedang diantar"
-      );
-
-      const button = makeElement(
-        "button",
-        "",
-        "Selesaikan Pengiriman"
-      );
-
-      button.type = "button";
-      button.addEventListener("click", () => completeOrder(
-        order.order_id,
-        button
-      ));
-
-      card.appendChild(button);
-      active.appendChild(card);
-    });
-
-    completedRows.forEach(order => {
-      const card = createCard(
-        "Pesanan #" + shortId(order.order_id),
-        [
-          ["ID pesanan", order.order_id],
-          ["ID mitra", shortId(order.merchant_id)],
-          ["Jumlah item", order.item_count],
-          ["Total pesanan", formatMoney(order.total_amount)],
-          ["Mulai pengiriman", formatDate(order.assigned_at)],
-          ["Selesai pada", formatDate(order.completed_at)]
-        ],
-        "Selesai"
-      );
-
-      history.appendChild(card);
-    });
-  }
-
-  async function refreshDashboard() {
-    if (busy) return;
-
-    busy = true;
-    $("refreshBtn").disabled = true;
-    showMessage("Memperbarui daftar pesanan...");
-
-    try {
-      const allowed = await checkCourier();
-      if (!allowed) return;
-
-      await Promise.all([
-        loadAvailable(),
-        loadMyDeliveries()
-      ]);
-
-      showMessage(
-        "Daftar pesanan berhasil diperbarui.",
-        "success"
-      );
-
-      setTimeout(() => {
-        if ($("message").textContent ===
-            "Daftar pesanan berhasil diperbarui.") {
-          hideMessage();
-        }
-      }, 3000);
-
-    } catch (error) {
-      console.error(error);
-      showMessage(
-        "Gagal memuat data. Periksa koneksi internet lalu coba Muat Ulang. " +
-        (error.message || ""),
-        "error"
-      );
-    } finally {
-      busy = false;
-      $("refreshBtn").disabled = false;
-    }
-  }
-
-  async function claimOrder(orderId, button) {
-    if (busy) return;
-
-    const confirmed = window.confirm(
-      "Ambil pesanan ini untuk kamu antar? " +
-      "Pastikan kamu siap menjalankan pengiriman."
-    );
-
-    if (!confirmed) return;
-
-    busy = true;
-    button.disabled = true;
-
-    try {
-      const { data, error } = await db.rpc(
-        "claim_antardesa_delivery",
-        { p_order_id: orderId }
-      );
-
-      if (error) throw error;
-
-      showMessage(
-        "Pesanan berhasil diambil. ID penugasan: " + data,
-        "success"
-      );
-
-      await loadAvailable();
-      await loadMyDeliveries();
-
-    } catch (error) {
-      console.error(error);
-      showMessage(
-        "Pesanan tidak dapat diambil. Mungkin sudah diambil kurir lain, " +
-        "atau status pesanan sudah berubah. " +
-        (error.message || ""),
-        "error"
-      );
-    } finally {
-      busy = false;
-      button.disabled = false;
-    }
-  }
-
-  async function completeOrder(orderId, button) {
-    if (busy) return;
-
-    const confirmed = window.confirm(
-      "Apakah pengiriman benar-benar sudah selesai dan pesanan telah diterima?"
-    );
-
-    if (!confirmed) return;
-
-    busy = true;
-    button.disabled = true;
-
-    try {
-      const { data, error } = await db.rpc(
-        "complete_antardesa_delivery",
-        { p_order_id: orderId }
-      );
-
-      if (error) throw error;
-
-      if (data !== "completed") {
-        throw new Error("Status pengiriman tidak terduga: " + data);
-      }
-
-      showMessage(
-        "Pengiriman berhasil ditandai selesai.",
-        "success"
-      );
-
-      await loadAvailable();
-      await loadMyDeliveries();
-
-    } catch (error) {
-      console.error(error);
-      showMessage(
-        "Gagal menyelesaikan pengiriman. Periksa status pesanan dan coba lagi. " +
-        (error.message || ""),
-        "error"
-      );
-    } finally {
-      busy = false;
-      button.disabled = false;
-    }
-  }
-
-  $("refreshBtn").addEventListener("click", refreshDashboard);
-
-  $("logoutBtn").addEventListener("click", async () => {
-    if (!window.confirm("Yakin ingin keluar dari akun?")) return;
-
-    $("logoutBtn").disabled = true;
-
-    try {
-      const { error } = await db.auth.signOut();
-      if (error) throw error;
-      window.location.href = "login.html";
-    } catch (error) {
-      console.error(error);
-      showMessage(
-        "Gagal keluar. " + (error.message || ""),
-        "error"
-      );
-      $("logoutBtn").disabled = false;
-    }
+  const button=makeElement(
+   "button",
+   "",
+   "Ambil Pesanan"
+  );
+
+  button.type="button";
+
+  button.addEventListener("click",()=>{
+   claimOrder(order.order_id,button);
   });
 
-  checkCourier()
-    .then(allowed => {
-      if (allowed) refreshDashboard();
-    })
-    .catch(error => {
-      console.error(error);
-      showMessage(
-        "Tidak dapat memeriksa akun. Coba muat ulang halaman. " +
-        (error.message || ""),
-        "error"
-      );
-    });
+  card.appendChild(button);
+  container.appendChild(card);
+ });
+}
+
+/* DETAIL ALAMAT KHUSUS KURIR PEMILIK PENUGASAN */
+
+async function showDeliveryDetails(orderId,button,container){
+ if(busy || button.disabled) return;
+
+ button.disabled=true;
+ button.textContent="Mengambil detail pengantaran...";
+
+ container.replaceChildren();
+ container.classList.remove("hidden");
+
+ try{
+  /*
+   Jangan SELECT langsung dari order_delivery_details.
+   Database memeriksa auth.uid(), role, verifikasi,
+   dan delivery_assignments di dalam RPC ini.
+  */
+
+  const {data,error}=await db.rpc(
+   "get_antardesa_delivery_details",
+   {p_order_id:orderId}
+  );
+
+  if(error) throw error;
+
+  if(!Array.isArray(data) || data.length!==1){
+   throw new Error(
+    "Detail tidak tersedia atau akun ini tidak memiliki akses ke pesanan tersebut."
+   );
+  }
+
+  const item=data[0];
+
+  if(item.order_id!==orderId){
+   throw new Error(
+    "Identitas pesanan tidak sesuai."
+   );
+  }
+
+  const heading=makeElement(
+   "h4",
+   "",
+   "📍 Detail Pengantaran"
+  );
+
+  container.appendChild(heading);
+
+  const fields=[
+   ["Nama penerima",item.recipient_name],
+   ["Nomor telepon",item.recipient_phone],
+   ["Alamat lengkap",item.delivery_address],
+   ["Catatan pengantaran",item.delivery_note||"-"]
+  ];
+
+  fields.forEach(([label,value])=>{
+   const line=makeElement("div","line");
+   const strong=makeElement("strong","",label);
+   const content=makeElement(
+    "span",
+    "",
+    String(value??"-")
+   );
+
+   line.append(strong,content);
+   container.appendChild(line);
+  });
+
+  button.textContent="Sembunyikan Detail Pengantaran";
+  button.disabled=false;
+
+  button.onclick=()=>{
+   container.replaceChildren();
+   container.classList.add("hidden");
+   button.textContent="📍 Lihat Detail Pengantaran";
+   button.onclick=null;
+  };
+
+ }catch(error){
+  console.error("Gagal mengambil detail pengantaran:",error);
+
+  container.appendChild(
+   makeElement(
+    "p",
+    "delivery-error",
+    "Detail tidak dapat ditampilkan. "+(error.message||"")
+   )
+  );
+
+  button.textContent="Coba Lagi Lihat Detail";
+  button.disabled=false;
+ }
+}
+
+function addDetailButton(card,orderId){
+ const button=makeElement(
+  "button",
+  "secondary",
+  "📍 Lihat Detail Pengantaran"
+ );
+
+ button.type="button";
+
+ const container=makeElement(
+  "div",
+  "delivery-details hidden"
+ );
+
+ button.addEventListener("click",()=>{
+  if(button.onclick) return;
+  showDeliveryDetails(orderId,button,container);
+ });
+
+ card.append(button,container);
+}
+
+/* PENGIRIMAN MILIK SAYA */
+
+async function loadMyDeliveries(){
+ const active=$("activeList");
+ const history=$("historyList");
+
+ emptyMessage(
+  active,
+  "Memuat pengiriman kamu..."
+ );
+
+ emptyMessage(
+  history,
+  "Memuat riwayat..."
+ );
+
+ const {data,error}=await db.rpc(
+  "list_my_antardesa_deliveries"
+ );
+
+ if(error) throw error;
+
+ active.replaceChildren();
+ history.replaceChildren();
+
+ const rows=data||[];
+
+ const activeRows=rows.filter(
+  item=>item.order_status==="delivering"
+ );
+
+ const completedRows=rows.filter(
+  item=>item.order_status==="completed"
+ );
+
+ if(!activeRows.length){
+  emptyMessage(
+   active,
+   "Kamu belum memiliki pengiriman aktif."
+  );
+ }
+
+ if(!completedRows.length){
+  emptyMessage(
+   history,
+   "Belum ada pengiriman yang selesai."
+  );
+ }
+
+ activeRows.forEach(order=>{
+  const card=createCard(
+   "Pengiriman #"+shortId(order.order_id),
+   [
+    ["ID pesanan",order.order_id],
+    ["ID mitra",shortId(order.merchant_id)],
+    ["Jumlah item",order.item_count],
+    ["Total pesanan",formatMoney(order.total_amount)],
+    ["Diambil pada",formatDate(order.assigned_at)]
+   ],
+   "Sedang diantar"
+  );
+
+  addDetailButton(card,order.order_id);
+
+  const button=makeElement(
+   "button",
+   "",
+   "Selesaikan Pengiriman"
+  );
+
+  button.type="button";
+
+  button.addEventListener("click",()=>{
+   completeOrder(order.order_id,button);
+  });
+
+  card.appendChild(button);
+  active.appendChild(card);
+ });
+
+ completedRows.forEach(order=>{
+  const card=createCard(
+   "Pesanan #"+shortId(order.order_id),
+   [
+    ["ID pesanan",order.order_id],
+    ["ID mitra",shortId(order.merchant_id)],
+    ["Jumlah item",order.item_count],
+    ["Total pesanan",formatMoney(order.total_amount)],
+    ["Mulai pengiriman",formatDate(order.assigned_at)],
+    ["Selesai pada",formatDate(order.completed_at)]
+   ],
+   "Selesai"
+  );
+
+  /*
+   Fungsi database saat ini juga mengizinkan
+   kurir yang ditugaskan membaca detail pesanan
+   berstatus completed.
+  */
+  addDetailButton(card,order.order_id);
+
+  history.appendChild(card);
+ });
+}
+
+/* MUAT ULANG */
+
+async function refreshDashboard(){
+ if(busy) return;
+
+ busy=true;
+ $("refreshBtn").disabled=true;
+
+ showMessage(
+  "Memperbarui daftar pesanan..."
+ );
+
+ try{
+  const allowed=await checkCourier();
+  if(!allowed) return;
+
+  await Promise.all([
+   loadAvailable(),
+   loadMyDeliveries()
+  ]);
+
+  showMessage(
+   "Daftar pesanan berhasil diperbarui.",
+   "success"
+  );
+
+ }catch(error){
+  console.error(error);
+
+  showMessage(
+   "Gagal memuat data. Periksa koneksi lalu coba Muat Ulang. "+
+   (error.message||""),
+   "error"
+  );
+
+ }finally{
+  busy=false;
+  $("refreshBtn").disabled=false;
+ }
+}
+
+/* AMBIL PESANAN */
+
+async function claimOrder(orderId,button){
+ if(busy) return;
+
+ if(!window.confirm(
+  "Ambil pesanan ini untuk kamu antar? "+
+  "Pastikan kamu siap menjalankan pengiriman."
+ )) return;
+
+ busy=true;
+ button.disabled=true;
+
+ try{
+  const {data,error}=await db.rpc(
+   "claim_antardesa_delivery",
+   {p_order_id:orderId}
+  );
+
+  if(error) throw error;
+
+  showMessage(
+   "Pesanan berhasil diambil. ID penugasan: "+data,
+   "success"
+  );
+
+  await loadAvailable();
+  await loadMyDeliveries();
+
+ }catch(error){
+  console.error(error);
+
+  showMessage(
+   "Pesanan tidak dapat diambil. "+
+   "Mungkin sudah diambil kurir lain atau status berubah. "+
+   (error.message||""),
+   "error"
+  );
+
+ }finally{
+  busy=false;
+  button.disabled=false;
+ }
+}
+
+/* SELESAIKAN PENGIRIMAN */
+
+async function completeOrder(orderId,button){
+ if(busy) return;
+
+ if(!window.confirm(
+  "Apakah pengiriman benar-benar sudah selesai "+
+  "dan pesanan telah diterima?"
+ )) return;
+
+ busy=true;
+ button.disabled=true;
+
+ try{
+  const {data,error}=await db.rpc(
+   "complete_antardesa_delivery",
+   {p_order_id:orderId}
+  );
+
+  if(error) throw error;
+
+  if(data!=="completed"){
+   throw new Error(
+    "Status pengiriman tidak terduga: "+data
+   );
+  }
+
+  showMessage(
+   "Pengiriman berhasil ditandai selesai.",
+   "success"
+  );
+
+  await loadAvailable();
+  await loadMyDeliveries();
+
+ }catch(error){
+  console.error(error);
+
+  showMessage(
+   "Gagal menyelesaikan pengiriman. "+
+   "Periksa status pesanan dan coba lagi. "+
+   (error.message||""),
+   "error"
+  );
+
+ }finally{
+  busy=false;
+  button.disabled=false;
+ }
+}
+
+/* EVENT */
+
+$("refreshBtn").addEventListener(
+ "click",
+ refreshDashboard
+);
+
+$("logoutBtn").addEventListener(
+ "click",
+ async()=>{
+  if(busy) return;
+
+  if(!window.confirm(
+   "Yakin ingin keluar dari akun?"
+  )) return;
+
+  $("logoutBtn").disabled=true;
+
+  try{
+   const {error}=await db.auth.signOut();
+
+   if(error) throw error;
+
+   window.location.replace("login.html");
+
+  }catch(error){
+   console.error(error);
+
+   showMessage(
+    "Gagal keluar. "+(error.message||""),
+    "error"
+   );
+
+   $("logoutBtn").disabled=false;
+  }
+ }
+);
+
+/* INISIALISASI */
+
+async function start(){
+ try{
+  if(!window.supabase){
+   throw new Error(
+    "Library Supabase gagal dimuat. Periksa koneksi internet."
+   );
+  }
+
+  db=window.supabase.createClient(
+   SUPABASE_URL,
+   SUPABASE_KEY
+  );
+
+  const allowed=await checkCourier();
+
+  if(allowed){
+   await refreshDashboard();
+  }
+
+ }catch(error){
+  console.error(error);
+
+  showMessage(
+   "Tidak dapat memulai Dashboard Kurir. "+
+   (error.message||""),
+   "error"
+  );
+ }
+}
+
+start();
+
 })();
 </script>
 </body>
