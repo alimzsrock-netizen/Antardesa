@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uji Selesai Pengiriman | AntarDesa</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f7f5;color:#20352a;padding:18px;margin:0}
+main{max-width:620px;margin:auto}
+section{background:white;border:1px solid #dce6df;border-radius:12px;padding:18px;margin:14px 0}
+input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #cbd8cf;border-radius:8px;font:inherit}
+button{width:100%;padding:13px;border:0;border-radius:8px;background:#16805d;color:white;font-weight:bold;margin-top:10px}
+button:disabled{opacity:.5}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3ef;padding:12px;border-radius:8px}
+small{color:#64766a}
+</style>
+</head>
+<body>
+<main>
+<h2>AntarDesa 🚚</h2>
+<p>Pengujian Tahap 7.1.49B</p>
+
+<section>
+<h3>1. Pemeriksaan akun</h3>
+<div id="session">Memeriksa sesi login...</div>
+<button id="checkSession">Periksa Akun</button>
+</section>
+
+<section>
+<h3>2. Uji penyelesaian</h3>
+<p>Masukkan ID pesanan pengujian yang berstatus delivering dan ditugaskan kepada akun Kurir ini.</p>
+
+<input id="orderId" placeholder="UUID pesanan lengkap" autocomplete="off">
+
+<button id="complete">Selesaikan Pengiriman</button>
+<button id="repeat">Uji Pemanggilan Ulang</button>
+
+<pre id="result">Belum ada pengujian.</pre>
+
+<small>
+PERHATIAN: tindakan pertama yang berhasil akan mengubah status
+pesanan menjadi completed secara permanen melalui fungsi ini.
+Gunakan pesanan khusus pengujian.
+</small>
+</section>
+
+<p><a href="uji-daftar-kurir.html">Kembali ke Uji Daftar Kurir</a></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+"use strict";
+
+const db = window.supabase.createClient(
+ "https://gswlkajcizcvrhcfabtg.supabase.co",
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63"
+);
+
+const $ = id => document.getElementById(id);
+let busy = false;
+
+function show(data){
+ $("result").textContent = JSON.stringify(data,null,2);
+}
+
+async function checkSession(){
+ $("session").textContent = "Memeriksa...";
+
+ try{
+  const {data,error} = await db.auth.getUser();
+
+  if(error || !data.user){
+   $("session").textContent = "Belum login. Login sebagai Kurir.";
+   return;
+  }
+
+  const {data:role,error:roleError} = await db
+   .from("user_roles")
+   .select("role,is_verified")
+   .eq("user_id",data.user.id)
+   .maybeSingle();
+
+  if(roleError) throw roleError;
+
+  $("session").textContent =
+   "User ID: " + data.user.id +
+   "\nRole: " + (role?.role || "tidak ditemukan") +
+   "\nTerverifikasi: " +
+   (role?.is_verified === true ? "Ya" : "Tidak");
+
+ }catch(e){
+  $("session").textContent = "Error: " + e.message;
+ }
+}
+
+async function callComplete(){
+ const id = $("orderId").value.trim();
+
+ const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+ if(!uuidPattern.test(id)){
+  show({result:"GAGAL",message:"ID pesanan bukan UUID yang valid."});
+  return;
+ }
+
+ const {data:userData,error:userError} = await db.auth.getUser();
+
+ if(userError || !userData.user){
+  show({result:"GAGAL",message:"Silakan login sebagai Kurir."});
+  return;
+ }
+
+ const {data:role,error:roleError} = await db
+  .from("user_roles")
+  .select("role,is_verified")
+  .eq("user_id",userData.user.id)
+  .maybeSingle();
+
+ if(roleError || role?.role !== "kurir" || role?.is_verified !== true){
+  show({result:"DITOLAK",message:"Akun bukan Kurir terverifikasi."});
+  return;
+ }
+
+ const {data:assignments,error:assignmentError} = await db.rpc(
+  "list_my_antardesa_deliveries"
+ );
+
+ if(assignmentError){
+  show({result:"GAGAL MEMERIKSA PENUGASAN",message:assignmentError.message});
+  return;
+ }
+
+ const mine = (assignments || []).find(row=>row.order_id === id);
+
+ if(!mine){
+  show({
+   result:"DITOLAK",
+   message:"Pesanan ini tidak ditemukan dalam daftar penugasan akun Kurir ini."
+  });
+  return;
+ }
+
+ if(mine.order_status !== "delivering"){
+  show({
+   result:"DITOLAK",
+   message:"Status harus delivering.",
+   current_status:mine.order_status
+  });
+  return;
+ }
+
+ if(!confirm(
+  "Konfirmasi bahwa pesanan ini benar-benar sudah diterima Pelanggan?\n\n" +
+  "ID: " + id
+ )) return;
+
+ busy = true;
+ $("complete").disabled = true;
+ $("repeat").disabled = true;
+
+ try{
+  const {data,error} = await db.rpc(
+   "complete_antardesa_delivery",
+   {p_order_id:id}
+  );
+
+  if(error){
+   show({result:"GAGAL",message:error.message,code:error.code});
+   return;
+  }
+
+  show({
+   result:data === "completed" ? "BERHASIL" : "PERLU DIPERIKSA",
+   order_id:id,
+   returned_status:data
+  });
+
+ }catch(e){
+  show({result:"ERROR",message:e.message});
+ }finally{
+  busy = false;
+  $("complete").disabled = false;
+  $("repeat").disabled = false;
+ }
+}
+
+async function repeatComplete(){
+ const id = $("orderId").value.trim();
+
+ const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+ if(!uuidPattern.test(id)){
+  show({result:"GAGAL",message:"Masukkan UUID pesanan yang valid."});
+  return;
+ }
+
+ if(!confirm("Uji pemanggilan ulang fungsi penyelesaian untuk pesanan ini?")) return;
+
+ busy = true;
+ $("complete").disabled = true;
+ $("repeat").disabled = true;
+
+ try{
+  const {data,error} = await db.rpc(
+   "complete_antardesa_delivery",
+   {p_order_id:id}
+  );
+
+  if(error){
+   show({result:"GAGAL",message:error.message,code:error.code});
+   return;
+  }
+
+  show({
+   result:data === "completed" ? "BERHASIL" : "PERLU DIPERIKSA",
+   order_id:id,
+   returned_status:data,
+   note:"Periksa completed_at di database untuk memastikan waktu penyelesaian pertama tetap."
+  });
+
+ }catch(e){
+  show({result:"ERROR",message:e.message});
+ }finally{
+  busy = false;
+  $("complete").disabled = false;
+  $("repeat").disabled = false;
+ }
+}
+
+$("checkSession").addEventListener("click",checkSession);
+$("complete").addEventListener("click",()=>{
+ if(!busy) callComplete();
+});
+$("repeat").addEventListener("click",()=>{
+ if(!busy) repeatComplete();
+});
+
+checkSession();
+</script>
+</body>
+</html>
