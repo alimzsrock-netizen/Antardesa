@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uji Checkout V3 | AntarDesa</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#f2f7f3;margin:0;color:#193629}
+main{max-width:650px;margin:auto;padding:18px}
+h1{font-size:23px;color:#12643e}
+.card{background:white;border:1px solid #dce9df;border-radius:14px;padding:17px;margin:14px 0}
+label{display:block;font-weight:650;margin:13px 0 5px}
+input,textarea,select{width:100%;padding:12px;border:1px solid #cad8cf;border-radius:9px;font:inherit}
+button{background:#12643e;color:white;border:0;border-radius:9px;padding:13px;width:100%;font-weight:700;margin-top:12px}
+button:disabled{opacity:.5}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf5ef;padding:12px;border-radius:9px;font-size:13px}
+small{color:#607266}
+a{color:#12643e}
+</style>
+</head>
+<body>
+<main>
+<h1>🧪 Uji Checkout V3</h1>
+<p>Halaman khusus pengujian AntarDesa. Gunakan akun pelanggan dan data penerima fiktif.</p>
+
+<div class="card">
+  <strong id="account">Memeriksa akun...</strong>
+  <p><small>Masuk menggunakan akun pelanggan yang berbeda dari akun pemilik produk.</small></p>
+  <a href="login.html">Buka halaman login</a>
+</div>
+
+<div class="card">
+  <h3>1. Pilih produk pengujian</h3>
+  <button id="loadBtn" type="button">Muat Daftar Produk</button>
+  <label for="product">Produk</label>
+  <select id="product">
+    <option value="">Memuat...</option>
+  </select>
+  <label for="quantity">Jumlah</label>
+  <input id="quantity" type="number" min="1" max="100" value="1">
+</div>
+
+<div class="card">
+  <h3>2. Detail pengantaran</h3>
+
+  <label for="name">Nama penerima</label>
+  <input id="name" maxlength="100" value="Penerima Pengujian">
+
+  <label for="phone">Nomor telepon uji</label>
+  <input id="phone" maxlength="20" value="081234567890">
+
+  <label for="address">Alamat pengujian</label>
+  <textarea id="address" maxlength="500" rows="3">Alamat fiktif pengujian sistem AntarDesa, bukan alamat pelanggan sungguhan.</textarea>
+
+  <label for="note">Catatan pesanan</label>
+  <textarea id="note" maxlength="500" rows="2">Pengujian checkout V3</textarea>
+
+  <label for="deliveryNote">Catatan pengantaran</label>
+  <textarea id="deliveryNote" maxlength="500" rows="2">Pesanan khusus pengujian.</textarea>
+</div>
+
+<div class="card">
+  <h3>3. Jalankan pengujian</h3>
+  <p><small>Pengujian pertama akan membuat satu pesanan nyata di database dan mengurangi stok produk uji sebanyak jumlah yang dipilih.</small></p>
+
+  <button id="firstBtn" type="button">A. Checkout Pertama</button>
+  <button id="repeatBtn" type="button" disabled>B. Ulangi Request yang Sama</button>
+  <button id="differentBtn" type="button" disabled>C. Uji Alamat Berbeda</button>
+
+  <h3>Hasil</h3>
+  <pre id="result">Belum ada pengujian.</pre>
+</div>
+</main>
+
+<script>
+(() => {
+"use strict";
+
+const db = window.supabase.createClient(
+  "https://gswlkajcizcvrhcfabtg.supabase.co",
+  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63"
+);
+
+const $ = id => document.getElementById(id);
+let testPayload = null;
+let firstOrderId = null;
+let busy = false;
+
+function log(message) {
+  $("result").textContent += "\n\n" + message;
+}
+
+function setBusy(value) {
+  busy = value;
+  $("firstBtn").disabled = value || !!testPayload;
+  $("repeatBtn").disabled = value || !firstOrderId;
+  $("differentBtn").disabled = value || !firstOrderId;
+}
+
+async function checkUser() {
+  const {data,error} = await db.auth.getUser();
+  if(error) throw error;
+  if(!data.user) {
+    $("account").textContent = "Belum login. Silakan masuk terlebih dahulu.";
+    return false;
+  }
+  const {data:role,error:roleError} = await db
+    .from("user_roles")
+    .select("role,is_verified")
+    .eq("user_id",data.user.id)
+    .maybeSingle();
+  if(roleError) throw roleError;
+  const permitted = role && (
+    role.role === "pelanggan" ||
+    (["mitra","kurir"].includes(role.role) && role.is_verified === true)
+  );
+  $("account").textContent = permitted
+    ? "Login aktif: " + data.user.email + " (" + role.role + ")"
+    : "Akun tidak memiliki izin pemesanan.";
+  return !!permitted;
+}
+
+async function loadProducts() {
+  const select = $("product");
+  select.replaceChildren(new Option("Memuat produk...", ""));
+  try {
+    const permitted = await checkUser();
+    if(!permitted) throw new Error("Login dengan akun pelanggan terlebih dahulu.");
+
+    const {data,error} = await db
+      .from("products")
+      .select("id,name,price,stock,merchant_id")
+      .eq("is_active",true)
+      .gt("stock",0)
+      .order("created_at",{ascending:false})
+      .limit(30);
+
+    if(error) throw error;
+
+    const {data:userData} = await db.auth.getUser();
+    const products = (data || []).filter(
+      p => p.merchant_id !== userData.user.id
+    );
+
+    select.replaceChildren(new Option("Pilih produk...", ""));
+
+    for(const p of products) {
+      select.add(new Option(
+        p.name + " | Rp" + Number(p.price).toLocaleString("id-ID") +
+        " | Stok " + p.stock,
+        p.id
+      ));
+    }
+
+    if(!products.length) log("Belum ada produk aktif dengan stok tersedia dari mitra lain.");
+    else log("Berhasil memuat " + products.length + " produk.");
+
+  } catch(e) {
+    log("GAGAL memuat produk: " + e.message);
+  }
+}
+
+function readPayload() {
+  const productId = $("product").value;
+  const quantity = Number($("quantity").value);
+
+  if(!productId) throw new Error("Pilih produk terlebih dahulu.");
+  if(!Number.isInteger(quantity) || quantity < 1 || quantity > 100)
+    throw new Error("Jumlah harus 1 sampai 100.");
+
+  return {
+    p_product_id: productId,
+    p_quantity: quantity,
+    p_request_id: crypto.randomUUID(),
+    p_customer_note: $("note").value,
+    p_recipient_name: $("name").value,
+    p_recipient_phone: $("phone").value,
+    p_delivery_address: $("address").value,
+    p_delivery_note: $("deliveryNote").value
+  };
+}
+
+async function callCheckout(payload) {
+  return await db.rpc("create_antardesa_order_v3", payload);
+}
+
+$("loadBtn").onclick = loadProducts;
+
+$("firstBtn").onclick = async () => {
+  if(busy || testPayload) return;
+  try {
+    const allowed = await checkUser();
+    if(!allowed) throw new Error("Akun belum memiliki izin pemesanan.");
+
+    const payload = readPayload();
+    if(!confirm("Buat SATU pesanan uji dan kurangi stok produk uji?")) return;
+
+    setBusy(true);
+    const {data,error} = await callCheckout(payload);
+    if(error) throw error;
+
+    testPayload = payload;
+    firstOrderId = data;
+
+    log("A. CHECKOUT BERHASIL\nOrder ID: " + data +
+      "\nRequest ID: " + payload.p_request_id +
+      "\nSimpan Order ID ini untuk audit SQL.");
+
+  } catch(e) {
+    log("A. GAGAL: " + e.message);
+  } finally {
+    setBusy(false);
+  }
+};
+
+$("repeatBtn").onclick = async () => {
+  if(busy || !firstOrderId) return;
+  setBusy(true);
+  try {
+    const {data,error} = await callCheckout(testPayload);
+    if(error) throw error;
+
+    log(
+      "B. PENGULANGAN\nOrder ID awal: " + firstOrderId +
+      "\nOrder ID ulang: " + data +
+      "\nHasil: " + (data === firstOrderId
+        ? "LULUS, ID sama."
+        : "GAGAL, ID berbeda.")
+    );
+  } catch(e) {
+    log("B. GAGAL: " + e.message);
+  } finally {
+    setBusy(false);
+  }
+};
+
+$("differentBtn").onclick = async () => {
+  if(busy || !firstOrderId) return;
+  setBusy(true);
+  try {
+    const changed = {
+      ...testPayload,
+      p_delivery_address:
+        testPayload.p_delivery_address + " Alamat berbeda."
+    };
+
+    const {data,error} = await callCheckout(changed);
+
+    if(error) {
+      log("C. LULUS, perubahan alamat ditolak:\n" + error.message);
+    } else {
+      log("C. PERLU DIPERIKSA: server mengembalikan Order ID " + data);
+    }
+  } catch(e) {
+    log("C. ERROR: " + e.message);
+  } finally {
+    setBusy(false);
+  }
+};
+
+$("result").textContent = "Halaman siap. Muat produk terlebih dahulu.";
+checkUser().then(ok => {
+  if(ok) loadProducts();
+}).catch(e => log("Pemeriksaan akun gagal: " + e.message));
+})();
+</script>
+</body>
+</html>
