@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uji Respons Pesanan | AntarDesa</title>
+<style>
+*{box-sizing:border-box}
+body{
+ font-family:Arial,sans-serif;background:#f4f8f5;
+ color:#20352a;margin:0;padding:18px;
+}
+main{max-width:650px;margin:auto}
+section{
+ background:white;border:1px solid #dae5dd;
+ border-radius:14px;padding:18px;margin:14px 0;
+}
+h1{font-size:23px}
+p{line-height:1.6}
+small{color:#61746b;overflow-wrap:anywhere}
+button{
+ border:0;border-radius:9px;padding:12px;
+ font-size:14px;font-weight:bold;cursor:pointer;
+}
+button:disabled{opacity:.5}
+.primary{background:#16805d;color:white;width:100%}
+.secondary{background:#e8f4ee;color:#106747}
+.order{
+ border:1px solid #dae5dd;border-radius:10px;
+ padding:13px;margin-top:12px;
+}
+.order p{font-size:13px}
+pre{
+ white-space:pre-wrap;overflow-wrap:anywhere;
+ background:#f4f8f5;padding:12px;border-radius:9px;
+ font-size:12px;
+}
+.error{color:#b91c1c}
+.success{color:#106747}
+.warning{
+ background:#fff7df;padding:12px;border-radius:9px;
+ font-size:13px;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>AntarDesa 🧪</h1>
+<p>Pengujian 7.1.45C-1: Terima Pesanan</p>
+
+<section id="authScreen">
+ <p id="authStatus">Memeriksa akun Mitra...</p>
+ <a href="login.html">Login</a>
+</section>
+
+<div id="testScreen" hidden>
+<section>
+ <h2>Pesanan Pending</h2>
+ <p class="warning">
+  Pilih satu pesanan pengujian. Tombol TERIMA akan
+  benar-benar mengubah status di database.
+  Stok seharusnya tidak berubah.
+ </p>
+ <button class="secondary" id="refresh" type="button">
+  ↻ Muat Ulang
+ </button>
+ <p id="message" role="status"></p>
+ <div id="orders"></div>
+</section>
+
+<section>
+ <h2>Hasil Pengujian</h2>
+ <pre id="result">Belum ada pengujian.</pre>
+</section>
+</div>
+
+<p><a href="mitra.html">Kembali ke Dashboard Mitra</a></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+"use strict";
+
+const client = window.supabase.createClient(
+ "https://gswlkajcizcvrhcfabtg.supabase.co",
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63"
+);
+
+const $ = id => document.getElementById(id);
+let merchantId = null;
+let busy = false;
+
+const money = n =>
+ "Rp " + Number(n).toLocaleString("id-ID");
+
+function log(text){
+ $("result").textContent = text;
+}
+
+async function init(){
+ try{
+  const {data,error} = await client.auth.getUser();
+  if(error || !data?.user){
+   $("authStatus").textContent =
+    "Silakan login menggunakan akun Mitra.";
+   return;
+  }
+
+  const id = data.user.id;
+  const {data:role,error:roleError} = await client
+   .from("user_roles")
+   .select("role,is_verified")
+   .eq("user_id",id)
+   .single();
+
+  if(
+   roleError ||
+   role?.role !== "mitra" ||
+   role?.is_verified !== true
+  ){
+   $("authStatus").textContent =
+    "Akses ditolak. Diperlukan akun Mitra terverifikasi.";
+   return;
+  }
+
+  merchantId = id;
+  $("authScreen").hidden = true;
+  $("testScreen").hidden = false;
+  await loadOrders();
+
+ }catch(e){
+  $("authStatus").textContent = "Error: " + e.message;
+ }
+}
+
+async function loadOrders(){
+ if(!merchantId || busy) return;
+ $("refresh").disabled = true;
+ $("message").textContent = "Memuat pesanan...";
+ $("orders").replaceChildren();
+
+ try{
+  const {data,error} = await client
+   .from("orders")
+   .select("id,status,total_amount,created_at")
+   .eq("merchant_id",merchantId)
+   .eq("status","pending")
+   .order("created_at",{ascending:false})
+   .limit(20);
+
+  if(error) throw error;
+
+  if(!data?.length){
+   $("message").textContent =
+    "Tidak ada pesanan pending untuk Mitra ini.";
+   return;
+  }
+
+  $("message").textContent =
+   data.length + " pesanan pending ditemukan.";
+
+  for(const order of data){
+   const card = document.createElement("div");
+   card.className = "order";
+
+   const info = document.createElement("p");
+   info.textContent =
+    "ID: " + order.id +
+    "\nStatus: " + order.status +
+    "\nTotal: " + money(order.total_amount);
+   info.style.whiteSpace = "pre-wrap";
+
+   const button = document.createElement("button");
+   button.className = "primary";
+   button.type = "button";
+   button.textContent = "TERIMA PESANAN INI";
+
+   button.addEventListener("click",()=>{
+    acceptOrder(order.id);
+   });
+
+   card.append(info,button);
+   $("orders").appendChild(card);
+  }
+
+ }catch(e){
+  $("message").textContent = "Error: " + e.message;
+  $("message").className = "error";
+ }finally{
+  $("refresh").disabled = false;
+ }
+}
+
+async function getSnapshot(orderId){
+ const {data:order,error:orderError} = await client
+  .from("orders")
+  .select("id,status")
+  .eq("id",orderId)
+  .eq("merchant_id",merchantId)
+  .single();
+
+ if(orderError) throw orderError;
+
+ const {data:items,error:itemsError} = await client
+  .from("order_items")
+  .select("product_id,product_name,quantity")
+  .eq("order_id",orderId);
+
+ if(itemsError) throw itemsError;
+ if(!items?.length){
+  throw new Error("Rincian pesanan tidak ditemukan.");
+ }
+
+ const ids = items.map(item=>item.product_id);
+
+ const {data:products,error:productsError} = await client
+  .from("products")
+  .select("id,name,stock")
+  .eq("merchant_id",merchantId)
+  .in("id",ids);
+
+ if(productsError) throw productsError;
+ if(products.length !== new Set(ids).size){
+  throw new Error("Data stok produk belum lengkap.");
+ }
+
+ return {
+  status:order.status,
+  items,
+  stocks:products.map(p=>({
+   id:p.id,
+   name:p.name,
+   stock:p.stock
+  }))
+ };
+}
+
+async function acceptOrder(orderId){
+ if(busy) return;
+
+ const confirmed = window.confirm(
+  "Terima pesanan " + orderId +
+  " secara nyata?\n\n" +
+  "Status akan berubah menjadi accepted. " +
+  "Stok seharusnya tetap."
+ );
+
+ if(!confirmed) return;
+
+ busy = true;
+ $("refresh").disabled = true;
+ $("orders").querySelectorAll("button").forEach(
+  b=>b.disabled=true
+ );
+
+ try{
+  log("Mengambil kondisi awal...");
+
+  const before = await getSnapshot(orderId);
+
+  if(before.status !== "pending"){
+   throw new Error("Pesanan bukan lagi pending.");
+  }
+
+  const first = await client.rpc(
+   "respond_antardesa_order",
+   {
+    p_order_id:orderId,
+    p_decision:"accepted"
+   }
+  );
+  if(first.error) throw first.error;
+
+  const afterFirst = await getSnapshot(orderId);
+
+  const second = await client.rpc(
+   "respond_antardesa_order",
+   {
+    p_order_id:orderId,
+    p_decision:"accepted"
+   }
+  );
+  if(second.error) throw second.error;
+
+  const afterSecond = await getSnapshot(orderId);
+
+  const stockMap = snapshot =>
+   new Map(snapshot.stocks.map(p=>[p.id,p.stock]));
+
+  const initial = stockMap(before);
+  const once = stockMap(afterFirst);
+  const twice = stockMap(afterSecond);
+
+  const unchanged = [...initial.keys()].every(id=>
+   initial.get(id) === once.get(id) &&
+   initial.get(id) === twice.get(id)
+  );
+
+  const passed =
+   first.data === "accepted" &&
+   second.data === "accepted" &&
+   afterFirst.status === "accepted" &&
+   afterSecond.status === "accepted" &&
+   unchanged;
+
+  log(JSON.stringify({
+   result:passed ? "LULUS" : "PERLU DIPERIKSA",
+   order_id:orderId,
+   before,
+   first_rpc:first.data,
+   after_first:afterFirst,
+   second_rpc:second.data,
+   after_second:afterSecond,
+   stock_unchanged:unchanged
+  },null,2));
+
+  $("message").textContent = passed
+   ? "Uji TERIMA berhasil. Status accepted, stok tetap."
+   : "Ada hasil tidak sesuai. Periksa laporan.";
+  $("message").className = passed ? "success" : "error";
+
+ }catch(e){
+  log("PENGUJIAN TERHENTI\n" + e.message);
+  $("message").textContent =
+   "Pengujian terhenti: " + e.message;
+  $("message").className = "error";
+
+ }finally{
+  busy = false;
+  $("refresh").disabled = false;
+  await loadOrders();
+ }
+}
+
+$("refresh").addEventListener("click",loadOrders);
+init();
+</script>
+</body>
+</html>
