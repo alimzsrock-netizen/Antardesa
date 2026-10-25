@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -44,6 +45,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .order-card strong{display:block;margin-bottom:7px}
 .order-card small{color:#61746b;line-height:1.6}
 .order-item{border-top:1px solid #edf1ee;padding-top:8px;margin-top:8px;font-size:13px}
+.delivery-button{width:100%;margin-top:12px}
+.delivery-detail{border-top:1px solid #e2e9e4;padding-top:12px;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}
+.delivery-detail p{margin:8px 0}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;background:white;border-top:1px solid #ddd;padding:14px;padding-bottom:max(14px,env(safe-area-inset-bottom));z-index:10}
 nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:normal;font-family:inherit;background:transparent;border:0;padding:0;cursor:pointer}
 #dashboard{display:none}
@@ -145,7 +149,7 @@ Pembayaran online belum diaktifkan. Gunakan pesanan uji saat menguji fitur baru.
 <section class="card">
 <h3>Informasi</h3>
 <p class="notice">
-AntarDesa v0.2.5. Checkout Pasar Desa V3 dengan detail pengantaran.
+AntarDesa v0.2.6. Checkout Pasar Desa V3 dan riwayat detail pengantaran pelanggan.
 Layanan lainnya masih dalam pengembangan.
 </p>
 </section>
@@ -201,11 +205,11 @@ Layanan lainnya masih dalam pengembangan.
 "use strict";
 
 /*
- ANTARDESA v0.2.5
- CHECKOUT V3 + DETAIL PENGANTARAN
+ ANTARDESA v0.2.6
+ CHECKOUT V3 + DETAIL PENGANTARAN PELANGGAN
 
- Fungsi V2 dipertahankan hanya untuk menyelesaikan
- transaksi V2 lama yang mungkin tertunda di browser.
+ V2 tetap dipertahankan hanya untuk menyelesaikan
+ transaksi V2 lama yang tertunda di browser.
 */
 
 const SUPABASE_URL =
@@ -966,7 +970,7 @@ async function sendPendingOrder(){
  }
 }
 
-/* RIWAYAT PESANAN */
+/* RIWAYAT PESANAN + DETAIL PENGANTARAN */
 
 async function loadOrders(){
  if(
@@ -1048,6 +1052,133 @@ async function loadOrders(){
     card.appendChild(note);
    }
 
+   /* DETAIL PENGANTARAN */
+
+   const deliveryButton = document.createElement("button");
+   deliveryButton.type = "button";
+   deliveryButton.className = "secondary delivery-button";
+   deliveryButton.textContent = "📍 Lihat Detail Pengantaran";
+
+   const deliveryBox = document.createElement("div");
+   deliveryBox.className = "delivery-detail";
+   deliveryBox.hidden = true;
+
+   let detailVisible = false;
+   let detailLoading = false;
+
+   deliveryButton.addEventListener("click",async()=>{
+
+    if(detailLoading) return;
+
+    if(detailVisible){
+     deliveryBox.replaceChildren();
+     deliveryBox.hidden = true;
+     detailVisible = false;
+     deliveryButton.textContent = "📍 Lihat Detail Pengantaran";
+     return;
+    }
+
+    detailLoading = true;
+    deliveryButton.disabled = true;
+    deliveryButton.textContent = "Memuat detail pengantaran...";
+
+    try{
+     if(!accessApproved || !currentUserId){
+      throw new Error("Sesi pelanggan belum siap.");
+     }
+
+     const {data:authData,error:authError} =
+      await supabaseClient.auth.getUser();
+
+     if(
+      authError ||
+      !authData?.user ||
+      authData.user.id !== currentUserId
+     ){
+      throw new Error("Sesi akun berubah. Muat ulang halaman.");
+     }
+
+     const {data,error} = await supabaseClient.rpc(
+      "get_antardesa_customer_delivery_details",
+      {p_order_id:order.id}
+     );
+
+     if(error) throw error;
+
+     if(!Array.isArray(data)){
+      throw new Error("Format respons server tidak sesuai.");
+     }
+
+     deliveryBox.replaceChildren();
+
+     if(data.length === 0){
+      const empty = document.createElement("p");
+      empty.className = "notice";
+      empty.textContent =
+       "Detail pengantaran tidak tersedia untuk pesanan ini. " +
+       "Pesanan lama V2 mungkin belum memiliki data alamat.";
+      deliveryBox.appendChild(empty);
+
+     }else if(data.length === 1){
+      const delivery = data[0];
+
+      if(delivery.order_id !== order.id){
+       throw new Error("Identitas pesanan tidak sesuai.");
+      }
+
+      const heading = document.createElement("strong");
+      heading.textContent = "📍 Detail Pengantaran";
+      deliveryBox.appendChild(heading);
+
+      const fields = [
+       ["Nama penerima",delivery.recipient_name],
+       ["Telepon penerima",delivery.recipient_phone],
+       ["Alamat tujuan",delivery.delivery_address],
+       ["Catatan pengantaran",delivery.delivery_note || "-"]
+      ];
+
+      for(const [label,value] of fields){
+       const field = document.createElement("p");
+       field.className = "notice";
+       field.textContent = label + ":\n" + (value ?? "-");
+       deliveryBox.appendChild(field);
+      }
+
+     }else{
+      throw new Error(
+       "Server mengembalikan lebih dari satu detail."
+      );
+     }
+
+     deliveryBox.hidden = false;
+     detailVisible = true;
+     deliveryButton.textContent =
+      "🔒 Sembunyikan Detail Pengantaran";
+
+    }catch(error){
+     console.error("Gagal memuat detail pengantaran:",error);
+
+     deliveryBox.replaceChildren();
+
+     const message = document.createElement("p");
+     message.className = "catalog-status error";
+     message.textContent =
+      "Gagal mengambil detail pengantaran: " +
+      error.message + "\nSilakan coba lagi.";
+
+     deliveryBox.appendChild(message);
+     deliveryBox.hidden = false;
+     detailVisible = false;
+     deliveryButton.textContent =
+      "↻ Coba Lagi Detail Pengantaran";
+
+    }finally{
+     detailLoading = false;
+     deliveryButton.disabled = false;
+    }
+   });
+
+   card.append(deliveryButton,deliveryBox);
    list.appendChild(card);
   }
 
