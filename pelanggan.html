@@ -1,626 +1,211 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Dashboard Pelanggan | AntarDesa</title>
 <link rel="stylesheet" href="style.css">
-
 <style>
 *{box-sizing:border-box}
-
-body{
- margin:0;
- background:#f5f8f6;
- color:#20352a;
- font-family:Arial,sans-serif;
-}
-
-header{
- background:#16805d;
- color:white;
- padding:25px 20px;
- border-radius:0 0 24px 24px;
-}
-
+body{margin:0;background:#f5f8f6;color:#20352a;font-family:Arial,sans-serif}
+header{background:#16805d;color:white;padding:25px 20px;border-radius:0 0 24px 24px}
 header h1{margin:0}
 header p{font-size:13px}
-
-main{
- max-width:650px;
- margin:auto;
- padding:20px 16px 100px;
-}
-
-.card{
- background:white;
- padding:18px;
- border-radius:15px;
- border:1px solid #e2e9e4;
- margin-bottom:20px;
-}
-
-.grid{
- display:grid;
- grid-template-columns:repeat(3,minmax(0,1fr));
- gap:10px;
-}
-
-.service{
- background:white;
- border:1px solid #e2e9e4;
- border-radius:12px;
- padding:18px 5px;
- text-align:center;
- font-size:12px;
- color:#1c3028;
- cursor:pointer;
-}
-
-.service span{
- display:block;
- font-size:28px;
- margin-bottom:10px;
-}
-
-.notice{
- color:#61746b;
- font-size:13px;
- line-height:1.6;
-}
-
-.catalog-controls{
- display:grid;
- gap:10px;
- margin:15px 0;
-}
-
-input,select,textarea{
- width:100%;
- padding:12px;
- border:1px solid #ccd9d0;
- border-radius:9px;
- background:white;
- font:inherit;
-}
-
-textarea{
- resize:vertical;
- min-height:80px;
-}
-
+main{max-width:650px;margin:auto;padding:20px 16px 100px}
+.card{background:white;padding:18px;border-radius:15px;border:1px solid #e2e9e4;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.service{background:white;border:1px solid #e2e9e4;border-radius:12px;padding:18px 5px;text-align:center;font-size:12px;color:#1c3028;cursor:pointer}
+.service span{display:block;font-size:28px;margin-bottom:10px}
+.notice{color:#61746b;font-size:13px;line-height:1.6}
+.catalog-controls{display:grid;gap:10px;margin:15px 0}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ccd9d0;border-radius:9px;background:white;font:inherit}
+textarea{resize:vertical;min-height:80px}
 button{cursor:pointer}
-
-button:disabled{
- opacity:.6;
- cursor:not-allowed;
-}
-
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible{
- outline:3px solid #85c9a8;
- outline-offset:2px;
-}
-
-.refresh{
- border:0;
- border-radius:9px;
- padding:12px;
- background:#e8f4ee;
- color:#16805d;
- font-weight:bold;
-}
-
-.primary{
- border:0;
- border-radius:9px;
- padding:12px;
- background:#16805d;
- color:white;
- font-weight:bold;
-}
-
-.secondary{
- border:1px solid #ccd9d0;
- border-radius:9px;
- padding:12px;
- background:white;
- color:#20352a;
-}
-
-.catalog-grid{
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
- gap:12px;
-}
-
-.product{
- border:1px solid #e2e9e4;
- border-radius:12px;
- overflow:hidden;
- background:white;
- min-width:0;
-}
-
-.product-image{
- width:100%;
- height:125px;
- object-fit:cover;
- display:block;
- background:#edf3ee;
-}
-
-.product-placeholder{
- height:125px;
- display:flex;
- align-items:center;
- justify-content:center;
- background:#edf3ee;
- font-size:36px;
-}
-
+button:disabled{opacity:.6;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #85c9a8;outline-offset:2px}
+.refresh{border:0;border-radius:9px;padding:12px;background:#e8f4ee;color:#16805d;font-weight:bold}
+.primary{border:0;border-radius:9px;padding:12px;background:#16805d;color:white;font-weight:bold}
+.secondary{border:1px solid #ccd9d0;border-radius:9px;padding:12px;background:white;color:#20352a}
+.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.product{border:1px solid #e2e9e4;border-radius:12px;overflow:hidden;background:white;min-width:0}
+.product-image{width:100%;height:125px;object-fit:cover;display:block;background:#edf3ee}
+.product-placeholder{height:125px;display:flex;align-items:center;justify-content:center;background:#edf3ee;font-size:36px}
 .product-content{padding:12px}
-
-.product-name{
- display:block;
- font-size:14px;
- overflow-wrap:anywhere;
- margin-bottom:7px;
-}
-
-.product-category{
- font-size:11px;
- color:#61746b;
-}
-
-.product-price{
- display:block;
- color:#16805d;
- font-weight:bold;
- margin:10px 0 6px;
- font-size:15px;
-}
-
-.product-stock{
- font-size:12px;
- color:#61746b;
-}
-
-.product-stock.empty-stock{
- color:#b91c1c;
- font-weight:bold;
-}
-
-.product-description{
- font-size:12px;
- color:#61746b;
- line-height:1.5;
- overflow-wrap:anywhere;
- white-space:pre-wrap;
-}
-
-.buy-button{
- width:100%;
- margin-top:12px;
- border:0;
- border-radius:8px;
- padding:10px;
- background:#16805d;
- color:white;
- font-weight:bold;
-}
-
-.catalog-status{
- color:#61746b;
- font-size:13px;
- line-height:1.6;
- margin:12px 0;
-}
-
+.product-name{display:block;font-size:14px;overflow-wrap:anywhere;margin-bottom:7px}
+.product-category{font-size:11px;color:#61746b}
+.product-price{display:block;color:#16805d;font-weight:bold;margin:10px 0 6px;font-size:15px}
+.product-stock{font-size:12px;color:#61746b}
+.product-stock.empty-stock{color:#b91c1c;font-weight:bold}
+.product-description{font-size:12px;color:#61746b;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.buy-button{width:100%;margin-top:12px;border:0;border-radius:8px;padding:10px;background:#16805d;color:white;font-weight:bold}
+.catalog-status{color:#61746b;font-size:13px;line-height:1.6;margin:12px 0}
 .catalog-status.error{color:#b91c1c}
-
-.order-card{
- border:1px solid #e2e9e4;
- border-radius:10px;
- padding:12px;
- margin-top:12px;
- overflow-wrap:anywhere;
-}
-
-.order-card strong{
- display:block;
- margin-bottom:7px;
-}
-
-.order-card small{
- color:#61746b;
- line-height:1.6;
-}
-
-.order-item{
- border-top:1px solid #edf1ee;
- padding-top:8px;
- margin-top:8px;
- font-size:13px;
-}
-
-nav{
- position:fixed;
- bottom:0;
- left:0;
- right:0;
- display:flex;
- justify-content:space-around;
- align-items:center;
- background:white;
- border-top:1px solid #ddd;
- padding:14px;
- padding-bottom:max(14px,env(safe-area-inset-bottom));
- z-index:10;
-}
-
-nav a,nav button{
- text-decoration:none;
- color:#16805d;
- font-size:13px;
- font-weight:normal;
- font-family:inherit;
- background:transparent;
- border:0;
- padding:0;
- cursor:pointer;
-}
-
+.order-card{border:1px solid #e2e9e4;border-radius:10px;padding:12px;margin-top:12px;overflow-wrap:anywhere}
+.order-card strong{display:block;margin-bottom:7px}
+.order-card small{color:#61746b;line-height:1.6}
+.order-item{border-top:1px solid #edf1ee;padding-top:8px;margin-top:8px;font-size:13px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;background:white;border-top:1px solid #ddd;padding:14px;padding-bottom:max(14px,env(safe-area-inset-bottom));z-index:10}
+nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:normal;font-family:inherit;background:transparent;border:0;padding:0;cursor:pointer}
 #dashboard{display:none}
-
-#accessScreen{
- max-width:460px;
- margin:55px auto;
- padding:24px;
- text-align:center;
-}
-
+#accessScreen{max-width:460px;margin:55px auto;padding:24px;text-align:center}
 #accessScreen p{line-height:1.6}
 #accessScreen a{color:#16805d}
-
-#accessLink[hidden],
-#retryButton[hidden],
-[hidden]{
- display:none!important;
-}
-
-#retryButton{
- margin-top:12px;
- padding:12px 18px;
- background:#16805d;
- color:white;
- border:0;
- border-radius:9px;
-}
-
-/* Formulir pembelian */
-
-.modal{
- position:fixed;
- inset:0;
- z-index:30;
- background:rgba(0,0,0,.55);
- display:flex;
- align-items:center;
- justify-content:center;
- padding:15px;
-}
-
-.modal-panel{
- background:white;
- width:100%;
- max-width:450px;
- max-height:90vh;
- overflow-y:auto;
- border-radius:16px;
- padding:20px;
-}
-
+[hidden]{display:none!important}
+#retryButton{margin-top:12px;padding:12px 18px;background:#16805d;color:white;border:0;border-radius:9px}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:15px}
+.modal-panel{background:white;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;border-radius:16px;padding:20px}
 .modal-panel h3{margin-top:0}
-
-.modal-panel label{
- display:block;
- font-size:13px;
- font-weight:bold;
- margin:14px 0 6px;
-}
-
-.modal-actions{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
- margin-top:15px;
-}
-
-#checkoutMessage{
- white-space:pre-wrap;
- overflow-wrap:anywhere;
- line-height:1.6;
- font-size:13px;
- color:#51685a;
-}
-
+.modal-panel label{display:block;font-size:13px;font-weight:bold;margin:14px 0 6px}
+.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+#checkoutMessage{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:13px;color:#51685a}
 #checkoutMessage.error{color:#b91c1c}
-
-#pendingNotice{
- border:1px solid #e3c67d;
- background:#fff9e8;
- border-radius:10px;
- padding:12px;
- margin-bottom:15px;
-}
-
-#pendingNotice p{
- font-size:13px;
- line-height:1.6;
-}
+#pendingNotice{border:1px solid #e3c67d;background:#fff9e8;border-radius:10px;padding:12px;margin-bottom:15px}
+#pendingNotice p{font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.field-help{font-size:12px;color:#61746b;line-height:1.5}
+.required{color:#b91c1c}
 </style>
 </head>
-
 <body>
 
 <section id="accessScreen" role="status" aria-live="polite">
- <h2>AntarDesa 🏡</h2>
- <p id="accessMessage">
-  Sedang memeriksa sesi dan hak akses...
- </p>
- <a id="accessLink" href="login.html" hidden>
-  Kembali ke Login
- </a>
- <button id="retryButton" type="button" hidden>
-  Coba Lagi
- </button>
+<h2>AntarDesa 🏡</h2>
+<p id="accessMessage">Sedang memeriksa sesi dan hak akses...</p>
+<a id="accessLink" href="login.html" hidden>Kembali ke Login</a>
+<button id="retryButton" type="button" hidden>Coba Lagi</button>
 </section>
 
 <div id="dashboard">
-
 <header>
- <h1>AntarDesa.</h1>
- <p>Selamat datang, Pelanggan 👋</p>
+<h1>AntarDesa.</h1>
+<p>Selamat datang, Pelanggan 👋</p>
 </header>
 
 <main>
+<section class="card">
+<h2>Halo, Warga Desa!</h2>
+<p class="notice">Mau kirim barang atau membutuhkan bantuan hari ini? Pilih layanan yang tersedia.</p>
+</section>
 
- <section class="card">
-  <h2>Halo, Warga Desa!</h2>
-  <p class="notice">
-   Mau kirim barang atau membutuhkan bantuan
-   hari ini? Pilih layanan yang tersedia.
-  </p>
- </section>
+<h3>Layanan AntarDesa</h3>
+<div class="grid">
+<button class="service" type="button" onclick="layanan('Antar Paket')"><span>📦</span>Antar Paket</button>
+<button class="service" type="button" onclick="layanan('Titip Belanja')"><span>🛒</span>Titip Belanja</button>
+<button class="service" type="button" onclick="layanan('Antar Makan')"><span>🍜</span>Antar Makan</button>
+<button class="service" type="button" onclick="layanan('Pasar Desa')"><span>🏪</span>Pasar Desa</button>
+<button class="service" type="button" onclick="layanan('Sekalian Jalan')"><span>🛵</span>Sekalian Jalan</button>
+<button class="service" type="button" onclick="layanan('Angkut Desa')"><span>🚚</span>Angkut Desa</button>
+</div>
 
- <h3>Layanan AntarDesa</h3>
+<br>
 
- <div class="grid">
-  <button class="service" type="button"
-   onclick="layanan('Antar Paket')">
-   <span>📦</span>Antar Paket
-  </button>
+<section class="card" id="pasarDesa">
+<h3>🏪 Pasar Desa</h3>
+<p class="notice">Jelajahi produk aktif yang ditambahkan oleh Mitra AntarDesa.</p>
 
-  <button class="service" type="button"
-   onclick="layanan('Titip Belanja')">
-   <span>🛒</span>Titip Belanja
-  </button>
+<div id="pendingNotice" hidden>
+<strong>⚠️ Ada transaksi yang perlu diperiksa</strong>
+<p id="pendingDescription"></p>
+<button id="resumeOrder" class="primary" type="button">Periksa / Coba Lagi Transaksi</button>
+</div>
 
-  <button class="service" type="button"
-   onclick="layanan('Antar Makan')">
-   <span>🍜</span>Antar Makan
-  </button>
+<div class="catalog-controls">
+<label for="searchProduct">Cari produk</label>
+<input id="searchProduct" type="search" maxlength="100" placeholder="Cari nama atau deskripsi produk...">
 
-  <button class="service" type="button"
-   onclick="layanan('Pasar Desa')">
-   <span>🏪</span>Pasar Desa
-  </button>
+<label for="filterCategory">Kategori</label>
+<select id="filterCategory">
+<option value="">Semua kategori</option>
+<option value="Sembako">Sembako</option>
+<option value="Makanan dan Minuman">Makanan dan Minuman</option>
+<option value="Sayur dan Buah">Sayur dan Buah</option>
+<option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option>
+<option value="Lainnya">Lainnya</option>
+</select>
 
-  <button class="service" type="button"
-   onclick="layanan('Sekalian Jalan')">
-   <span>🛵</span>Sekalian Jalan
-  </button>
+<button id="refreshCatalog" class="refresh" type="button">↻ Muat Ulang Katalog</button>
+</div>
 
-  <button class="service" type="button"
-   onclick="layanan('Angkut Desa')">
-   <span>🚚</span>Angkut Desa
-  </button>
- </div>
+<p id="catalogStatus" class="catalog-status" role="status" aria-live="polite">Katalog belum dimuat.</p>
+<div id="catalogList" class="catalog-grid"></div>
 
- <br>
+<p class="notice">
+Pemesanan produk dan penyimpanan alamat tujuan sudah terhubung ke database.
+Pembayaran online belum diaktifkan. Gunakan pesanan uji saat menguji fitur baru.
+</p>
+</section>
 
- <section class="card" id="pasarDesa">
-  <h3>🏪 Pasar Desa</h3>
+<section class="card" id="pesananSaya">
+<h3>📋 Aktivitas Pesanan</h3>
+<p class="notice">Menampilkan lima pesanan terbaru.</p>
+<button id="refreshOrders" class="refresh" type="button">↻ Muat Ulang Pesanan</button>
+<p id="ordersStatus" class="catalog-status" role="status" aria-live="polite">Belum dimuat.</p>
+<div id="ordersList"></div>
+</section>
 
-  <p class="notice">
-   Jelajahi produk aktif yang ditambahkan
-   oleh Mitra AntarDesa.
-  </p>
-
-  <div id="pendingNotice" hidden>
-   <strong>⚠️ Ada transaksi yang perlu diperiksa</strong>
-   <p id="pendingDescription"></p>
-   <button
-    id="resumeOrder"
-    class="primary"
-    type="button"
-   >Periksa / Coba Lagi Transaksi</button>
-  </div>
-
-  <div class="catalog-controls">
-   <label for="searchProduct">Cari produk</label>
-   <input
-    id="searchProduct"
-    type="search"
-    maxlength="100"
-    placeholder="Cari nama atau deskripsi produk..."
-   >
-
-   <label for="filterCategory">Kategori</label>
-   <select id="filterCategory">
-    <option value="">Semua kategori</option>
-    <option value="Sembako">Sembako</option>
-    <option value="Makanan dan Minuman">
-     Makanan dan Minuman
-    </option>
-    <option value="Sayur dan Buah">
-     Sayur dan Buah
-    </option>
-    <option value="Kebutuhan Rumah Tangga">
-     Kebutuhan Rumah Tangga
-    </option>
-    <option value="Lainnya">Lainnya</option>
-   </select>
-
-   <button
-    id="refreshCatalog"
-    class="refresh"
-    type="button"
-   >↻ Muat Ulang Katalog</button>
-  </div>
-
-  <p
-   id="catalogStatus"
-   class="catalog-status"
-   role="status"
-   aria-live="polite"
-  >Katalog belum dimuat.</p>
-
-  <div id="catalogList" class="catalog-grid"></div>
-
-  <p class="notice">
-   Pemesanan produk Pasar Desa sudah terhubung
-   ke database. Pembayaran online dan pengiriman
-   belum diaktifkan.
-  </p>
- </section>
-
- <section class="card" id="pesananSaya">
-  <h3>📋 Aktivitas Pesanan</h3>
-
-  <p class="notice">
-   Menampilkan lima pesanan terbaru.
-  </p>
-
-  <button
-   id="refreshOrders"
-   class="refresh"
-   type="button"
-  >↻ Muat Ulang Pesanan</button>
-
-  <p
-   id="ordersStatus"
-   class="catalog-status"
-   role="status"
-   aria-live="polite"
-  >Belum dimuat.</p>
-
-  <div id="ordersList"></div>
- </section>
-
- <section class="card">
-  <h3>Informasi</h3>
-  <p class="notice">
-   AntarDesa v0.2.4.
-   Katalog dan pemesanan Pasar Desa
-   terhubung dengan Supabase.
-   Layanan lainnya masih tahap simulasi.
-  </p>
- </section>
-
+<section class="card">
+<h3>Informasi</h3>
+<p class="notice">
+AntarDesa v0.2.5. Checkout Pasar Desa V3 dengan detail pengantaran.
+Layanan lainnya masih dalam pengembangan.
+</p>
+</section>
 </main>
 
 <nav aria-label="Navigasi Pelanggan">
- <a href="pelanggan.html">⌂ Beranda</a>
- <a href="#pesananSaya">▤ Pesanan Saya</a>
- <button id="logoutButton" type="button">
-  ♙ Keluar
- </button>
+<a href="pelanggan.html">⌂ Beranda</a>
+<a href="#pesananSaya">▤ Pesanan Saya</a>
+<button id="logoutButton" type="button">♙ Keluar</button>
 </nav>
-
 </div>
 
-<!-- MODAL PEMESANAN -->
+<div id="checkoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" hidden>
+<div class="modal-panel">
+<h3 id="checkoutTitle">🛒 Buat Pesanan</h3>
+<p id="checkoutProductName"></p>
+<p id="checkoutProductInfo" class="notice"></p>
 
-<div
- id="checkoutModal"
- class="modal"
- role="dialog"
- aria-modal="true"
- aria-labelledby="checkoutTitle"
- hidden
->
- <div class="modal-panel">
+<label for="checkoutQuantity">Jumlah pembelian <span class="required">*</span></label>
+<input id="checkoutQuantity" type="number" min="1" max="100" step="1" value="1" required>
 
-  <h3 id="checkoutTitle">🛒 Buat Pesanan</h3>
+<label for="checkoutNote">Catatan untuk Mitra (opsional)</label>
+<textarea id="checkoutNote" maxlength="500" placeholder="Contoh: Mohon pilih yang masih segar"></textarea>
 
-  <p id="checkoutProductName"></p>
-  <p id="checkoutProductInfo" class="notice"></p>
+<h3 style="margin-top:24px">📍 Detail Pengantaran</h3>
+<p class="field-help">Isi informasi penerima dengan benar sebelum mengirim pesanan.</p>
 
-  <label for="checkoutQuantity">
-   Jumlah pembelian
-  </label>
-  <input
-   id="checkoutQuantity"
-   type="number"
-   min="1"
-   max="100"
-   step="1"
-   value="1"
-  >
+<label for="recipientName">Nama penerima <span class="required">*</span></label>
+<input id="recipientName" type="text" minlength="2" maxlength="100" autocomplete="name" placeholder="Nama penerima pesanan" required>
 
-  <label for="checkoutNote">
-   Catatan untuk Mitra (opsional)
-  </label>
-  <textarea
-   id="checkoutNote"
-   maxlength="500"
-   placeholder="Contoh: Mohon pilih yang masih segar"
-  ></textarea>
+<label for="recipientPhone">Nomor telepon penerima <span class="required">*</span></label>
+<input id="recipientPhone" type="tel" inputmode="tel" minlength="8" maxlength="20" placeholder="Contoh: 081234567890" required>
+<p class="field-help">Gunakan angka 8 sampai 20 digit. Boleh diawali tanda +.</p>
 
-  <p id="checkoutTotal">
-   Total: Rp 0
-  </p>
+<label for="deliveryAddress">Alamat lengkap tujuan <span class="required">*</span></label>
+<textarea id="deliveryAddress" minlength="10" maxlength="500" placeholder="Desa, dusun, RT/RW, nomor rumah, dan patokan lokasi" required></textarea>
 
-  <p
-   id="checkoutMessage"
-   role="status"
-   aria-live="polite"
-  ></p>
+<label for="deliveryNote">Catatan pengantaran (opsional)</label>
+<textarea id="deliveryNote" maxlength="500" placeholder="Contoh: Rumah pagar hijau, dekat balai desa"></textarea>
 
-  <div class="modal-actions">
-   <button
-    id="closeCheckout"
-    class="secondary"
-    type="button"
-   >Tutup</button>
+<p id="checkoutTotal">Total: Rp 0</p>
+<p id="checkoutMessage" role="status" aria-live="polite"></p>
 
-   <button
-    id="submitOrder"
-    class="primary"
-    type="button"
-   >Konfirmasi Pesanan</button>
-  </div>
-
- </div>
+<div class="modal-actions">
+<button id="closeCheckout" class="secondary" type="button">Tutup</button>
+<button id="submitOrder" class="primary" type="button">Konfirmasi Pesanan</button>
+</div>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
 <script>
 "use strict";
 
 /*
- ANTARDESA v0.2.4
- TAHAP 7.1.44A
+ ANTARDESA v0.2.5
+ CHECKOUT V3 + DETAIL PENGANTARAN
 
- Katalog + pesanan nyata via RPC V2.
- Gunakan publishable key, bukan secret key.
+ Fungsi V2 dipertahankan hanya untuk menyelesaikan
+ transaksi V2 lama yang mungkin tertunda di browser.
 */
 
 const SUPABASE_URL =
@@ -649,12 +234,13 @@ let currentUserId = null;
 let selectedProduct = null;
 let orderBusy = false;
 let pendingRequest = null;
+let pendingCorrupt = false;
 
 const rupiah = value =>
  "Rp " + Number(value).toLocaleString("id-ID");
 
-function pendingStorageKey(){
- return "antardesa_pending_order_v2_" + currentUserId;
+function pendingStorageKey(version){
+ return "antardesa_pending_order_" + version + "_" + currentUserId;
 }
 
 function showAccessScreen(message,options={}){
@@ -672,35 +258,27 @@ function allowAccess(){
  dashboard.style.display = "block";
 }
 
-function hasCustomerAccess(userRole){
- if(!userRole) return false;
-
- if(userRole.role === "pelanggan") return true;
-
+function hasCustomerAccess(role){
+ if(!role) return false;
+ if(role.role === "pelanggan") return true;
  return (
-  ["mitra","kurir"].includes(userRole.role) &&
-  userRole.is_verified === true
+  ["mitra","kurir"].includes(role.role) &&
+  role.is_verified === true
  );
 }
 
 async function verifyCustomerAccess(){
  if(checkingAccess) return;
-
  checkingAccess = true;
 
- showAccessScreen(
-  "Sedang memeriksa sesi dan hak akses..."
- );
+ showAccessScreen("Sedang memeriksa sesi dan hak akses...");
 
  try{
   if(
    !window.supabase ||
    !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
   ){
-   showAccessScreen(
-    "Konfigurasi Supabase belum siap.",
-    {showRetry:true}
-   );
+   showAccessScreen("Konfigurasi Supabase belum siap.",{showRetry:true});
    return;
   }
 
@@ -730,7 +308,6 @@ async function verifyCustomerAccess(){
 
   if(roleError){
    console.error(roleError);
-
    showAccessScreen(
     "Hak akses belum dapat diperiksa. Periksa koneksi.",
     {showRetry:true}
@@ -750,19 +327,14 @@ async function verifyCustomerAccess(){
   allowAccess();
   renderPendingNotice();
 
-  await Promise.all([
-   loadCatalog(),
-   loadOrders()
-  ]);
+  await Promise.all([loadCatalog(),loadOrders()]);
 
  }catch(error){
   console.error(error);
-
   showAccessScreen(
    "Terjadi kendala saat memeriksa akses.",
    {showRetry:true}
   );
-
  }finally{
   checkingAccess = false;
  }
@@ -790,11 +362,7 @@ function layanan(nama){
 /* KATALOG */
 
 async function loadCatalog(){
- if(
-  !accessApproved ||
-  !supabaseClient ||
-  catalogLoading
- ) return;
+ if(!accessApproved || !supabaseClient || catalogLoading) return;
 
  catalogLoading = true;
  $("refreshCatalog").disabled = true;
@@ -820,16 +388,11 @@ async function loadCatalog(){
 
  }catch(error){
   console.error("Gagal memuat katalog:",error);
-
-  $("catalogStatus").className =
-   "catalog-status error";
-
+  $("catalogStatus").className = "catalog-status error";
   $("catalogStatus").textContent =
    "Gagal memuat katalog: " + error.message;
 
-  if(!catalogLoaded){
-   $("catalogList").replaceChildren();
-  }
+  if(!catalogLoaded) $("catalogList").replaceChildren();
 
  }finally{
   catalogLoading = false;
@@ -841,10 +404,7 @@ function createProductPlaceholder(){
  const placeholder = document.createElement("div");
  placeholder.className = "product-placeholder";
  placeholder.textContent = "🛍️";
- placeholder.setAttribute(
-  "aria-label",
-  "Produk tanpa foto"
- );
+ placeholder.setAttribute("aria-label","Produk tanpa foto");
  return placeholder;
 }
 
@@ -881,11 +441,9 @@ function renderCatalog(){
  if(filtered.length === 0){
   const empty = document.createElement("p");
   empty.className = "notice";
-
   empty.textContent = catalogProducts.length === 0
    ? "Belum ada produk aktif dari Mitra."
    : "Tidak ada produk yang cocok dengan pencarian.";
-
   list.appendChild(empty);
   return;
  }
@@ -896,21 +454,15 @@ function renderCatalog(){
 
   let visual;
 
-  if(
-   product.image_url &&
-   /^https:\/\//i.test(product.image_url)
-  ){
+  if(product.image_url && /^https:\/\//i.test(product.image_url)){
    visual = document.createElement("img");
    visual.className = "product-image";
    visual.src = product.image_url;
    visual.alt = "Foto " + product.name;
    visual.loading = "lazy";
    visual.referrerPolicy = "no-referrer";
-
    visual.onerror = ()=>{
-    visual.replaceWith(
-     createProductPlaceholder()
-    );
+    visual.replaceWith(createProductPlaceholder());
    };
   }else{
    visual = createProductPlaceholder();
@@ -921,8 +473,7 @@ function renderCatalog(){
 
   const categoryText = document.createElement("small");
   categoryText.className = "product-category";
-  categoryText.textContent =
-   product.category || "Lainnya";
+  categoryText.textContent = product.category || "Lainnya";
 
   const name = document.createElement("strong");
   name.className = "product-name";
@@ -951,34 +502,27 @@ function renderCatalog(){
   buy.className = "buy-button";
   buy.textContent = "Pesan Sekarang";
 
-  const ownProduct =
-   product.merchant_id === currentUserId;
+  const ownProduct = product.merchant_id === currentUserId;
 
   buy.disabled =
    Number(product.stock) <= 0 ||
    ownProduct ||
    !!pendingRequest ||
+   pendingCorrupt ||
    orderBusy;
 
   if(ownProduct){
    buy.textContent = "Produk Milik Anda";
   }else if(Number(product.stock) <= 0){
    buy.textContent = "Stok Habis";
-  }else if(pendingRequest){
-   buy.textContent = "Selesaikan Transaksi Tertunda";
+  }else if(pendingRequest || pendingCorrupt){
+   buy.textContent = "Periksa Transaksi Tertunda";
   }
 
-  buy.addEventListener("click",()=>{
-   openCheckout(product.id);
-  });
+  buy.addEventListener("click",()=>openCheckout(product.id));
 
   content.append(
-   categoryText,
-   name,
-   price,
-   stock,
-   description,
-   buy
+   categoryText,name,price,stock,description,buy
   );
 
   card.append(visual,content);
@@ -986,44 +530,72 @@ function renderCatalog(){
  });
 }
 
-/* PENYIMPANAN REQUEST TERTUNDA */
+/* TRANSAKSI TERTUNDA V2 DAN V3 */
+
+function validPending(saved,version){
+ if(!saved || saved.userId !== currentUserId) return false;
+
+ if(
+  typeof saved.requestId !== "string" ||
+  typeof saved.productId !== "string" ||
+  !Number.isInteger(saved.quantity) ||
+  saved.quantity < 1 ||
+  saved.quantity > 100 ||
+  typeof saved.note !== "string"
+ ) return false;
+
+ if(version === "v2") return true;
+
+ return (
+  saved.version === "v3" &&
+  typeof saved.recipientName === "string" &&
+  typeof saved.recipientPhone === "string" &&
+  typeof saved.deliveryAddress === "string" &&
+  typeof saved.deliveryNote === "string"
+ );
+}
 
 function restorePendingRequest(){
  pendingRequest = null;
+ pendingCorrupt = false;
 
  try{
-  const raw = localStorage.getItem(
-   pendingStorageKey()
-  );
+  const oldRaw = localStorage.getItem(pendingStorageKey("v2"));
+  const newRaw = localStorage.getItem(pendingStorageKey("v3"));
 
-  if(!raw) return;
+  if(oldRaw && newRaw){
+   pendingCorrupt = true;
+   return;
+  }
 
-  const saved = JSON.parse(raw);
+  if(oldRaw){
+   const saved = JSON.parse(oldRaw);
+   if(!validPending(saved,"v2")){
+    pendingCorrupt = true;
+    return;
+   }
+   pendingRequest = {...saved,version:"v2"};
+   return;
+  }
 
-  if(
-   saved &&
-   saved.userId === currentUserId &&
-   typeof saved.requestId === "string" &&
-   typeof saved.productId === "string" &&
-   Number.isInteger(saved.quantity) &&
-   saved.quantity >= 1 &&
-   saved.quantity <= 100 &&
-   typeof saved.note === "string"
-  ){
+  if(newRaw){
+   const saved = JSON.parse(newRaw);
+   if(!validPending(saved,"v3")){
+    pendingCorrupt = true;
+    return;
+   }
    pendingRequest = saved;
   }
 
  }catch(error){
-  console.error(
-   "Gagal membaca transaksi tertunda:",
-   error
-  );
+  console.error("Gagal membaca transaksi tertunda:",error);
+  pendingCorrupt = true;
  }
 }
 
 function savePendingRequest(request){
  localStorage.setItem(
-  pendingStorageKey(),
+  pendingStorageKey(request.version),
   JSON.stringify(request)
  );
 
@@ -1033,7 +605,12 @@ function savePendingRequest(request){
 }
 
 function clearPendingRequest(){
- localStorage.removeItem(pendingStorageKey());
+ if(!pendingRequest) return;
+
+ localStorage.removeItem(
+  pendingStorageKey(pendingRequest.version)
+ );
+
  pendingRequest = null;
  renderPendingNotice();
  renderCatalog();
@@ -1041,18 +618,27 @@ function clearPendingRequest(){
 
 function renderPendingNotice(){
  const notice = $("pendingNotice");
+ notice.hidden = !pendingRequest && !pendingCorrupt;
 
- notice.hidden = !pendingRequest;
+ if(pendingCorrupt){
+  $("pendingDescription").textContent =
+   "Data transaksi tersimpan tidak dapat dibaca atau ada dua transaksi tertunda. " +
+   "Jangan membuat pesanan baru. Hubungi pengelola untuk pemeriksaan.";
+  $("resumeOrder").disabled = true;
+  return;
+ }
+
+ $("resumeOrder").disabled = orderBusy || !pendingRequest;
 
  if(pendingRequest){
   $("pendingDescription").textContent =
-   "Ada permintaan pembelian yang belum dikonfirmasi. " +
-   "Periksa transaksi ini sebelum membuat pesanan baru. " +
+   "Ada transaksi " + pendingRequest.version.toUpperCase() +
+   " yang perlu diperiksa. Jangan membuat pesanan baru. " +
    "Request ID: " + pendingRequest.requestId;
  }
 }
 
-/* FORMULIR PESANAN */
+/* FORMULIR CHECKOUT */
 
 function checkoutMessage(text,isError=false){
  const element = $("checkoutMessage");
@@ -1063,10 +649,8 @@ function checkoutMessage(text,isError=false){
 function openCheckout(productId){
  if(!accessApproved || orderBusy) return;
 
- if(pendingRequest){
-  alert(
-   "Selesaikan transaksi tertunda terlebih dahulu."
-  );
+ if(pendingRequest || pendingCorrupt){
+  alert("Periksa transaksi tertunda terlebih dahulu.");
   $("pendingNotice").scrollIntoView({
    behavior:"smooth",
    block:"center"
@@ -1074,9 +658,7 @@ function openCheckout(productId){
   return;
  }
 
- const product = catalogProducts.find(
-  p=>p.id === productId
- );
+ const product = catalogProducts.find(p=>p.id === productId);
 
  if(!product || Number(product.stock) <= 0){
   alert("Produk tidak tersedia. Muat ulang katalog.");
@@ -1090,21 +672,22 @@ function openCheckout(productId){
 
  selectedProduct = product;
 
- $("checkoutProductName").textContent =
-  product.name;
-
+ $("checkoutProductName").textContent = product.name;
  $("checkoutProductInfo").textContent =
   rupiah(product.price) +
-  " per produk | Stok tersedia: " +
-  product.stock;
+  " per produk | Stok tersedia: " + product.stock;
 
  $("checkoutQuantity").value = "1";
  $("checkoutQuantity").max =
   String(Math.min(100,Number(product.stock)));
 
  $("checkoutNote").value = "";
- checkoutMessage("");
+ $("recipientName").value = "";
+ $("recipientPhone").value = "";
+ $("deliveryAddress").value = "";
+ $("deliveryNote").value = "";
 
+ checkoutMessage("");
  updateCheckoutTotal();
 
  $("checkoutModal").hidden = false;
@@ -1113,7 +696,6 @@ function openCheckout(productId){
 
 function closeCheckout(){
  if(orderBusy) return;
-
  $("checkoutModal").hidden = true;
  selectedProduct = null;
 }
@@ -1121,9 +703,7 @@ function closeCheckout(){
 function updateCheckoutTotal(){
  if(!selectedProduct) return;
 
- const quantity = Number(
-  $("checkoutQuantity").value
- );
+ const quantity = Number($("checkoutQuantity").value);
 
  const valid =
   Number.isSafeInteger(quantity) &&
@@ -1137,27 +717,56 @@ function updateCheckoutTotal(){
   : "Masukkan jumlah yang valid.";
 
  $("submitOrder").disabled =
-  !valid || orderBusy || !!pendingRequest;
+  !valid || orderBusy || !!pendingRequest || pendingCorrupt;
 }
 
 function setOrderBusy(value){
  orderBusy = value;
-
  $("closeCheckout").disabled = value;
  $("submitOrder").disabled = value;
  $("resumeOrder").disabled = value;
-
  renderCatalog();
 
  if(!value){
   updateCheckoutTotal();
+  renderPendingNotice();
  }
 }
 
+function readDeliveryFields(){
+ const name = $("recipientName").value.trim();
+ const phone = $("recipientPhone").value.trim();
+ const address = $("deliveryAddress").value.trim();
+ const deliveryNote = $("deliveryNote").value.trim();
+
+ if(name.length < 2 || name.length > 100){
+  throw new Error("Nama penerima harus 2 sampai 100 karakter.");
+ }
+
+ if(
+  phone.length < 8 ||
+  phone.length > 20 ||
+  !/^\+?[0-9]{8,20}$/.test(phone)
+ ){
+  throw new Error(
+   "Nomor telepon harus 8 sampai 20 digit, boleh diawali tanda +."
+  );
+ }
+
+ if(address.length < 10 || address.length > 500){
+  throw new Error("Alamat lengkap harus 10 sampai 500 karakter.");
+ }
+
+ if(deliveryNote.length > 500){
+  throw new Error("Catatan pengantaran maksimal 500 karakter.");
+ }
+
+ return {name,phone,address,deliveryNote};
+}
+
 /*
- Request ID dibuat sekali dan disimpan
- sebelum RPC dikirim. Jika hasil koneksi
- tidak pasti, request yang sama dipakai ulang.
+ Request ID dibuat satu kali dan disimpan sebelum RPC.
+ Jika koneksi gagal, kirim ulang payload yang sama.
 */
 
 async function submitNewOrder(){
@@ -1165,13 +774,11 @@ async function submitNewOrder(){
   !accessApproved ||
   orderBusy ||
   pendingRequest ||
+  pendingCorrupt ||
   !selectedProduct
  ) return;
 
- const quantity = Number(
-  $("checkoutQuantity").value
- );
-
+ const quantity = Number($("checkoutQuantity").value);
  const note = $("checkoutNote").value;
 
  if(
@@ -1180,18 +787,21 @@ async function submitNewOrder(){
   quantity > 100 ||
   quantity > Number(selectedProduct.stock)
  ){
-  checkoutMessage(
-   "Jumlah pembelian tidak valid.",
-   true
-  );
+  checkoutMessage("Jumlah pembelian tidak valid.",true);
   return;
  }
 
  if(note.length > 500){
-  checkoutMessage(
-   "Catatan maksimal 500 karakter.",
-   true
-  );
+  checkoutMessage("Catatan maksimal 500 karakter.",true);
+  return;
+ }
+
+ let delivery;
+
+ try{
+  delivery = readDeliveryFields();
+ }catch(error){
+  checkoutMessage(error.message,true);
   return;
  }
 
@@ -1206,18 +816,26 @@ async function submitNewOrder(){
  if(!confirm(
   "Konfirmasi pembelian " +
   quantity + " × " + selectedProduct.name +
-  "?\n\nPerkiraan total: " +
+  "?\n\nPenerima: " + delivery.name +
+  "\nTelepon: " + delivery.phone +
+  "\nAlamat: " + delivery.address +
+  "\n\nPerkiraan total: " +
   rupiah(Number(selectedProduct.price) * quantity) +
   "\n\nPesanan nyata akan dicatat di database. " +
-  "Pembayaran dan pengiriman belum tersedia."
+  "Pembayaran online belum tersedia."
  )) return;
 
  const request = {
+  version:"v3",
   userId:currentUserId,
   requestId:crypto.randomUUID(),
   productId:selectedProduct.id,
   quantity,
-  note
+  note,
+  recipientName:delivery.name,
+  recipientPhone:delivery.phone,
+  deliveryAddress:delivery.address,
+  deliveryNote:delivery.deliveryNote
  };
 
  try{
@@ -1245,44 +863,60 @@ async function findExistingPendingOrder(){
   .maybeSingle();
 
  if(error) throw error;
-
  return data;
 }
 
 async function sendPendingOrder(){
- if(
-  !accessApproved ||
-  !pendingRequest ||
-  orderBusy
- ) return;
+ if(!accessApproved || !pendingRequest || orderBusy || pendingCorrupt){
+  return;
+ }
 
  setOrderBusy(true);
-
- checkoutMessage(
-  "Memeriksa dan mengirim transaksi. Mohon tunggu..."
- );
+ checkoutMessage("Memeriksa dan mengirim transaksi. Mohon tunggu...");
 
  try{
+  const request = pendingRequest;
   const existing = await findExistingPendingOrder();
 
   let orderId;
 
   if(existing){
-   orderId = existing.id;
-  }else{
-   const request = pendingRequest;
+   /*
+    V3 selalu memanggil RPC dengan payload asli agar
+    database sendiri memvalidasi idempotensi dan alamat.
+    V2 lama tetap dapat diselesaikan dengan cara sebelumnya.
+   */
+   if(request.version === "v2"){
+    orderId = existing.id;
+   }
+  }
+
+  if(!orderId){
+   const functionName = request.version === "v2"
+    ? "create_antardesa_order_v2"
+    : "create_antardesa_order_v3";
+
+   const args = {
+    p_product_id:request.productId,
+    p_quantity:request.quantity,
+    p_request_id:request.requestId,
+    p_customer_note:request.note
+   };
+
+   if(request.version === "v3"){
+    args.p_recipient_name = request.recipientName;
+    args.p_recipient_phone = request.recipientPhone;
+    args.p_delivery_address = request.deliveryAddress;
+    args.p_delivery_note = request.deliveryNote;
+   }
 
    const {data,error} = await supabaseClient.rpc(
-    "create_antardesa_order_v2",
-    {
-     p_product_id:request.productId,
-     p_quantity:request.quantity,
-     p_request_id:request.requestId,
-     p_customer_note:request.note
-    }
+    functionName,
+    args
    );
 
    if(error) throw error;
+   if(!data) throw new Error("Server tidak mengembalikan Order ID.");
 
    orderId = data;
   }
@@ -1292,7 +926,7 @@ async function sendPendingOrder(){
   $("checkoutModal").hidden = true;
   selectedProduct = null;
 
-  await Promise.all([
+  await Promise.allSettled([
    loadCatalog(),
    loadOrders()
   ]);
@@ -1309,10 +943,7 @@ async function sendPendingOrder(){
   });
 
  }catch(error){
-  console.error(
-   "Transaksi perlu diperiksa:",
-   error
-  );
+  console.error("Transaksi perlu diperiksa:",error);
 
   checkoutMessage(
    "Status transaksi belum dapat dipastikan.\n" +
@@ -1347,17 +978,13 @@ async function loadOrders(){
 
  ordersLoading = true;
  $("refreshOrders").disabled = true;
-
  $("ordersStatus").className = "catalog-status";
- $("ordersStatus").textContent =
-  "Sedang mengambil pesanan...";
+ $("ordersStatus").textContent = "Sedang mengambil pesanan...";
 
  try{
   const {data:orders,error} = await supabaseClient
    .from("orders")
-   .select(
-    "id,status,total_amount,customer_note,created_at"
-   )
+   .select("id,status,total_amount,customer_note,created_at")
    .eq("customer_id",currentUserId)
    .order("created_at",{ascending:false})
    .limit(5);
@@ -1368,28 +995,22 @@ async function loadOrders(){
   list.replaceChildren();
 
   if(!orders?.length){
-   $("ordersStatus").textContent =
-    "Belum ada pesanan.";
+   $("ordersStatus").textContent = "Belum ada pesanan.";
    return;
   }
 
   $("ordersStatus").textContent =
-   "Menampilkan " + orders.length +
-   " pesanan terbaru.";
+   "Menampilkan " + orders.length + " pesanan terbaru.";
 
   for(const order of orders){
    const card = document.createElement("article");
    card.className = "order-card";
 
    const title = document.createElement("strong");
-   title.textContent =
-    "Pesanan " + order.id.slice(0,8);
+   title.textContent = "Pesanan " + order.id.slice(0,8);
 
    const detail = document.createElement("small");
-
-   const date = new Date(
-    order.created_at
-   ).toLocaleString("id-ID");
+   const date = new Date(order.created_at).toLocaleString("id-ID");
 
    detail.textContent =
     "Status: " + order.status +
@@ -1398,16 +1019,12 @@ async function loadOrders(){
     "\nID: " + order.id;
 
    detail.style.whiteSpace = "pre-wrap";
-
    card.append(title,detail);
 
-   const {data:items,error:itemError} =
-    await supabaseClient
-     .from("order_items")
-     .select(
-      "product_name,quantity,unit_price,subtotal"
-     )
-     .eq("order_id",order.id);
+   const {data:items,error:itemError} = await supabaseClient
+    .from("order_items")
+    .select("product_name,quantity,unit_price,subtotal")
+    .eq("order_id",order.id);
 
    if(itemError) throw itemError;
 
@@ -1427,8 +1044,7 @@ async function loadOrders(){
    if(order.customer_note){
     const note = document.createElement("p");
     note.className = "notice";
-    note.textContent =
-     "Catatan: " + order.customer_note;
+    note.textContent = "Catatan: " + order.customer_note;
     card.appendChild(note);
    }
 
@@ -1437,10 +1053,7 @@ async function loadOrders(){
 
  }catch(error){
   console.error("Gagal memuat pesanan:",error);
-
-  $("ordersStatus").className =
-   "catalog-status error";
-
+  $("ordersStatus").className = "catalog-status error";
   $("ordersStatus").textContent =
    "Gagal memuat pesanan: " + error.message;
 
@@ -1452,103 +1065,56 @@ async function loadOrders(){
 
 /* EVENT */
 
-$("searchProduct").addEventListener(
- "input",
- renderCatalog
-);
+$("searchProduct").addEventListener("input",renderCatalog);
+$("filterCategory").addEventListener("change",renderCatalog);
+$("refreshCatalog").addEventListener("click",loadCatalog);
+$("refreshOrders").addEventListener("click",loadOrders);
+$("checkoutQuantity").addEventListener("input",updateCheckoutTotal);
+$("closeCheckout").addEventListener("click",closeCheckout);
+$("submitOrder").addEventListener("click",submitNewOrder);
 
-$("filterCategory").addEventListener(
- "change",
- renderCatalog
-);
+$("resumeOrder").addEventListener("click",async()=>{
+ if(!pendingRequest || orderBusy || pendingCorrupt) return;
 
-$("refreshCatalog").addEventListener(
- "click",
- loadCatalog
-);
+ if(!confirm(
+  "Periksa transaksi tertunda dan, jika diperlukan, " +
+  "kirim ulang menggunakan Request ID yang SAMA?"
+ )) return;
 
-$("refreshOrders").addEventListener(
- "click",
- loadOrders
-);
-
-$("checkoutQuantity").addEventListener(
- "input",
- updateCheckoutTotal
-);
-
-$("closeCheckout").addEventListener(
- "click",
- closeCheckout
-);
-
-$("submitOrder").addEventListener(
- "click",
- submitNewOrder
-);
-
-$("resumeOrder").addEventListener(
- "click",
- async()=>{
-  if(!pendingRequest || orderBusy) return;
-
-  if(!confirm(
-   "Periksa transaksi tertunda dan, jika belum " +
-   "tercatat, kirim ulang dengan Request ID " +
-   "yang SAMA?"
-  )) return;
-
-  await sendPendingOrder();
- }
-);
+ await sendPendingOrder();
+});
 
 /* LOGOUT */
 
-logoutButton.addEventListener(
- "click",
- async function(){
-  if(!supabaseClient || logoutButton.disabled) return;
+logoutButton.addEventListener("click",async function(){
+ if(!supabaseClient || logoutButton.disabled) return;
 
-  if(orderBusy){
-   alert("Tunggu pemeriksaan transaksi selesai.");
-   return;
-  }
-
-  logoutButton.disabled = true;
-
-  showAccessScreen(
-   "Sedang keluar dari akun..."
-  );
-
-  try{
-   const {error} =
-    await supabaseClient.auth.signOut();
-
-   if(error) throw error;
-
-   window.location.replace("login.html");
-
-  }catch(error){
-   console.error("Logout gagal:",error);
-
-   showAccessScreen(
-    "Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.",
-    {showRetry:true}
-   );
-
-  }finally{
-   logoutButton.disabled = false;
-  }
+ if(orderBusy){
+  alert("Tunggu pemeriksaan transaksi selesai.");
+  return;
  }
-);
 
-retryButton.addEventListener(
- "click",
- verifyCustomerAccess
-);
+ logoutButton.disabled = true;
+ showAccessScreen("Sedang keluar dari akun...");
 
+ try{
+  const {error} = await supabaseClient.auth.signOut();
+  if(error) throw error;
+  window.location.replace("login.html");
+
+ }catch(error){
+  console.error("Logout gagal:",error);
+  showAccessScreen(
+   "Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.",
+   {showRetry:true}
+  );
+ }finally{
+  logoutButton.disabled = false;
+ }
+});
+
+retryButton.addEventListener("click",verifyCustomerAccess);
 verifyCustomerAccess();
 </script>
-
 </body>
 </html>
