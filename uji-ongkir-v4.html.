@@ -1,61 +1,986 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Uji Ongkir V4 | AntarDesa</title>
+
+<meta
+ name="viewport"
+ content="width=device-width, initial-scale=1"
+>
+
+<title>Uji Shipping Quote V4 | AntarDesa</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:#20352a;font-family:Arial,sans-serif}header{background:#16805d;color:#fff;padding:22px 18px;border-radius:0 0 20px 20px}header h1{margin:0;font-size:23px}header p{font-size:13px;line-height:1.5}main{max-width:540px;margin:auto;padding:18px 14px 60px}.card{background:#fff;border:1px solid #dce7df;border-radius:14px;padding:17px;margin-bottom:15px}label{display:block;font-weight:bold;font-size:13px;margin:14px 0 7px}input{width:100%;padding:12px;border:1px solid #b8cbbf;border-radius:9px;font:inherit}button{border:0;border-radius:9px;padding:12px 14px;font-weight:bold;cursor:pointer;background:#16805d;color:#fff}button.secondary{background:#e8f4ee;color:#176849}button:disabled{opacity:.55;cursor:not-allowed}.actions{display:grid;gap:10px;margin-top:16px}.help{font-size:12px;color:#5e7165;line-height:1.6}.status{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6}.error{color:#b91c1c}.success{color:#126a4b}.result{font-size:19px;font-weight:bold;color:#126a4b}a{color:#16805d}[hidden]{display:none!important}
+
+*{
+ box-sizing:border-box;
+}
+
+body{
+ margin:0;
+ background:#f5f8f6;
+ color:#20352a;
+ font-family:Arial,sans-serif;
+}
+
+header{
+ background:#16805d;
+ color:white;
+ padding:25px 18px;
+ border-radius:0 0 22px 22px;
+}
+
+header h1{
+ margin:0;
+ font-size:24px;
+}
+
+header p{
+ font-size:13px;
+ line-height:1.6;
+}
+
+main{
+ max-width:600px;
+ margin:auto;
+ padding:18px 15px 60px;
+}
+
+.card{
+ background:white;
+ border:1px solid #e0e9e3;
+ border-radius:14px;
+ padding:18px;
+ margin-bottom:16px;
+}
+
+h2{
+ font-size:18px;
+ margin-top:0;
+}
+
+label{
+ display:block;
+ font-size:13px;
+ font-weight:bold;
+ margin:15px 0 7px;
+}
+
+input{
+ width:100%;
+ padding:12px;
+ border:1px solid #cbd9d0;
+ border-radius:9px;
+ background:white;
+ font:inherit;
+}
+
+button{
+ width:100%;
+ border:0;
+ border-radius:9px;
+ padding:13px;
+ margin-top:12px;
+ font:inherit;
+ font-weight:bold;
+ cursor:pointer;
+}
+
+button:disabled{
+ opacity:.55;
+ cursor:not-allowed;
+}
+
+.primary{
+ background:#16805d;
+ color:white;
+}
+
+.secondary{
+ background:#e8f4ee;
+ color:#16805d;
+}
+
+.quote-button{
+ background:#174e82;
+ color:white;
+}
+
+.notice{
+ font-size:13px;
+ color:#61746b;
+ line-height:1.7;
+}
+
+.status{
+ padding:12px;
+ border-radius:9px;
+ background:#eef3ef;
+ font-size:13px;
+ line-height:1.7;
+ overflow-wrap:anywhere;
+ white-space:pre-wrap;
+}
+
+.success{
+ background:#e7f7ed;
+ color:#146c3e;
+}
+
+.error{
+ background:#fff0f0;
+ color:#b91c1c;
+}
+
+.result{
+ background:#f4f8f5;
+ border:1px solid #dce8df;
+ padding:15px;
+ border-radius:10px;
+ margin-top:15px;
+ line-height:1.9;
+ overflow-wrap:anywhere;
+}
+
+.result strong{
+ color:#16805d;
+}
+
+.small{
+ font-size:12px;
+ color:#61746b;
+}
+
+a{
+ color:#16805d;
+}
+
+[hidden]{
+ display:none!important;
+}
+
 </style>
+
 </head>
+
 <body>
-<header><h1>🛵 Uji Ongkir V4</h1><p>Halaman pengembangan AntarDesa. Hanya estimasi, tidak membuat pesanan.</p></header>
+
+<header>
+
+<h1>AntarDesa 🏡</h1>
+
+<p>
+Pengujian Shipping Quote V4
+<br>
+Tahap 7.2.21
+</p>
+
+</header>
+
 <main>
+
 <section class="card">
-<strong>1. Pemeriksaan sesi pelanggan</strong>
-<p id="sessionStatus" class="status" role="status">Memeriksa sesi...</p>
-<button id="retrySession" class="secondary" type="button">Periksa Sesi Lagi</button>
-<p class="help">Gunakan browser dan domain dev yang sama dengan dashboard pelanggan. Jangan tempelkan token ke halaman atau percakapan.</p>
+
+<h2>1. Pemeriksaan Sesi</h2>
+
+<p
+ id="sessionStatus"
+ class="status"
+ role="status"
+ aria-live="polite"
+>
+Sedang memeriksa sesi pelanggan...
+</p>
+
+<button
+ id="retrySession"
+ class="secondary"
+ type="button"
+>
+Periksa Ulang Sesi
+</button>
+
 </section>
+
 <section class="card">
-<strong>2. Produk pengujian</strong>
-<p>Beras 5kg | ID produk:</p>
-<p class="help" style="overflow-wrap:anywhere">78d7fd22-27fb-4d66-98f5-ab3b06814edd</p>
-<strong>3. Titik tujuan uji</strong>
-<p class="help">Masukkan koordinat tujuan yang memang kamu pilih untuk pengujian. Jangan menggunakan titik acak. Lokasi GPS opsional dan hanya diambil setelah izin diberikan.</p>
-<label for="latitude">Latitude tujuan</label>
-<input id="latitude" type="number" inputmode="decimal" step="any" min="-90" max="90" placeholder="Contoh format: -4.000000">
-<label for="longitude">Longitude tujuan</label>
-<input id="longitude" type="number" inputmode="decimal" step="any" min="-180" max="180" placeholder="Contoh format: 103.000000">
-<div class="actions">
-<button id="gps" class="secondary" type="button">📍 Isi dari GPS perangkat (opsional)</button>
-<button id="estimate" type="button" disabled>Hitung Estimasi Ongkir</button>
-</div>
-<p id="message" class="status" role="status" aria-live="polite"></p>
-<div id="result" hidden>
-<p class="help">Jarak rute jalan</p><p id="distance" class="result"></p>
-<p class="help">Estimasi ongkir</p><p id="fee" class="result"></p>
-<p id="serviceArea" class="help"></p>
-<p class="help">Ini bukan penawaran harga final. Checkout V4 belum aktif.</p>
-</div>
+
+<h2>2. Produk Pengujian</h2>
+
+<p>
+<strong>Beras 5kg</strong>
+</p>
+
+<p class="notice">
+Harga produk: Rp14.000
+<br>
+Produk Mitra terverifikasi dengan GPS tersimpan.
+</p>
+
+<label for="quantity">
+Jumlah pembelian
+</label>
+
+<input
+ id="quantity"
+ type="number"
+ min="1"
+ max="100"
+ step="1"
+ value="1"
+>
+
+<p class="small">
+Jumlah digunakan untuk mengikat shipping quote
+ke permintaan pembelian.
+</p>
+
 </section>
-<p class="help"><a href="pelanggan.html">Kembali ke dashboard pelanggan</a></p>
+
+<section class="card">
+
+<h2>3. Titik Tujuan Uji</h2>
+
+<p class="notice">
+Gunakan GPS perangkat atau masukkan koordinat
+titik tujuan secara manual.
+</p>
+
+<label for="latitude">
+Latitude tujuan
+</label>
+
+<input
+ id="latitude"
+ type="number"
+ step="any"
+ min="-90"
+ max="90"
+ placeholder="Contoh: -4.025000"
+>
+
+<label for="longitude">
+Longitude tujuan
+</label>
+
+<input
+ id="longitude"
+ type="number"
+ step="any"
+ min="-180"
+ max="180"
+ placeholder="Contoh: 103.250000"
+>
+
+<button
+ id="gpsButton"
+ class="secondary"
+ type="button"
+>
+📍 Isi dari GPS perangkat (opsional)
+</button>
+
+<p
+ id="gpsStatus"
+ class="notice"
+ role="status"
+ aria-live="polite"
+>
+Belum memilih titik tujuan.
+</p>
+
+</section>
+
+<section class="card">
+
+<h2>4. Pengujian Mesin Ongkir</h2>
+
+<p class="notice">
+Tombol pertama hanya menghitung estimasi.
+Tombol kedua meminta server menerbitkan
+shipping quote resmi dengan masa berlaku 10 menit.
+</p>
+
+<button
+ id="estimateButton"
+ class="primary"
+ type="button"
+ disabled
+>
+Hitung Estimasi Ongkir
+</button>
+
+<button
+ id="quoteButton"
+ class="quote-button"
+ type="button"
+ disabled
+>
+Terbitkan Shipping Quote (10 Menit)
+</button>
+
+<p
+ id="requestStatus"
+ class="status"
+ role="status"
+ aria-live="polite"
+>
+Menunggu pengujian.
+</p>
+
+<div
+ id="resultBox"
+ class="result"
+ hidden
+></div>
+
+</section>
+
+<section class="card">
+
+<h2>5. Pengamanan Pengujian</h2>
+
+<p class="notice">
+Halaman ini hanya digunakan untuk menguji
+estimasi dan penerbitan Shipping Quote V4.
+</p>
+
+<p class="notice">
+Tidak membuat pesanan, tidak mengurangi stok,
+dan tidak mengaktifkan Checkout V4.
+</p>
+
+<p class="notice">
+Jangan membagikan access token atau
+service-role key kepada siapa pun.
+</p>
+
+<a href="pelanggan.html">
+Kembali ke Dashboard Pelanggan
+</a>
+
+</section>
+
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <script>
+
 "use strict";
-const SUPABASE_URL="https://gswlkajcizcvrhcfabtg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
-const PRODUCT_ID="78d7fd22-27fb-4d66-98f5-ab3b06814edd";
-const $=id=>document.getElementById(id);
-const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-let ready=false,busy=false;
-function message(text,error=false){$("message").textContent=text;$("message").className="status"+(error?" error":"");}
-async function checkSession(){ready=false;$("estimate").disabled=true;$("sessionStatus").textContent="Memeriksa sesi...";try{const {data,error}=await client.auth.getUser();if(error||!data?.user)throw new Error("Sesi login tidak ditemukan. Buka dashboard pelanggan dan login dari browser yang sama.");ready=true;$("sessionStatus").textContent="✅ Sesi pengguna valid. Siap melakukan uji estimasi.";$("sessionStatus").className="status success";$("estimate").disabled=false;}catch(e){$("sessionStatus").textContent="❌ "+e.message;$("sessionStatus").className="status error";}}
-$("retrySession").addEventListener("click",checkSession);
-$("gps").addEventListener("click",()=>{if(!navigator.geolocation){message("GPS tidak tersedia di browser ini.",true);return;}$("gps").disabled=true;message("Meminta izin lokasi perangkat...");navigator.geolocation.getCurrentPosition(pos=>{$("latitude").value=String(pos.coords.latitude);$("longitude").value=String(pos.coords.longitude);$("gps").disabled=false;message("Koordinat tujuan terisi. Periksa kembali sebelum menguji.");},err=>{$("gps").disabled=false;message("GPS gagal atau izin ditolak: "+err.message,true);},{enableHighAccuracy:true,timeout:15000,maximumAge:0});});
-$("estimate").addEventListener("click",async()=>{if(!ready||busy)return;$("result").hidden=true;const latText=$("latitude").value.trim(),lonText=$("longitude").value.trim();const lat=Number(latText),lon=Number(lonText);if(!latText||!lonText||!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat >90||lon < -180||lon >180){message("Masukkan latitude dan longitude tujuan yang valid.",true);return;}busy=true;$("estimate").disabled=true;message("Memvalidasi sesi dan meminta estimasi rute...");try{const {data:sessionData,error:sessionError}=await client.auth.getSession();if(sessionError||!sessionData?.session?.access_token)throw new Error("Sesi tidak tersedia. Login kembali.");const {data:userData,error:userError}=await client.auth.getUser();if(userError||!userData?.user)throw new Error("Sesi tidak valid. Login kembali.");const response=await fetch(SUPABASE_URL+"/functions/v1/antardesa-shipping-v4",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+sessionData.session.access_token},body:JSON.stringify({action:"estimate",product_id:PRODUCT_ID,delivery_latitude:lat,delivery_longitude:lon})});let payload;try{payload=await response.json();}catch{throw new Error("Server mengembalikan respons bukan JSON (HTTP "+response.status+").");}if(!response.ok)throw new Error("HTTP "+response.status+": "+(payload.error||payload.message||"Permintaan ditolak"));if(payload.status!=="estimate"||payload.checkout_enabled!==false||typeof payload.delivery_fee!=="number"||typeof payload.distance_km!=="number")throw new Error("Format hasil estimasi server tidak sesuai.");$("distance").textContent=payload.distance_km.toLocaleString("id-ID")+" km";$("fee").textContent="Rp "+payload.delivery_fee.toLocaleString("id-ID");$("serviceArea").textContent="Wilayah konfigurasi: "+String(payload.service_area||"-");$("result").hidden=false;message("Estimasi berhasil. Tidak ada transaksi yang dibuat.");}catch(e){message(e.message||"Gagal menguji estimasi.",true);}finally{busy=false;$("estimate").disabled=!ready;}});
+
+// =====================================================
+// ANTARDESA
+// TAHAP 7.2.21
+// SHIPPING QUOTE TEST PAGE
+// =====================================================
+
+// KONFIGURASI PUBLIK SUPABASE
+
+const SUPABASE_URL =
+ "https://gswlkajcizcvrhcfabtg.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+// PRODUK UJI
+
+const PRODUCT_ID =
+ "78d7fd22-27fb-4d66-98f5-ab3b06814edd";
+
+// EDGE FUNCTION
+
+const SHIPPING_FUNCTION =
+ SUPABASE_URL +
+ "/functions/v1/antardesa-shipping-v4";
+
+// =====================================================
+// STATE
+// =====================================================
+
+const $ = id =>
+ document.getElementById(id);
+
+let client = null;
+
+let currentUser = null;
+
+let busy = false;
+
+// =====================================================
+// TAMPILAN STATUS
+// =====================================================
+
+function showStatus(id,message,type=""){
+
+ const element = $(id);
+
+ element.className =
+  "status" + (type ? " " + type : "");
+
+ element.textContent = message;
+
+}
+
+function setBusy(value){
+
+ busy = value;
+
+ $("estimateButton").disabled =
+  value || !currentUser;
+
+ $("quoteButton").disabled =
+  value || !currentUser;
+
+ $("gpsButton").disabled = value;
+
+ $("retrySession").disabled = value;
+
+}
+
+// =====================================================
+// PEMERIKSAAN SESI
+// =====================================================
+
+async function checkSession(){
+
+ if(busy) return;
+
+ setBusy(true);
+
+ currentUser = null;
+
+ $("resultBox").hidden = true;
+
+ showStatus(
+  "sessionStatus",
+  "Sedang memeriksa sesi login..."
+ );
+
+ try{
+
+  if(!window.supabase){
+
+   throw new Error(
+    "Library Supabase gagal dimuat."
+   );
+
+  }
+
+  if(!client){
+
+   client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+   );
+
+  }
+
+  const {
+   data,
+   error
+  } = await client.auth.getUser();
+
+  if(error || !data?.user){
+
+   throw new Error(
+    "Sesi login tidak ditemukan. " +
+    "Silakan login melalui dashboard pelanggan."
+   );
+
+  }
+
+  currentUser = data.user;
+
+  showStatus(
+   "sessionStatus",
+   "✅ Sesi pengguna valid. " +
+   "Siap melakukan uji estimasi dan Shipping Quote.",
+   "success"
+  );
+
+ }catch(error){
+
+  console.error(
+   "Session check:",
+   error
+  );
+
+  showStatus(
+   "sessionStatus",
+   error.message,
+   "error"
+  );
+
+ }finally{
+
+  setBusy(false);
+
+ }
+
+}
+
+// =====================================================
+// GPS PERANGKAT
+// =====================================================
+
+function useDeviceGPS(){
+
+ if(busy) return;
+
+ if(!navigator.geolocation){
+
+  $("gpsStatus").textContent =
+   "Browser tidak mendukung GPS.";
+
+  return;
+
+ }
+
+ $("gpsButton").disabled = true;
+
+ $("gpsStatus").textContent =
+  "Sedang meminta lokasi perangkat...";
+
+ navigator.geolocation.getCurrentPosition(
+
+  position => {
+
+   $("latitude").value =
+    position.coords.latitude.toFixed(7);
+
+   $("longitude").value =
+    position.coords.longitude.toFixed(7);
+
+   $("gpsStatus").textContent =
+    "✅ Koordinat tujuan berhasil diisi dari GPS.";
+
+   $("gpsButton").disabled = false;
+
+  },
+
+  error => {
+
+   console.error(
+    "GPS:",
+    error
+   );
+
+   $("gpsStatus").textContent =
+    "GPS gagal: " + error.message +
+    ". Kamu dapat mengisi koordinat secara manual.";
+
+   $("gpsButton").disabled = false;
+
+  },
+
+  {
+   enableHighAccuracy:true,
+   timeout:15000,
+   maximumAge:0
+  }
+
+ );
+
+}
+
+// =====================================================
+// VALIDASI FORM
+// =====================================================
+
+function readForm(){
+
+ const quantity =
+  Number($("quantity").value);
+
+ const latText =
+  $("latitude").value.trim();
+
+ const lonText =
+  $("longitude").value.trim();
+
+ if(
+  !Number.isSafeInteger(quantity) ||
+  quantity < 1 ||
+  quantity > 100
+ ){
+
+  throw new Error(
+   "Jumlah pembelian harus 1 sampai 100."
+  );
+
+ }
+
+ if(!latText || !lonText){
+
+  throw new Error(
+   "Isi koordinat tujuan terlebih dahulu."
+  );
+
+ }
+
+ const latitude =
+  Number(latText);
+
+ const longitude =
+  Number(lonText);
+
+ if(
+  !Number.isFinite(latitude) ||
+  !Number.isFinite(longitude) ||
+  latitude < -90 ||
+  latitude > 90 ||
+  longitude < -180 ||
+  longitude > 180
+ ){
+
+  throw new Error(
+   "Koordinat tujuan tidak valid."
+  );
+
+ }
+
+ return {
+  quantity,
+  latitude,
+  longitude
+ };
+
+}
+
+// =====================================================
+// REQUEST KE EDGE FUNCTION
+// =====================================================
+
+async function runShipping(action){
+
+ if(busy) return;
+
+ if(!currentUser){
+
+  showStatus(
+   "requestStatus",
+   "Sesi pelanggan belum siap.",
+   "error"
+  );
+
+  return;
+
+ }
+
+ let form;
+
+ try{
+
+  form = readForm();
+
+ }catch(error){
+
+  showStatus(
+   "requestStatus",
+   error.message,
+   "error"
+  );
+
+  return;
+
+ }
+
+ if(action === "quote"){
+
+  const approved = confirm(
+   "Terbitkan Shipping Quote pengujian?\n\n" +
+   "Produk: Beras 5kg\n" +
+   "Jumlah: " + form.quantity + "\n\n" +
+   "Quote berlaku selama 10 menit.\n" +
+   "Tidak membuat pesanan atau mengurangi stok."
+  );
+
+  if(!approved) return;
+
+ }
+
+ setBusy(true);
+
+ $("resultBox").hidden = true;
+
+ showStatus(
+  "requestStatus",
+  action === "quote"
+   ? "Meminta server menerbitkan Shipping Quote..."
+   : "Sedang menghitung estimasi ongkir..."
+ );
+
+ try{
+
+  // Ambil sesi langsung dari Supabase.
+  // Token tidak ditampilkan pada halaman.
+
+  const {
+   data:sessionData,
+   error:sessionError
+  } = await client.auth.getSession();
+
+  if(
+   sessionError ||
+   !sessionData?.session?.access_token
+  ){
+
+   throw new Error(
+    "Sesi login tidak tersedia. Login kembali."
+   );
+
+  }
+
+  const token =
+   sessionData.session.access_token;
+
+  const payload = {
+
+   action:action,
+
+   product_id:PRODUCT_ID,
+
+   quantity:form.quantity,
+
+   delivery_latitude:form.latitude,
+
+   delivery_longitude:form.longitude
+
+  };
+
+  const response = await fetch(
+   SHIPPING_FUNCTION,
+   {
+    method:"POST",
+
+    headers:{
+
+     "Content-Type":"application/json",
+
+     "apikey":SUPABASE_PUBLISHABLE_KEY,
+
+     "Authorization":"Bearer " + token
+
+    },
+
+    body:JSON.stringify(payload)
+
+   }
+  );
+
+  const raw =
+   await response.text();
+
+  let result;
+
+  try{
+
+   result = JSON.parse(raw);
+
+  }catch{
+
+   throw new Error(
+    "Server mengembalikan respons bukan JSON. " +
+    "HTTP " + response.status
+   );
+
+  }
+
+  if(!response.ok){
+
+   throw new Error(
+    "HTTP " + response.status + ": " +
+    (
+     result.error ||
+     result.message ||
+     "Permintaan gagal."
+    )
+   );
+
+  }
+
+  if(action === "quote"){
+
+   if(
+    result.status !== "quote_issued" ||
+    !result.quote_id ||
+    !result.expires_at
+   ){
+
+    throw new Error(
+     "Format respons Shipping Quote tidak sesuai."
+    );
+
+   }
+
+   const expiry =
+    new Date(result.expires_at);
+
+   if(Number.isNaN(expiry.getTime())){
+
+    throw new Error(
+     "Waktu kedaluwarsa quote tidak valid."
+    );
+
+   }
+
+   showStatus(
+    "requestStatus",
+    "✅ Shipping Quote berhasil diterbitkan.",
+    "success"
+   );
+
+   const box =
+    $("resultBox");
+
+   box.replaceChildren();
+
+   const heading =
+    document.createElement("strong");
+
+   heading.textContent =
+    "Shipping Quote V4 berhasil";
+
+   const details =
+    document.createElement("p");
+
+   details.style.whiteSpace =
+    "pre-wrap";
+
+   details.textContent =
+    "Quote ID:\n" +
+    result.quote_id +
+    "\n\nJarak perjalanan: " +
+    result.distance_km + " km" +
+    "\nOngkir: Rp " +
+    Number(result.delivery_fee)
+     .toLocaleString("id-ID") +
+    "\nBerlaku sampai: " +
+    expiry.toLocaleString("id-ID") +
+    "\nCheckout aktif: " +
+    (
+     result.checkout_enabled === true
+      ? "Ya"
+      : "Tidak"
+    );
+
+   box.append(
+    heading,
+    details
+   );
+
+   box.hidden = false;
+
+  }else{
+
+   if(result.status !== "estimate"){
+
+    throw new Error(
+     "Format respons estimasi tidak sesuai."
+    );
+
+   }
+
+   showStatus(
+    "requestStatus",
+    "✅ Estimasi ongkir berhasil dihitung.",
+    "success"
+   );
+
+   const box =
+    $("resultBox");
+
+   box.replaceChildren();
+
+   const heading =
+    document.createElement("strong");
+
+   heading.textContent =
+    "Hasil Estimasi Ongkir";
+
+   const details =
+    document.createElement("p");
+
+   details.style.whiteSpace =
+    "pre-wrap";
+
+   details.textContent =
+    "Jarak perjalanan: " +
+    result.distance_km + " km" +
+    "\nOngkir: Rp " +
+    Number(result.delivery_fee)
+     .toLocaleString("id-ID") +
+    "\nWilayah layanan: " +
+    (result.service_area || "-") +
+    "\nCheckout aktif: " +
+    (
+     result.checkout_enabled === true
+      ? "Ya"
+      : "Tidak"
+    );
+
+   box.append(
+    heading,
+    details
+   );
+
+   box.hidden = false;
+
+  }
+
+ }catch(error){
+
+  console.error(
+   "Shipping V4 test:",
+   error
+  );
+
+  showStatus(
+   "requestStatus",
+   "❌ " + error.message,
+   "error"
+  );
+
+ }finally{
+
+  setBusy(false);
+
+ }
+
+}
+
+// =====================================================
+// EVENT
+// =====================================================
+
+$("retrySession").addEventListener(
+ "click",
+ checkSession
+);
+
+$("gpsButton").addEventListener(
+ "click",
+ useDeviceGPS
+);
+
+$("estimateButton").addEventListener(
+ "click",
+ () => runShipping("estimate")
+);
+
+$("quoteButton").addEventListener(
+ "click",
+ () => runShipping("quote")
+);
+
+// =====================================================
+// START
+// =====================================================
+
 checkSession();
+
 </script>
+
 </body>
 </html>
