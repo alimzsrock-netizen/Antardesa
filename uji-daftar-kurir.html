@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uji Daftar Kurir AntarDesa</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f7f5;color:#20352a;padding:18px;margin:0}
+main{max-width:700px;margin:auto}
+section{background:white;padding:18px;margin:14px 0;border:1px solid #dce6df;border-radius:12px}
+button{background:#16805d;color:white;border:0;padding:12px;border-radius:8px;width:100%;margin:7px 0;font-weight:bold}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3ef;padding:12px;border-radius:8px}
+small{color:#65756c}
+</style>
+</head>
+<body>
+<main>
+<h2>AntarDesa 🚚</h2>
+<p>Pengujian Tahap 7.1.48C</p>
+
+<section>
+<h3>Sesi Kurir</h3>
+<div id="session">Memeriksa sesi login...</div>
+<button id="refresh">Periksa Sesi</button>
+</section>
+
+<section>
+<h3>A. Pesanan Siap Diambil</h3>
+<p>Menampilkan pesanan berstatus ready yang belum memiliki penugasan.</p>
+<button id="available">Uji Daftar Pesanan Tersedia</button>
+<pre id="availableResult">Belum diuji.</pre>
+</section>
+
+<section>
+<h3>B. Pengiriman Saya</h3>
+<p>Menampilkan penugasan milik akun Kurir yang sedang login.</p>
+<button id="mine">Uji Pengiriman Saya</button>
+<pre id="mineResult">Belum diuji.</pre>
+</section>
+
+<p><small>
+Halaman ini hanya membaca data. Tidak mengambil atau mengubah pesanan.
+</small></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+"use strict";
+
+const db = window.supabase.createClient(
+ "https://gswlkajcizcvrhcfabtg.supabase.co",
+ "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63"
+);
+
+const $ = id => document.getElementById(id);
+
+async function checkSession(){
+ $("session").textContent = "Memeriksa...";
+ const {data,error} = await db.auth.getUser();
+
+ if(error || !data.user){
+  $("session").textContent = "Belum login. Silakan login sebagai Kurir.";
+  return;
+ }
+
+ const {data:role,error:roleError} = await db
+  .from("user_roles")
+  .select("role,is_verified")
+  .eq("user_id",data.user.id)
+  .maybeSingle();
+
+ if(roleError){
+  $("session").textContent = "Gagal membaca role: " + roleError.message;
+  return;
+ }
+
+ $("session").textContent =
+  "User ID: " + data.user.id +
+  "\nRole: " + (role?.role || "tidak ditemukan") +
+  "\nTerverifikasi: " + (role?.is_verified === true ? "Ya" : "Tidak");
+}
+
+async function runRpc(rpcName,resultId){
+ $(resultId).textContent = "Menjalankan pengujian...";
+
+ try{
+  const {data,error} = await db.rpc(rpcName);
+
+  if(error){
+   $(resultId).textContent = JSON.stringify({
+    result:"GAGAL",
+    function:rpcName,
+    message:error.message,
+    code:error.code
+   },null,2);
+   return;
+  }
+
+  $(resultId).textContent = JSON.stringify({
+   result:"BERHASIL",
+   function:rpcName,
+   row_count:Array.isArray(data) ? data.length : null,
+   data:data
+  },null,2);
+
+ }catch(e){
+  $(resultId).textContent = JSON.stringify({
+   result:"ERROR",
+   message:e.message
+  },null,2);
+ }
+}
+
+$("refresh").addEventListener("click",checkSession);
+$("available").addEventListener("click",()=>
+ runRpc("list_antardesa_ready_deliveries","availableResult")
+);
+$("mine").addEventListener("click",()=>
+ runRpc("list_my_antardesa_deliveries","mineResult")
+);
+
+checkSession();
+</script>
+</body>
+</html>
