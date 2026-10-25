@@ -3,226 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>Dashboard Mitra | AntarDesa</title>
-
 <link rel="stylesheet" href="style.css">
 
 <style>
 :root {
-  --green: #16805d;
-  --green-dark: #106747;
-  --red: #dc2626;
-  --border: #e2e9e4;
-  --muted: #61746b;
+  --green:#16805d;
+  --green-dark:#106747;
+  --red:#dc2626;
+  --border:#e2e9e4;
+  --muted:#61746b;
 }
-
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  background: #f5f8f6;
-  color: #20352a;
-  font-family: Arial, sans-serif;
+  margin:0;
+  background:#f5f8f6;
+  color:#20352a;
+  font-family:Arial,sans-serif;
 }
-
 header {
-  background: var(--green);
-  color: white;
-  padding: 24px 20px;
-  border-radius: 0 0 22px 22px;
+  background:var(--green);
+  color:white;
+  padding:24px 20px;
+  border-radius:0 0 22px 22px;
 }
-
-header h1 {
-  margin: 0;
-}
-
-header p {
-  font-size: 13px;
-  margin-bottom: 0;
-}
-
+header h1 { margin:0; }
+header p { font-size:13px; margin-bottom:0; }
 main {
-  max-width: 650px;
-  margin: auto;
-  padding: 20px 16px 100px;
+  max-width:650px;
+  margin:auto;
+  padding:20px 16px 100px;
 }
-
 .card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  padding: 18px;
-  margin-bottom: 18px;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:18px;
+  margin-bottom:18px;
 }
-
 .muted {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.6;
 }
-
 label {
-  display: block;
-  font-size: 13px;
-  font-weight: bold;
-  margin: 13px 0 6px;
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin:13px 0 6px;
 }
-
-input, select {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccd9d0;
-  border-radius: 9px;
-  font: inherit;
-  background: white;
+input,select,textarea {
+  display:block;
+  width:100%;
+  padding:12px;
+  border:1px solid #ccd9d0;
+  border-radius:9px;
+  font:inherit;
+  background:white;
 }
-
+textarea {
+  min-height:85px;
+  resize:vertical;
+}
 button {
-  border: 0;
-  border-radius: 10px;
-  padding: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
+  border:0;
+  border-radius:10px;
+  padding:12px;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:14px;
 }
-
+button:disabled {
+  opacity:.6;
+  cursor:not-allowed;
+}
 button:focus-visible {
-  outline: 3px solid #85c9a8;
-  outline-offset: 2px;
+  outline:3px solid #85c9a8;
+  outline-offset:2px;
 }
-
 .primary {
-  background: var(--green);
-  color: white;
-  width: 100%;
-  margin-top: 15px;
+  background:var(--green);
+  color:white;
+  width:100%;
+  margin-top:15px;
 }
-
-.primary:hover {
-  background: var(--green-dark);
-}
-
+.primary:hover { background:var(--green-dark); }
 .secondary {
-  background: #e8f4ee;
-  color: var(--green);
+  background:#e8f4ee;
+  color:var(--green);
 }
-
-.product {
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 14px;
-  margin-top: 10px;
-  background: white;
-}
-
-.product strong {
-  display: block;
-  margin-bottom: 6px;
-  overflow-wrap: anywhere;
-}
-
-.product small {
-  display: block;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.product-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
 .delete-button {
-  background: var(--red);
-  color: white;
-  width: 100%;
+  background:var(--red);
+  color:white;
+  width:100%;
 }
-
+.product {
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:14px;
+  margin-top:10px;
+  background:white;
+}
+.product strong {
+  display:block;
+  margin-bottom:6px;
+  overflow-wrap:anywhere;
+}
+.product small {
+  display:block;
+  color:var(--muted);
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+.product img {
+  width:100%;
+  max-height:220px;
+  object-fit:cover;
+  border-radius:9px;
+  margin-bottom:10px;
+}
+.product-actions {
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
 .empty {
-  padding: 14px 0;
-  color: var(--muted);
-  font-size: 14px;
+  padding:14px 0;
+  color:var(--muted);
+  font-size:14px;
 }
-
-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  gap: 8px;
-  background: white;
-  border-top: 1px solid #ddd;
-  padding: 14px 8px;
-  padding-bottom: max(14px, env(safe-area-inset-bottom));
-  z-index: 10;
-}
-
-nav a,
-nav button {
-  text-decoration: none;
-  color: var(--green);
-  font-size: 13px;
-  font-weight: normal;
-  background: transparent;
-  padding: 0;
-}
-
 .notice {
-  background: #fff8e6;
-  border: 1px solid #f2dfad;
-  color: #755b19;
-  padding: 11px;
-  border-radius: 9px;
-  font-size: 12px;
-  line-height: 1.5;
+  background:#fff8e6;
+  border:1px solid #f2dfad;
+  color:#755b19;
+  padding:11px;
+  border-radius:9px;
+  font-size:12px;
+  line-height:1.5;
 }
-
-/* Dashboard tidak ditampilkan sebelum izin diperiksa. */
-#dashboard {
-  display: none;
+.message {
+  font-size:13px;
+  line-height:1.5;
+  margin-top:12px;
+  overflow-wrap:anywhere;
 }
-
+.message.error { color:#b91c1c; }
+.message.success { color:#106747; }
+nav {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  gap:8px;
+  background:white;
+  border-top:1px solid #ddd;
+  padding:14px 8px;
+  padding-bottom:max(14px,env(safe-area-inset-bottom));
+  z-index:10;
+}
+nav a,nav button {
+  text-decoration:none;
+  color:var(--green);
+  font-size:13px;
+  font-weight:normal;
+  background:transparent;
+  padding:0;
+}
+#dashboard { display:none; }
 #accessScreen {
-  max-width: 460px;
-  margin: 55px auto;
-  padding: 24px;
-  text-align: center;
+  max-width:460px;
+  margin:55px auto;
+  padding:24px;
+  text-align:center;
 }
-
 #accessScreen a {
-  display: inline-block;
-  margin-top: 12px;
-  color: var(--green);
+  display:inline-block;
+  margin-top:12px;
+  color:var(--green);
 }
-
-#accessScreen p {
-  line-height: 1.6;
-}
+#accessScreen p { line-height:1.6; }
 </style>
 </head>
 
 <body>
 
-<!-- Gerbang akses yang tampil pertama kali -->
 <section id="accessScreen" role="status" aria-live="polite">
   <h2>AntarDesa 🏪</h2>
-  <p id="accessMessage">Sedang memeriksa hak akses Mitra...</p>
+  <p id="accessMessage">
+    Sedang memeriksa hak akses Mitra...
+  </p>
   <a id="accessLink" href="login.html" hidden>
     Kembali ke Login
   </a>
+  <button
+    id="retryLogout"
+    class="primary"
+    type="button"
+    hidden
+  >Coba Keluar Lagi</button>
 </section>
 
-<!-- Seluruh dashboard disembunyikan sampai akses disetujui -->
 <div id="dashboard">
-
   <header>
     <h1>AntarDesa.</h1>
     <p>Dashboard Mitra Usaha 🏪</p>
@@ -232,28 +216,28 @@ nav button {
 
     <section class="card">
       <h2>Kelola Toko</h2>
-
       <p class="muted">
-        Atur status toko dan tambahkan produk yang ingin dijual.
+        Kelola produk yang tersimpan di database AntarDesa.
       </p>
-
       <p>
         <strong>Status toko:</strong>
         <span id="storeStatus">Buka (Demo)</span>
       </p>
-
       <button
         class="secondary"
         id="toggleStore"
         type="button"
       >Tutup Toko</button>
+      <p class="muted">
+        Status buka/tutup masih simulasi dan belum
+        memengaruhi katalog pelanggan.
+      </p>
     </section>
 
     <section class="card">
       <h3>Tambah Produk</h3>
 
       <form id="productForm">
-
         <label for="productName">Nama produk</label>
         <input
           id="productName"
@@ -262,13 +246,22 @@ nav button {
           required
         >
 
+        <label for="description">Deskripsi</label>
+        <textarea
+          id="description"
+          maxlength="1000"
+          placeholder="Keterangan produk (opsional)"
+        ></textarea>
+
         <label for="category">Kategori</label>
         <select id="category" required>
           <option value="">Pilih kategori</option>
           <option value="Sembako">Sembako</option>
           <option value="Makanan dan Minuman">Makanan dan Minuman</option>
           <option value="Sayur dan Buah">Sayur dan Buah</option>
-          <option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option>
+          <option value="Kebutuhan Rumah Tangga">
+            Kebutuhan Rumah Tangga
+          </option>
           <option value="Lainnya">Lainnya</option>
         </select>
 
@@ -294,49 +287,72 @@ nav button {
           required
         >
 
-        <button class="primary" type="submit">
-          + Tambah Produk
-        </button>
+        <label for="imageUrl">URL gambar (opsional)</label>
+        <input
+          id="imageUrl"
+          type="url"
+          maxlength="2000"
+          placeholder="https://contoh.com/foto.jpg"
+        >
 
+        <button
+          class="primary"
+          id="saveProduct"
+          type="submit"
+        >+ Simpan Produk</button>
       </form>
 
+      <p
+        id="formMessage"
+        class="message"
+        role="status"
+        aria-live="polite"
+      ></p>
+
       <p class="muted">
-        Ini masih versi demo. Produk belum tersimpan ke database.
+        Produk baru disimpan sebagai produk aktif.
+        Gunakan URL gambar HTTPS jika tersedia.
       </p>
     </section>
 
     <section class="card">
-      <h3>Daftar Produk</h3>
+      <h3>Daftar Produk Saya</h3>
 
       <p class="muted" id="productCount">
-        Jumlah produk: 0
+        Memuat produk...
       </p>
 
-      <div id="productList" aria-live="polite">
-        <p class="empty">Belum ada produk.</p>
-      </div>
+      <button
+        id="refreshProducts"
+        class="secondary"
+        type="button"
+      >↻ Muat Ulang Produk</button>
+
+      <p
+        id="listMessage"
+        class="message"
+        role="status"
+        aria-live="polite"
+      ></p>
+
+      <div id="productList" aria-live="polite"></div>
     </section>
 
     <section class="card">
       <h3>Pesanan Masuk</h3>
-
       <p class="muted">Belum ada pesanan masuk.</p>
-
       <p class="muted">
-        Pesanan pelanggan akan tampil setelah sistem database
-        dan pemesanan terhubung.
+        Integrasi pemesanan akan dibuat pada tahap berikutnya.
       </p>
     </section>
 
     <section class="card">
       <p class="muted">
-        AntarDesa v0.2.1 · Dashboard simulasi
+        AntarDesa v0.2.2 · Integrasi Produk Supabase
       </p>
-
       <div class="notice">
-        Data produk dan status toko saat ini hanya tersimpan
-        selama halaman masih aktif. Muat ulang halaman akan
-        menghapus data demo.
+        Produk kini disimpan di database Supabase.
+        Status toko dan pesanan masih dalam tahap demo.
       </div>
     </section>
 
@@ -349,18 +365,17 @@ nav button {
       ♙ Keluar
     </button>
   </nav>
-
 </div>
 
-<!-- Supabase JavaScript SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
 "use strict";
 
 /*
-  Konfigurasi Supabase AntarDesa.
-  Gunakan publishable key, bukan secret key.
+  ANTARDESA TAHAP 7.1.42B
+  Hanya gunakan publishable key.
+  Jangan menaruh secret/service_role key di HTML.
 */
 
 const SUPABASE_URL =
@@ -369,20 +384,30 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
 
-const accessScreen = document.getElementById("accessScreen");
-const accessMessage = document.getElementById("accessMessage");
-const accessLink = document.getElementById("accessLink");
-const dashboard = document.getElementById("dashboard");
-const logoutButton = document.getElementById("logoutButton");
+const $ = id => document.getElementById(id);
+
+const accessScreen = $("accessScreen");
+const accessMessage = $("accessMessage");
+const accessLink = $("accessLink");
+const retryLogout = $("retryLogout");
+const dashboard = $("dashboard");
+const logoutButton = $("logoutButton");
 
 let supabaseClient = null;
+let merchantId = null;
 let dashboardInitialized = false;
+let busy = false;
+let products = [];
+
+const rupiah = value =>
+  "Rp " + Number(value).toLocaleString("id-ID");
 
 function denyAccess(message) {
   dashboard.style.display = "none";
   accessScreen.style.display = "block";
   accessMessage.textContent = message;
   accessLink.hidden = false;
+  retryLogout.hidden = true;
 }
 
 function allowAccess() {
@@ -390,8 +415,13 @@ function allowAccess() {
   dashboard.style.display = "block";
 }
 
-async function verifyMerchantAccess() {
+function setMessage(id, message, type = "") {
+  const element = $(id);
+  element.textContent = message;
+  element.className = "message " + type;
+}
 
+async function verifyMerchantAccess() {
   if (
     !window.supabase ||
     !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
@@ -406,8 +436,6 @@ async function verifyMerchantAccess() {
   );
 
   try {
-
-    // Memvalidasi pengguna melalui Supabase Auth.
     const { data: authData, error: authError } =
       await supabaseClient.auth.getUser();
 
@@ -418,7 +446,6 @@ async function verifyMerchantAccess() {
 
     const userId = authData.user.id;
 
-    // Membaca peran resmi dari tabel yang dilindungi RLS.
     const { data: userRole, error: roleError } =
       await supabaseClient
         .from("user_roles")
@@ -428,7 +455,7 @@ async function verifyMerchantAccess() {
 
     if (roleError || !userRole) {
       denyAccess(
-        "Hak akses belum dapat diverifikasi. Periksa koneksi atau coba lagi."
+        "Hak akses belum dapat diverifikasi. Periksa koneksi."
       );
       return;
     }
@@ -438,273 +465,352 @@ async function verifyMerchantAccess() {
       userRole.is_verified !== true
     ) {
       denyAccess(
-        "Akses ditolak. Halaman ini hanya untuk Mitra AntarDesa yang telah disetujui."
+        "Akses ditolak. Halaman ini hanya untuk Mitra terverifikasi."
       );
       return;
     }
 
-    // Dashboard hanya dijalankan setelah verifikasi berhasil.
+    merchantId = userId;
     allowAccess();
     initializeDashboard();
 
   } catch (error) {
-
-    console.error("Pemeriksaan akses gagal:", error.message);
-
+    console.error("Verifikasi gagal:", error);
     denyAccess(
-      "Terjadi kendala saat memeriksa hak akses. Silakan coba lagi."
+      "Terjadi kendala saat memeriksa hak akses."
     );
-
   }
 }
 
 /*
-  Tombol logout mengakhiri sesi Supabase,
-  bukan sekadar membuka halaman login.
+  Logout tetap mengakhiri sesi Supabase.
 */
 
-logoutButton.addEventListener("click", async function () {
-
-  if (!supabaseClient) {
-    return;
-  }
+async function logout() {
+  if (!supabaseClient || logoutButton.disabled) return;
 
   logoutButton.disabled = true;
   logoutButton.textContent = "Memproses...";
 
-  // Sembunyikan dashboard saat proses keluar dimulai.
   dashboard.style.display = "none";
   accessScreen.style.display = "block";
   accessMessage.textContent = "Sedang keluar dari akun...";
   accessLink.hidden = true;
+  retryLogout.hidden = true;
 
   try {
-
-    const { error } =
-      await supabaseClient.auth.signOut();
-
-    if (error) {
-      throw error;
-    }
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
 
     window.location.replace("login.html");
-
   } catch (error) {
-
-    console.error("Logout gagal:", error.message);
-
-    denyAccess(
-      "Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi."
-    );
-
+    console.error("Logout gagal:", error);
+    accessMessage.textContent =
+      "Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.";
+    retryLogout.hidden = false;
     logoutButton.disabled = false;
     logoutButton.textContent = "♙ Keluar";
-
-    // Berikan pilihan mencoba logout kembali.
-    accessLink.hidden = true;
-
-    const retryButton = document.createElement("button");
-    retryButton.type = "button";
-    retryButton.className = "primary";
-    retryButton.textContent = "Coba Keluar Lagi";
-
-    retryButton.addEventListener("click", function () {
-      retryButton.remove();
-      logoutButton.click();
-    });
-
-    accessScreen.appendChild(retryButton);
-
   }
+}
 
-});
+logoutButton.addEventListener("click", logout);
+retryLogout.addEventListener("click", logout);
 
 /*
-  Dashboard demo.
-  Fungsi ini tidak dipanggil sebelum akses Mitra disetujui.
+  Seluruh fitur produk baru dijalankan
+  setelah role Mitra diverifikasi.
 */
 
 function initializeDashboard() {
-
-  if (dashboardInitialized) {
-    return;
-  }
-
+  if (dashboardInitialized) return;
   dashboardInitialized = true;
 
   let storeOpen = true;
-  let products = [];
-  let nextProductId = 1;
 
-  const productForm =
-    document.getElementById("productForm");
-
-  const productList =
-    document.getElementById("productList");
-
-  const productCount =
-    document.getElementById("productCount");
-
-  const storeStatus =
-    document.getElementById("storeStatus");
-
-  const toggleStoreButton =
-    document.getElementById("toggleStore");
-
-  toggleStoreButton.addEventListener("click", function () {
-
+  $("toggleStore").addEventListener("click", function () {
     storeOpen = !storeOpen;
 
-    storeStatus.textContent = storeOpen
-      ? "Buka (Demo)"
-      : "Tutup (Demo)";
+    $("storeStatus").textContent =
+      storeOpen ? "Buka (Demo)" : "Tutup (Demo)";
 
-    toggleStoreButton.textContent = storeOpen
-      ? "Tutup Toko"
-      : "Buka Toko";
-
+    this.textContent =
+      storeOpen ? "Tutup Toko" : "Buka Toko";
   });
 
-  productForm.addEventListener("submit", function (event) {
+  $("productForm").addEventListener("submit", saveProduct);
 
-    event.preventDefault();
+  $("refreshProducts").addEventListener(
+    "click",
+    loadProducts
+  );
 
-    const name =
-      document.getElementById("productName").value.trim();
+  loadProducts();
+}
 
-    const category =
-      document.getElementById("category").value;
+function renderProducts() {
+  const list = $("productList");
+  list.replaceChildren();
 
-    const priceValue =
-      document.getElementById("price").value;
+  $("productCount").textContent =
+    "Jumlah produk: " + products.length;
 
-    const stockValue =
-      document.getElementById("stock").value;
+  if (products.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "Belum ada produk tersimpan.";
+    list.appendChild(empty);
+    return;
+  }
 
-    const price = Number(priceValue);
-    const stock = Number(stockValue);
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product";
 
     if (
-      !name ||
-      !category ||
-      priceValue === "" ||
-      stockValue === "" ||
-      !Number.isSafeInteger(price) ||
-      price < 1 ||
-      price > 100000000 ||
-      !Number.isSafeInteger(stock) ||
-      stock < 0 ||
-      stock > 100000
+      product.image_url &&
+      /^https:\/\//i.test(product.image_url)
     ) {
-      alert(
-        "Periksa kembali nama, kategori, harga, dan stok produk."
+      const img = document.createElement("img");
+      img.src = product.image_url;
+      img.alt = "Foto " + product.name;
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => img.remove();
+      card.appendChild(img);
+    }
+
+    const title = document.createElement("strong");
+    title.textContent = product.name;
+
+    const info = document.createElement("small");
+    info.textContent =
+      product.category +
+      " · " + rupiah(product.price) +
+      " · Stok: " + product.stock +
+      " · " + (product.is_active ? "Aktif" : "Nonaktif");
+
+    const description = document.createElement("p");
+    description.className = "muted";
+    description.textContent = product.description || "";
+
+    const actions = document.createElement("div");
+    actions.className = "product-actions";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "delete-button";
+    deleteButton.textContent = "🗑️ Hapus Produk";
+    deleteButton.disabled = busy;
+
+    deleteButton.addEventListener("click", () => {
+      deleteProduct(product, deleteButton);
+    });
+
+    actions.appendChild(deleteButton);
+    card.append(title, info, description, actions);
+    list.appendChild(card);
+  });
+}
+
+async function loadProducts() {
+  if (!merchantId || busy) return;
+
+  $("refreshProducts").disabled = true;
+  setMessage("listMessage", "Memuat produk...");
+  $("productCount").textContent = "Memuat produk...";
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("products")
+      .select(
+        "id,merchant_id,name,description,category,price,stock,image_url,is_active,created_at"
+      )
+      .eq("merchant_id", merchantId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    products = data || [];
+    renderProducts();
+    setMessage("listMessage", "");
+  } catch (error) {
+    console.error("Gagal memuat produk:", error);
+    setMessage(
+      "listMessage",
+      "Gagal memuat produk: " + error.message,
+      "error"
+    );
+    $("productCount").textContent =
+      "Daftar produk belum berhasil dimuat.";
+  } finally {
+    $("refreshProducts").disabled = false;
+  }
+}
+
+async function saveProduct(event) {
+  event.preventDefault();
+  if (busy || !merchantId) return;
+
+  const name = $("productName").value.trim();
+  const description = $("description").value.trim();
+  const category = $("category").value;
+  const priceText = $("price").value;
+  const stockText = $("stock").value;
+  const imageText = $("imageUrl").value.trim();
+
+  const price = Number(priceText);
+  const stock = Number(stockText);
+
+  if (
+    !name ||
+    name.length > 80 ||
+    description.length > 1000 ||
+    !category ||
+    priceText === "" ||
+    stockText === "" ||
+    !Number.isSafeInteger(price) ||
+    price < 1 ||
+    price > 100000000 ||
+    !Number.isSafeInteger(stock) ||
+    stock < 0 ||
+    stock > 100000
+  ) {
+    setMessage(
+      "formMessage",
+      "Periksa nama, kategori, harga, dan stok produk.",
+      "error"
+    );
+    return;
+  }
+
+  let imageUrl = null;
+
+  if (imageText) {
+    try {
+      const parsed = new URL(imageText);
+
+      if (
+        parsed.protocol !== "https:" ||
+        parsed.username ||
+        parsed.password ||
+        imageText.length > 2000
+      ) {
+        throw new Error("URL tidak valid");
+      }
+
+      imageUrl = parsed.href;
+    } catch {
+      setMessage(
+        "formMessage",
+        "URL gambar harus menggunakan HTTPS yang valid.",
+        "error"
       );
       return;
     }
-
-    products.push({
-      id: nextProductId++,
-      name: name,
-      category: category,
-      price: price,
-      stock: stock
-    });
-
-    renderProducts();
-    productForm.reset();
-
-  });
-
-  function renderProducts() {
-
-    productList.replaceChildren();
-
-    productCount.textContent =
-      "Jumlah produk: " + products.length;
-
-    if (products.length === 0) {
-
-      const emptyMessage =
-        document.createElement("p");
-
-      emptyMessage.className = "empty";
-      emptyMessage.textContent = "Belum ada produk.";
-
-      productList.appendChild(emptyMessage);
-      return;
-
-    }
-
-    products.forEach(function (product) {
-
-      const card =
-        document.createElement("div");
-
-      card.className = "product";
-
-      const title =
-        document.createElement("strong");
-
-      title.textContent = product.name;
-
-      const info =
-        document.createElement("small");
-
-      info.textContent =
-        product.category +
-        " · Rp " +
-        product.price.toLocaleString("id-ID") +
-        " · Stok: " +
-        product.stock;
-
-      const actions =
-        document.createElement("div");
-
-      actions.className = "product-actions";
-
-      const deleteButton =
-        document.createElement("button");
-
-      deleteButton.type = "button";
-      deleteButton.className = "delete-button";
-      deleteButton.textContent = "🗑️ Hapus";
-
-      deleteButton.addEventListener("click", function () {
-
-        const confirmed = window.confirm(
-          'Apakah kamu yakin ingin menghapus produk "' +
-          product.name +
-          '"?'
-        );
-
-        if (!confirmed) {
-          return;
-        }
-
-        products = products.filter(function (item) {
-          return item.id !== product.id;
-        });
-
-        renderProducts();
-
-      });
-
-      actions.appendChild(deleteButton);
-      card.append(title, info, actions);
-      productList.appendChild(card);
-
-    });
-
   }
 
-  renderProducts();
+  busy = true;
+  $("saveProduct").disabled = true;
+  $("saveProduct").textContent = "Menyimpan...";
+  setMessage("formMessage", "Sedang menyimpan produk...");
 
+  try {
+    const { error } = await supabaseClient
+      .from("products")
+      .insert({
+        merchant_id: merchantId,
+        name,
+        description,
+        category,
+        price,
+        stock,
+        image_url: imageUrl,
+        is_active: true
+      });
+
+    if (error) throw error;
+
+    $("productForm").reset();
+
+    setMessage(
+      "formMessage",
+      "Produk berhasil disimpan ke Supabase.",
+      "success"
+    );
+  } catch (error) {
+    console.error("Gagal menyimpan produk:", error);
+    setMessage(
+      "formMessage",
+      "Gagal menyimpan produk: " + error.message,
+      "error"
+    );
+    return;
+  } finally {
+    busy = false;
+    $("saveProduct").disabled = false;
+    $("saveProduct").textContent = "+ Simpan Produk";
+  }
+
+  await loadProducts();
 }
 
-// Jalankan pemeriksaan akses terlebih dahulu.
+async function deleteProduct(product, button) {
+  if (busy || !merchantId) return;
+
+  const confirmed = window.confirm(
+    'Hapus produk "' + product.name +
+    '" secara permanen dari database?'
+  );
+
+  if (!confirmed) return;
+
+  busy = true;
+  button.disabled = true;
+  button.textContent = "Menghapus...";
+  setMessage("listMessage", "Sedang menghapus produk...");
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("products")
+      .delete()
+      .eq("id", product.id)
+      .eq("merchant_id", merchantId)
+      .select("id");
+
+    if (error) throw error;
+
+    if (!data || data.length !== 1) {
+      throw new Error(
+        "Produk tidak terhapus. Periksa izin atau muat ulang."
+      );
+    }
+
+    products = products.filter(
+      item => item.id !== product.id
+    );
+
+    renderProducts();
+
+    setMessage(
+      "listMessage",
+      "Produk berhasil dihapus dari database.",
+      "success"
+    );
+  } catch (error) {
+    console.error("Gagal menghapus produk:", error);
+    setMessage(
+      "listMessage",
+      "Gagal menghapus produk: " + error.message,
+      "error"
+    );
+    button.disabled = false;
+    button.textContent = "🗑️ Hapus Produk";
+  } finally {
+    busy = false;
+  }
+}
+
 verifyMerchantAccess();
-
 </script>
-
 </body>
 </html>
