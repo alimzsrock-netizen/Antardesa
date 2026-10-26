@@ -445,6 +445,12 @@ function layanan(nama){
  );
 }
 
+/* G1: pesan UI standar, hanya untuk presentasi status. */
+function showCustomerUIStatus(targetId,code){
+ const target = $(targetId);
+ window.AntarDesaUI.showMessage(target,code);
+}
+
 /* KATALOG */
 
 async function loadCatalog(){
@@ -453,8 +459,7 @@ async function loadCatalog(){
  catalogLoading = true;
  $("refreshCatalog").disabled = true;
  $("catalogStatus").className = "catalog-status";
- $("catalogStatus").textContent =
-  "Sedang mengambil produk dari Supabase...";
+ showCustomerUIStatus("catalogStatus","UI-01");
 
  try{
   const {data,error} = await supabaseClient
@@ -475,8 +480,7 @@ async function loadCatalog(){
  }catch(error){
   console.error("Gagal memuat katalog:",error);
   $("catalogStatus").className = "catalog-status error";
-  $("catalogStatus").textContent =
-   "Gagal memuat katalog: " + error.message;
+  showCustomerUIStatus("catalogStatus","UI-06");
 
   if(!catalogLoaded) $("catalogList").replaceChildren();
 
@@ -525,11 +529,13 @@ function renderCatalog(){
   " produk aktif (maksimal 100 produk terbaru).";
 
  if(filtered.length === 0){
+  if(catalogProducts.length === 0){
+   showCustomerUIStatus("catalogStatus","UI-02");
+   return;
+  }
   const empty = document.createElement("p");
   empty.className = "notice";
-  empty.textContent = catalogProducts.length === 0
-   ? "Belum ada produk aktif dari Mitra."
-   : "Tidak ada produk yang cocok dengan pencarian.";
+  empty.textContent = "Tidak ada produk yang cocok dengan pencarian.";
   list.appendChild(empty);
   return;
  }
@@ -1497,8 +1503,7 @@ async function loadOrders(){
  ordersLoading = true;
  $("refreshOrders").disabled = true;
  $("ordersStatus").className = "catalog-status";
- $("ordersStatus").textContent =
-  "Sedang mengambil pesanan...";
+ showCustomerUIStatus("ordersStatus","UI-01");
 
  try{
   const {data:orders,error} = await supabaseClient
@@ -1514,7 +1519,7 @@ async function loadOrders(){
   list.replaceChildren();
 
   if(!orders?.length){
-   $("ordersStatus").textContent = "Belum ada pesanan.";
+   showCustomerUIStatus("ordersStatus","UI-03");
    return;
   }
 
@@ -1755,8 +1760,7 @@ async function loadOrders(){
   $("ordersStatus").className =
    "catalog-status error";
 
-  $("ordersStatus").textContent =
-   "Gagal memuat pesanan: " + error.message;
+  showCustomerUIStatus("ordersStatus","UI-06");
 
  }finally{
   ordersLoading = false;
