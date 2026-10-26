@@ -1,0 +1,37 @@
+/* AntarDesa v0.3.0 G1 - optional shared notice styles. Scoped to .ad-ui-notice. */
+.ad-ui-notice {
+  --ad-ui-border: #c9dfd4;
+  --ad-ui-background: #eff8f3;
+  --ad-ui-foreground: #1c3028;
+  display: block;
+  padding: 12px 14px;
+  margin: 10px 0;
+  border: 1px solid var(--ad-ui-border);
+  border-radius: 12px;
+  background: var(--ad-ui-background);
+  color: var(--ad-ui-foreground);
+  font: 14px/1.5 Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+.ad-ui-notice--empty { --ad-ui-border: #dbe5de; --ad-ui-background: #f7faf8; }
+.ad-ui-notice--warning { --ad-ui-border: #e6d6a7; --ad-ui-background: #fff9e8; --ad-ui-foreground: #58430e; }
+.ad-ui-notice--error { --ad-ui-border: #e8bdbd; --ad-ui-background: #fff3f3; --ad-ui-foreground: #762c2c; }
+.ad-ui-notice--info { --ad-ui-border: #c9d9e9; --ad-ui-background: #f1f7fd; --ad-ui-foreground: #214763; }
+.ad-ui-notice--loading { --ad-ui-border: #c9dfd4; --ad-ui-background: #eff8f3; }
+.ad-ui-notice__text { display: block; }
+@media (prefers-reduced-motion: no-preference) {
+  .ad-ui-notice--loading::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 9px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    vertical-align: -1px;
+    animation: ad-ui-spin .8s linear infinite;
+  }
+  .ad-ui-notice--loading .ad-ui-notice__text { display: inline; }
+  @keyframes ad-ui-spin { to { transform: rotate(360deg); } }
+}
