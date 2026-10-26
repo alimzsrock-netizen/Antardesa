@@ -167,7 +167,7 @@ nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:n
 <section class="card">
 <h3>Informasi</h3>
 <p class="notice">
-AntarDesa v0.2.8. Shipping V4 Preview dengan GPS otomatis, koordinat manual, estimasi ongkir dan Shipping Quote. Pemeriksaan transaksi tertunda V2/V3 tidak membuat ulang pesanan. Layanan lainnya masih dalam pengembangan.
+AntarDesa v0.2.9. Shipping V4 Preview dengan GPS otomatis, koordinat manual, estimasi ongkir dan Shipping Quote. Pemeriksaan transaksi tertunda V2/V3 tidak membuat ulang pesanan. Layanan lainnya masih dalam pengembangan.
 </p>
 </section>
 
@@ -265,7 +265,7 @@ Jika koordinat diubah, estimasi dan quote sebelumnya otomatis tidak berlaku untu
 "use strict";
 
 /*
- ANTARDESA v0.2.8
+ ANTARDESA v0.2.9
  SHIPPING V4 PREVIEW
 
  - GPS otomatis dan koordinat manual.
@@ -1269,13 +1269,7 @@ async function runShipping(action){
     "\nOngkir: " + rupiah(fee) +
     "\nBerlaku sampai: " +
     new Date(expiryTime).toLocaleString("id-ID") +
-    "\nCheckout server aktif: " +
-    (
-     result.checkout_enabled === true
-      ? "Ya"
-      : "Tidak"
-    ) +
-    "\nCheckout halaman ini: TIDAK AKTIF" +
+    "\nCheckout halaman ini: TIDAK AKTIF (MODE PREVIEW)" +
     "\n\nQuote ini hanya untuk pengujian. " +
     "Belum membuat pesanan dan belum mengurangi stok.";
 
@@ -1337,6 +1331,14 @@ document.addEventListener(
 );
 
 window.addEventListener("focus",checkQuoteExpiry);
+
+/*
+ * Periksa kedaluwarsa saat halaman tetap terbuka.
+ * Ini hanya memperbarui tampilan lokal, tidak memanggil API,
+ * tidak menggunakan quote, dan tidak membuat pesanan.
+ * Event visibilitychange/focus tetap menjadi pemeriksaan tambahan.
+ */
+window.setInterval(checkQuoteExpiry,1000);
 
 /* PEMERIKSAAN TRANSAKSI LAMA V2/V3 */
 
