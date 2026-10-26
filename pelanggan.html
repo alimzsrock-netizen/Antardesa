@@ -122,13 +122,13 @@ nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:n
 
 <div class="preview-banner">
 <strong>Shipping V4 Preview</strong>
-<p>Pengujian GPS, estimasi ongkir, dan Shipping Quote sudah tersedia. Pembuatan pesanan baru belum diaktifkan pada halaman ini. Transaksi V2/V3 lama yang tertunda tetap dapat diperiksa.</p>
+<p>Pengujian GPS, estimasi ongkir, dan Shipping Quote sudah tersedia. Pembuatan pesanan baru belum diaktifkan pada halaman ini. Transaksi V2/V3 lama yang tertunda tetap dapat diperiksa tanpa memanggil RPC pembuatan pesanan lama.</p>
 </div>
 
 <div id="pendingNotice" hidden>
 <strong>⚠️ Ada transaksi yang perlu diperiksa</strong>
 <p id="pendingDescription"></p>
-<button id="resumeOrder" class="primary" type="button">Periksa / Coba Lagi Transaksi</button>
+<button id="resumeOrder" class="primary" type="button">Periksa Transaksi Lama</button>
 </div>
 
 <div class="catalog-controls">
@@ -167,7 +167,7 @@ nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:n
 <section class="card">
 <h3>Informasi</h3>
 <p class="notice">
-AntarDesa v0.2.7. Shipping V4 Preview dengan GPS otomatis, koordinat manual, estimasi ongkir dan Shipping Quote. Pemulihan transaksi tertunda V2/V3 dipertahankan. Layanan lainnya masih dalam pengembangan.
+AntarDesa v0.2.8. Shipping V4 Preview dengan GPS otomatis, koordinat manual, estimasi ongkir dan Shipping Quote. Pemeriksaan transaksi tertunda V2/V3 tidak membuat ulang pesanan. Layanan lainnya masih dalam pengembangan.
 </p>
 </section>
 
@@ -265,13 +265,13 @@ Jika koordinat diubah, estimasi dan quote sebelumnya otomatis tidak berlaku untu
 "use strict";
 
 /*
- ANTARDESA v0.2.7
+ ANTARDESA v0.2.8
  SHIPPING V4 PREVIEW
 
  - GPS otomatis dan koordinat manual.
  - Estimasi ongkir dan penerbitan quote.
  - Tidak membuat pesanan baru.
- - Pemulihan transaksi V2/V3 tetap tersedia.
+ - Pemeriksaan transaksi tertunda V2/V3 tanpa memanggil RPC lama.
 */
 
 const SUPABASE_URL =
@@ -620,7 +620,9 @@ function validPending(saved,version){
 
  if(
   typeof saved.requestId !== "string" ||
+  !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(saved.requestId) ||
   typeof saved.productId !== "string" ||
+  !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(saved.productId) ||
   !Number.isInteger(saved.quantity) ||
   saved.quantity < 1 ||
   saved.quantity > 100 ||
@@ -713,15 +715,21 @@ function renderPendingNotice(){
    "Jangan membuat pesanan baru. Hubungi pengelola untuk pemeriksaan.";
 
   $("resumeOrder").disabled = true;
+  $("resumeOrder").textContent = "Perlu Pemeriksaan Manual";
   return;
  }
 
  $("resumeOrder").disabled = orderBusy || !pendingRequest;
+ $("resumeOrder").textContent = orderBusy
+  ? "Sedang Memeriksa..."
+  : "Periksa Transaksi Lama";
 
  if(pendingRequest){
   $("pendingDescription").textContent =
    "Ada transaksi " + pendingRequest.version.toUpperCase() +
-   " yang perlu diperiksa. Jangan membuat pesanan baru. " +
+   " yang perlu diperiksa. Fitur pengiriman ulang transaksi lama telah dinonaktifkan " +
+   "karena RPC V2/V3 tidak lagi dapat dipanggil oleh pengguna. Sistem hanya akan mencari " +
+   "pesanan yang sudah tercatat dengan Request ID yang sama. Jika tidak ditemukan, data akan tetap disimpan. " +
    "Request ID: " + pendingRequest.requestId;
  }
 }
@@ -877,11 +885,6 @@ function updateCheckoutTotal(){
 
   $("checkoutTotal").textContent = text;
  }
-
- /*
-  Preview tidak boleh membuat pesanan baru.
-  Jangan aktifkan tombol hanya berdasarkan quote.
- */
 
  $("submitOrder").disabled = true;
  $("submitOrder").textContent =
@@ -1088,11 +1091,6 @@ async function runShipping(action){
   if(!approved) return;
  }
 
- /*
-  Setiap permintaan menggunakan revisi formulir.
-  Respons lama tidak boleh menggantikan hasil baru.
- */
-
  invalidateShipping(
   action === "quote"
    ? "Meminta server menerbitkan Shipping Quote..."
@@ -1180,11 +1178,6 @@ async function runShipping(action){
     )
    );
   }
-
-  /*
-   Jika formulir berubah saat request berlangsung,
-   respons tidak boleh digunakan.
-  */
 
   if(revision !== shippingRevision || !selectedProduct){
    return;
@@ -1320,11 +1313,6 @@ async function runShipping(action){
  }
 }
 
-/*
- Masa berlaku quote diperiksa saat halaman kembali aktif.
- Tidak ada jalur checkout pada versi Preview ini.
-*/
-
 function checkQuoteExpiry(){
  if(!shippingQuote) return;
 
@@ -1350,20 +1338,54 @@ document.addEventListener(
 
 window.addEventListener("focus",checkQuoteExpiry);
 
-/* PEMULIHAN TRANSAKSI LAMA */
+/* PEMERIKSAAN TRANSAKSI LAMA V2/V3 */
 
 async function findExistingPendingOrder(){
  if(!pendingRequest) return null;
 
+ const requestId = pendingRequest.requestId;
+
  const {data,error} = await supabaseClient
   .from("orders")
-  .select("id,status,total_amount")
+  .select("id,status,total_amount,request_id,customer_id")
   .eq("customer_id",currentUserId)
-  .eq("request_id",pendingRequest.requestId)
+  .eq("request_id",requestId)
   .maybeSingle();
 
  if(error) throw error;
+
+ if(!data) return null;
+
+ /*
+  Validasi ekstra agar UI tidak menerima baris yang
+  tidak cocok dengan pengguna atau Request ID aktif.
+ */
+ if(
+  data.customer_id !== currentUserId ||
+  data.request_id !== requestId ||
+  typeof data.id !== "string"
+ ){
+  throw new Error(
+   "Data pesanan yang ditemukan tidak cocok dengan transaksi tertunda."
+  );
+ }
+
  return data;
+}
+
+function friendlyOrderStatus(status){
+ const labels = {
+  pending:"Menunggu konfirmasi Mitra",
+  accepted:"Diterima Mitra",
+  rejected:"Ditolak Mitra",
+  preparing:"Sedang disiapkan",
+  ready:"Siap diantar",
+  delivering:"Sedang diantar",
+  completed:"Selesai",
+  cancelled:"Dibatalkan"
+ };
+
+ return labels[status] || status || "Status tidak diketahui";
 }
 
 async function sendPendingOrder(){
@@ -1375,57 +1397,42 @@ async function sendPendingOrder(){
  ) return;
 
  setOrderBusy(true);
+ $("pendingDescription").textContent =
+  "Sedang memeriksa apakah pesanan dengan Request ID yang sama sudah tercatat. " +
+  "Sistem tidak akan membuat atau mengirim ulang pesanan.";
 
  try{
+  /*
+   * Penting: tidak ada RPC create_antardesa_order_v2/v3 di sini.
+   * Kedua RPC tersebut sudah dicabut hak EXECUTE authenticated.
+   */
   const request = pendingRequest;
   const existing = await findExistingPendingOrder();
 
-  let orderId;
+  if(!existing){
+   $("pendingDescription").textContent =
+    "Pesanan dengan Request ID ini tidak ditemukan pada daftar pesanan yang dapat dibaca. " +
+    "Data transaksi tetap disimpan. Karena RPC lama sudah dinonaktifkan, halaman ini tidak akan " +
+    "mengirim ulang transaksi secara otomatis. Jangan membuat transaksi pengganti sebelum pemeriksaan manual.";
 
-  if(existing && request.version === "v2"){
-   orderId = existing.id;
+   alert(
+    "Pesanan lama belum ditemukan.\n\n" +
+    "Data transaksi tetap disimpan di perangkat ini. " +
+    "Sistem tidak mengirim ulang pesanan karena RPC V2/V3 sudah dinonaktifkan.\n\n" +
+    "Jangan membuat pesanan pengganti dulu. Minta pengelola memeriksa transaksi menggunakan Request ID:\n" +
+    request.requestId
+   );
+
+   return;
   }
 
   /*
-   V3 tetap memanggil RPC menggunakan payload asli,
-   termasuk jika pesanan dengan request ID sama ditemukan.
-   Validasi idempotensi tetap dilakukan oleh database.
-  */
-
-  if(!orderId){
-   const functionName = request.version === "v2"
-    ? "create_antardesa_order_v2"
-    : "create_antardesa_order_v3";
-
-   const args = {
-    p_product_id:request.productId,
-    p_quantity:request.quantity,
-    p_request_id:request.requestId,
-    p_customer_note:request.note
-   };
-
-   if(request.version === "v3"){
-    args.p_recipient_name = request.recipientName;
-    args.p_recipient_phone = request.recipientPhone;
-    args.p_delivery_address = request.deliveryAddress;
-    args.p_delivery_note = request.deliveryNote;
-   }
-
-   const {data,error} = await supabaseClient.rpc(
-    functionName,
-    args
-   );
-
-   if(error) throw error;
-
-   if(!data){
-    throw new Error(
-     "Server tidak mengembalikan Order ID."
-    );
-   }
-
-   orderId = data;
-  }
+   * Pesanan ditemukan dan cocok dengan customer_id + request_id.
+   * Baru sekarang data lokal transaksi ini boleh dibersihkan.
+   */
+  const orderId = existing.id;
+  const orderStatus = existing.status;
+  const orderTotal = existing.total_amount;
 
   clearPendingRequest();
 
@@ -1435,9 +1442,11 @@ async function sendPendingOrder(){
   ]);
 
   alert(
-   "Transaksi tertunda berhasil diselesaikan!\n\n" +
+   "Pesanan lama ditemukan di database.\n\n" +
    "Order ID:\n" + orderId +
-   "\n\nStatus: Menunggu konfirmasi Mitra."
+   "\nStatus: " + friendlyOrderStatus(orderStatus) +
+   "\nTotal tercatat: " + rupiah(orderTotal) +
+   "\n\nTidak ada pesanan baru yang dibuat."
   );
 
   $("pesananSaya").scrollIntoView({
@@ -1447,17 +1456,22 @@ async function sendPendingOrder(){
 
  }catch(error){
   console.error(
-   "Transaksi lama perlu diperiksa:",
+   "Pemeriksaan transaksi lama gagal:",
    error
   );
 
-  renderPendingNotice();
+  /*
+   * Jangan hapus data lokal ketika query gagal.
+   */
+  $("pendingDescription").textContent =
+   "Pemeriksaan gagal. Data transaksi tetap disimpan. " +
+   "Jangan mengirim ulang atau membuat pesanan pengganti. " +
+   "Kesalahan: " + error.message;
 
   alert(
-   "Status transaksi belum dapat dipastikan.\n\n" +
+   "Pemeriksaan transaksi gagal.\n\n" +
    error.message +
-   "\n\nJangan membuat permintaan baru. " +
-   "Gunakan kembali tombol transaksi tertunda."
+   "\n\nData transaksi tetap disimpan. Tidak ada pesanan baru yang dikirim."
   );
 
  }finally{
@@ -1515,7 +1529,7 @@ async function loadOrders(){
     new Date(order.created_at).toLocaleString("id-ID");
 
    detail.textContent =
-    "Status: " + order.status +
+    "Status: " + friendlyOrderStatus(order.status) +
     "\nTotal: " + rupiah(order.total_amount) +
     "\nTanggal: " + date +
     "\nID: " + order.id;
@@ -1814,12 +1828,6 @@ $("closeCheckout").addEventListener(
  closeCheckout
 );
 
-/*
- Pengamanan tambahan:
- Tidak ada pemanggilan create_antardesa_order_v4
- untuk pesanan baru dalam mode Preview.
-*/
-
 $("submitOrder").addEventListener(
  "click",
  ()=>{
@@ -1838,11 +1846,6 @@ $("resumeOrder").addEventListener(
    orderBusy ||
    pendingCorrupt
   ) return;
-
-  if(!confirm(
-   "Periksa transaksi tertunda dan, jika diperlukan, " +
-   "kirim ulang menggunakan Request ID yang SAMA?"
-  )) return;
 
   await sendPendingOrder();
  }
