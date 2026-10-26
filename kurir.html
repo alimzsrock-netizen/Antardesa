@@ -215,6 +215,25 @@ const SUPABASE_KEY =
 
 const $ = id => document.getElementById(id);
 
+/* G1: fallback lokal agar kegagalan modul UI tidak mengunci tombol. */
+const G1_FALLBACK = Object.freeze({
+ "UI-01":"Sedang memuat data…",
+ "UI-04":"Belum ada penugasan yang dapat ditampilkan.",
+ "UI-06":"Data belum dapat dimuat. Silakan coba lagi.",
+ "UI-07":"Sesi Anda berakhir. Silakan login kembali.",
+ "UI-08":"Anda tidak memiliki akses ke halaman ini."
+});
+function g1(id){
+ const fallback=G1_FALLBACK[id]||"";
+ try{
+  const value=window.AntarDesaUI?.get?.(id);
+  return typeof value==="string" && value ? value : fallback;
+ }catch(error){
+  console.warn("Pesan G1 tidak tersedia:",id);
+  return fallback;
+ }
+}
+
 let db = null;
 let currentUser = null;
 let busy = false;
@@ -307,6 +326,7 @@ async function checkCourier(){
  if(error) throw error;
 
  if(!data?.user){
+  showMessage(g1("UI-07"),"error");
   window.location.replace("login.html");
   return false;
  }
@@ -328,7 +348,7 @@ async function checkCourier(){
  ){
   $("dashboard").classList.add("hidden");
   showMessage(
-   "Akses ditolak. Halaman ini hanya untuk akun kurir yang sudah diverifikasi.",
+   g1("UI-08"),
    "error"
   );
   return false;
@@ -346,7 +366,7 @@ async function loadAvailable(){
 
  emptyMessage(
   container,
-  "Memuat pesanan tersedia..."
+  g1("UI-01")
  );
 
  const {data,error}=await db.rpc(
@@ -518,12 +538,12 @@ async function loadMyDeliveries(){
 
  emptyMessage(
   active,
-  "Memuat pengiriman kamu..."
+  g1("UI-01")
  );
 
  emptyMessage(
   history,
-  "Memuat riwayat..."
+  g1("UI-01")
  );
 
  const {data,error}=await db.rpc(
@@ -548,7 +568,7 @@ async function loadMyDeliveries(){
  if(!activeRows.length){
   emptyMessage(
    active,
-   "Kamu belum memiliki pengiriman aktif."
+   g1("UI-04")
   );
  }
 
@@ -624,7 +644,7 @@ async function refreshDashboard(){
  $("refreshBtn").disabled=true;
 
  showMessage(
-  "Memperbarui daftar pesanan..."
+  g1("UI-01")
  );
 
  try{
@@ -645,8 +665,7 @@ async function refreshDashboard(){
   console.error(error);
 
   showMessage(
-   "Gagal memuat data. Periksa koneksi lalu coba Muat Ulang. "+
-   (error.message||""),
+   g1("UI-06"),
    "error"
   );
 
@@ -815,8 +834,7 @@ async function start(){
   console.error(error);
 
   showMessage(
-   "Tidak dapat memulai Dashboard Kurir. "+
-   (error.message||""),
+   g1("UI-06"),
    "error"
   );
  }
