@@ -302,6 +302,7 @@ let accessApproved = false;
 let checkingAccess = false;
 let catalogLoading = false;
 let catalogLoaded = false;
+let catalogStale = false;
 let ordersLoading = false;
 let catalogProducts = [];
 let currentUserId = null;
@@ -445,11 +446,31 @@ function layanan(nama){
  );
 }
 
-/* G1: pesan UI standar, hanya untuk presentasi status. */
+/* G2: API G1 resmi dengan fallback defensif. */
+const CUSTOMER_UI_FALLBACK = Object.freeze({
+ "UI-01": "Sedang memuat data…",
+ "UI-02": "Belum ada produk yang tersedia.",
+ "UI-03": "Belum ada riwayat pesanan.",
+ "UI-04": "Belum ada penugasan yang dapat ditampilkan.",
+ "UI-05": "Koneksi internet terputus. Periksa jaringan dan coba lagi.",
+ "UI-06": "Data belum dapat dimuat. Silakan coba lagi.",
+ "UI-07": "Sesi Anda berakhir. Silakan login kembali.",
+ "UI-08": "Anda tidak memiliki akses ke halaman ini.",
+ "UI-09": "Sebagian informasi belum tersedia."
+});
+function customerUIMessage(code){
+ try{
+  const value = window.AntarDesaUI?.get?.(code);
+  if(typeof value === "string" && value) return value;
+ }catch(error){ console.warn("G1 fallback:",error); }
+ return CUSTOMER_UI_FALLBACK[code] || CUSTOMER_UI_FALLBACK["UI-06"];
+}
 function showCustomerUIStatus(targetId,code){
  const target = $(targetId);
- window.AntarDesaUI.showMessage(target,code);
+ if(!target) return;
+ target.textContent = customerUIMessage(code);
 }
+
 
 /* KATALOG */
 
@@ -459,9 +480,8 @@ async function loadCatalog(){
  catalogLoading = true;
  $("refreshCatalog").disabled = true;
  $("catalogStatus").className = "catalog-status";
- showCustomerUIStatus("catalogStatus","UI-01");
-
  try{
+  showCustomerUIStatus("catalogStatus","UI-01");
   const {data,error} = await supabaseClient
    .from("products")
    .select(
@@ -475,14 +495,23 @@ async function loadCatalog(){
 
   catalogProducts = data || [];
   catalogLoaded = true;
+  catalogStale = false;
   renderCatalog();
 
  }catch(error){
   console.error("Gagal memuat katalog:",error);
   $("catalogStatus").className = "catalog-status error";
   showCustomerUIStatus("catalogStatus","UI-06");
-
-  if(!catalogLoaded) $("catalogList").replaceChildren();
+  if(catalogLoaded){
+   catalogStale = true;
+   renderCatalog();
+   $("catalogStatus").className = "catalog-status error";
+   $("catalogStatus").textContent =
+    customerUIMessage("UI-06") +
+    " Produk yang terlihat berasal dari pemuatan sebelumnya dan tidak dapat digunakan untuk memulai pratinjau sampai refresh berhasil.";
+  }else{
+   $("catalogList").replaceChildren();
+  }
 
  }finally{
   catalogLoading = false;
@@ -601,7 +630,8 @@ function renderCatalog(){
    ownProduct ||
    !!pendingRequest ||
    pendingCorrupt ||
-   orderBusy;
+   orderBusy ||
+   catalogStale;
 
   if(ownProduct){
    buy.textContent = "Produk Milik Anda";
@@ -609,6 +639,8 @@ function renderCatalog(){
    buy.textContent = "Stok Habis";
   }else if(pendingRequest || pendingCorrupt){
    buy.textContent = "Periksa Transaksi Tertunda";
+  }else if(catalogStale){
+   buy.textContent = "Perbarui Katalog";
   }
 
   buy.addEventListener("click",()=>openCheckout(product.id));
@@ -780,7 +812,7 @@ function invalidateShipping(message=""){
 }
 
 function openCheckout(productId){
- if(!accessApproved || orderBusy || shippingBusy || gpsBusy) return;
+ if(!accessApproved || orderBusy || shippingBusy || gpsBusy || catalogStale) return;
 
  if(pendingRequest || pendingCorrupt){
   alert("Periksa transaksi tertunda terlebih dahulu.");
@@ -847,6 +879,11 @@ function closeCheckout(){
 }
 
 function updateCheckoutTotal(){
+ if(shippingQuote && Date.now() >= shippingQuote.expiryTime){
+  shippingQuote = null;
+  $("shippingResult").hidden = true;
+  shippingStatus(customerUIMessage("UI-12"),"warning");
+ }
  if(!selectedProduct){
   $("checkoutTotal").textContent = "Subtotal: Rp 0";
   $("submitOrder").disabled = true;
@@ -1503,9 +1540,8 @@ async function loadOrders(){
  ordersLoading = true;
  $("refreshOrders").disabled = true;
  $("ordersStatus").className = "catalog-status";
- showCustomerUIStatus("ordersStatus","UI-01");
-
  try{
+  showCustomerUIStatus("ordersStatus","UI-01");
   const {data:orders,error} = await supabaseClient
    .from("orders")
    .select("id,status,total_amount,customer_note,created_at")
@@ -1515,10 +1551,10 @@ async function loadOrders(){
 
   if(error) throw error;
 
-  const list = $("ordersList");
-  list.replaceChildren();
+  const list = document.createDocumentFragment();
 
   if(!orders?.length){
+   $("ordersList").replaceChildren();
    showCustomerUIStatus("ordersStatus","UI-03");
    return;
   }
@@ -1750,6 +1786,7 @@ async function loadOrders(){
    card.append(deliveryButton,deliveryBox);
    list.appendChild(card);
   }
+  $("ordersList").replaceChildren(list);
 
  }catch(error){
   console.error(
@@ -1761,6 +1798,10 @@ async function loadOrders(){
    "catalog-status error";
 
   showCustomerUIStatus("ordersStatus","UI-06");
+  if($("ordersList").childElementCount){
+   $("ordersStatus").textContent +=
+    " Riwayat yang terlihat berasal dari pemuatan sebelumnya.";
+  }
 
  }finally{
   ordersLoading = false;
