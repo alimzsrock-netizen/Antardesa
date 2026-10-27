@@ -82,6 +82,10 @@ nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:n
 .shipping-status{font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}
 .shipping-status.error{color:#b91c1c}
 .shipping-status.success{color:#146c3e}
+.estimate-state{font-size:12px;font-weight:bold;margin-top:12px;color:#51685a}
+.estimate-state[data-state="loading"]{color:#174e82}
+.estimate-state[data-state="success"]{color:#146c3e}
+.estimate-state[data-state="error"]{color:#b91c1c}
 .shipping-status.warning{color:#946200}
 .total-box{background:#e8f4ee;border-radius:9px;padding:12px;margin-top:15px;font-size:14px;line-height:1.9;white-space:pre-wrap}
 </style>
@@ -258,7 +262,10 @@ Jika koordinat diubah, estimasi dan quote sebelumnya otomatis tidak berlaku untu
 
 <button id="issueShippingQuote" class="quote-button" type="button">Terbitkan Shipping Quote (10 Menit)</button>
 
+<p id="estimateState" class="estimate-state" data-state="idle" role="status" aria-live="polite">Estimasi: Belum dihitung</p>
+
 <p id="shippingStatus" class="shipping-status" role="status" aria-live="polite">Belum menghitung ongkir.</p>
+<p id="quoteState" class="shipping-status" role="status" aria-live="polite">Shipping Quote: Belum diterbitkan.</p>
 
 <div id="shippingResult" class="shipping-result" hidden></div>
 
@@ -266,7 +273,7 @@ Jika koordinat diubah, estimasi dan quote sebelumnya otomatis tidak berlaku untu
 
 <p id="checkoutTotal" class="total-box">Subtotal: Rp 0</p>
 
-<p id="checkoutMessage" role="status" aria-live="polite"></p>
+<p id="checkoutMessage" role="status" aria-live="polite">Checkout belum tersedia.</p>
 
 <div class="modal-actions">
 <button id="closeCheckout" class="secondary" type="button">Tutup</button>
@@ -878,10 +885,25 @@ function shippingStatus(message,type=""){
   "shipping-status" + (type ? " " + type : "");
 }
 
+/* P-04: status estimasi hanya presentasi, tanpa request tambahan. */
+function setEstimateState(state){
+ const labels = {
+  idle:"Estimasi: Belum dihitung",
+  loading:"Estimasi: Sedang menghitung…",
+  success:"Estimasi: Berhasil dihitung",
+  error:"Estimasi: Belum berhasil dihitung"
+ };
+ const element = $("estimateState");
+ element.dataset.state = state;
+ element.textContent = labels[state] || labels.idle;
+}
+
 function invalidateShipping(message=""){
  shippingRevision++;
+ $("quoteState").textContent = "Shipping Quote: Belum diterbitkan.";
  shippingQuote = null;
  shippingEstimate = null;
+ setEstimateState("idle");
 
  if(shippingRequestController){
   shippingRequestController.abort();
@@ -947,7 +969,7 @@ function openCheckout(productId){
 
  $("gpsStatus").textContent = "Belum memilih titik tujuan.";
 
- checkoutMessage("");
+ checkoutMessage(customerUIMessage("UI-13"));
  invalidateShipping("Belum menghitung ongkir.");
 
  $("checkoutModal").hidden = false;
@@ -970,6 +992,7 @@ function updateCheckoutTotal(){
  if(shippingQuote && Date.now() >= shippingQuote.expiryTime){
   shippingQuote = null;
   $("shippingResult").hidden = true;
+  $("quoteState").textContent = customerUIMessage("UI-12");
   shippingStatus(customerUIMessage("UI-12"),"warning");
  }
  if(!selectedProduct){
@@ -1207,7 +1230,8 @@ async function runShipping(action){
  try{
   form = readShippingForm();
  }catch(error){
-  shippingStatus(error.message,"error");
+  if(action === "estimate") setEstimateState("error");
+  shippingStatus("Periksa kembali data yang dimasukkan. " + error.message,"error");
   return;
  }
 
@@ -1231,6 +1255,7 @@ async function runShipping(action){
    : "Sedang menghitung estimasi ongkir..."
  );
 
+ if(action === "estimate") setEstimateState("loading");
  const revision = shippingRevision;
  const controller = new AbortController();
 
@@ -1340,6 +1365,7 @@ async function runShipping(action){
     );
    }
 
+   setEstimateState("success");
    shippingEstimate = {
     fee,
     distance,
@@ -1396,6 +1422,7 @@ async function runShipping(action){
     longitude:form.longitude
    };
 
+   $("quoteState").textContent = "Shipping Quote: Aktif. Masa berlaku mengikuti waktu kedaluwarsa dari server.";
    resultBox.textContent =
     "SHIPPING QUOTE V4 BERHASIL\n\n" +
     "Quote ID:\n" + shippingQuote.id +
@@ -1425,6 +1452,7 @@ async function runShipping(action){
   if(revision !== shippingRevision) return;
 
   console.error("Shipping V4:",error);
+  if(action === "estimate") setEstimateState("error");
 
   shippingStatus(
    "❌ " + error.message,
@@ -1443,18 +1471,22 @@ async function runShipping(action){
 
 function checkQuoteExpiry(){
  if(!shippingQuote) return;
-
- if(Date.now() >= shippingQuote.expiryTime){
+ const remaining = shippingQuote.expiryTime - Date.now();
+ if(remaining <= 0){
   shippingQuote = null;
-
-  shippingStatus(
-   "Shipping Quote telah kedaluwarsa. Terbitkan quote baru jika ingin menguji lagi.",
-   "warning"
-  );
-
+  $("quoteState").textContent = customerUIMessage("UI-12");
+  shippingStatus(customerUIMessage("UI-12"),"warning");
   $("shippingResult").hidden = true;
   updateCheckoutTotal();
+  return;
  }
+ const seconds = Math.ceil(remaining / 1000);
+ const minutes = Math.floor(seconds / 60);
+ const rest = String(seconds % 60).padStart(2,"0");
+ $("quoteState").textContent = (remaining <= 60000
+  ? customerUIMessage("UI-11") + " "
+  : "Shipping Quote aktif. Sisa waktu: ") + minutes + ":" + rest +
+  ". Ini bukan pesanan dan tidak menjamin stok.";
 }
 
 document.addEventListener(
