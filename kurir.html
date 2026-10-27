@@ -111,7 +111,7 @@ h2{font-size:19px;margin:0 0 12px}
  border-color:#b9e4c7;
  color:#155d35;
 }
-.hidden{display:none!important}
+.hidden{display:none!important}.read-only{background:#f4faf6;border:1px solid #cde5d5;padding:12px;border-radius:10px;font-size:13px;line-height:1.6;margin:12px 0}.state-note{color:var(--muted);font-size:13px;line-height:1.6}.detail{overflow-wrap:anywhere}.detail .missing{color:var(--muted)}.hidden{display:none!important}
 .delivery-details{
  margin-top:12px;
  padding:14px;
@@ -163,6 +163,7 @@ footer{
 </div>
 
 <div id="dashboard" class="hidden">
+<div class="read-only"><strong>Pratinjau G4 · Baca-saja.</strong> Pengambilan penugasan dan penyelesaian pengiriman tidak tersedia pada tahap ini. Data yang ditampilkan mengikuti hak akses akun Kurir terverifikasi.</div>
 <div class="toolbar">
 <button id="refreshBtn" type="button">↻ Muat Ulang</button>
 <button id="logoutBtn" type="button" class="secondary">Keluar</button>
@@ -174,17 +175,17 @@ footer{
  Pesanan berstatus siap dikirim dan belum memiliki kurir.
  Detail penerima baru dapat dilihat setelah pesanan berhasil diambil.
 </p>
-<div id="availableList"></div>
+<div id="availableList" aria-live="polite"></div>
 </section>
 
 <section>
 <h2>🛵 Pengiriman Saya</h2>
-<div id="activeList"></div>
+<div id="activeList" aria-live="polite"></div>
 </section>
 
 <section>
 <h2>✅ Riwayat Pengiriman Selesai</h2>
-<div id="historyList"></div>
+<div id="historyList" aria-live="polite"></div>
 </section>
 </div>
 </main>
@@ -237,6 +238,7 @@ function g1(id){
 let db = null;
 let currentUser = null;
 let busy = false;
+const G4_READ_ONLY=true; // Gerbang G4: tidak menjalankan RPC mutasi penugasan/status.
 
 function showMessage(message,type=""){
  const el=$("message");
@@ -257,17 +259,16 @@ function makeElement(tag,className,text){
 }
 
 function formatMoney(value){
+ if(value===null||value===undefined||value===""||!Number.isFinite(Number(value)))return "Belum tersedia";
  return new Intl.NumberFormat("id-ID",{
-  style:"currency",
-  currency:"IDR",
-  maximumFractionDigits:0
- }).format(Number(value)||0);
+  style:"currency",currency:"IDR",maximumFractionDigits:0
+ }).format(Number(value));
 }
 
 function formatDate(value){
- if(!value) return "-";
+ if(!value) return "Belum tersedia";
  const date=new Date(value);
- if(Number.isNaN(date.getTime())) return "-";
+ if(Number.isNaN(date.getTime())) return "Belum tersedia";
  return new Intl.DateTimeFormat("id-ID",{
   dateStyle:"medium",
   timeStyle:"short"
@@ -275,7 +276,7 @@ function formatDate(value){
 }
 
 function shortId(value){
- return value?String(value).slice(0,8)+"…":"-";
+ return value?String(value).slice(0,8)+"…":"Belum tersedia";
 }
 
 function emptyMessage(container,message){
@@ -305,7 +306,7 @@ function createCard(title,details,status){
    makeElement("strong","",label+": ")
   );
   line.appendChild(
-   document.createTextNode(String(value??"-"))
+   document.createTextNode(value===null||value===undefined||value===""?"Belum tersedia":String(value))
   );
   detail.appendChild(line);
  });
@@ -377,7 +378,8 @@ async function loadAvailable(){
 
  container.replaceChildren();
 
- if(!data?.length){
+ if(!Array.isArray(data))throw new Error("Format daftar penugasan tidak sesuai.");
+ if(!data.length){
   emptyMessage(
    container,
    "Belum ada pesanan siap dikirim."
@@ -398,19 +400,7 @@ async function loadAvailable(){
    "Siap diambil"
   );
 
-  const button=makeElement(
-   "button",
-   "",
-   "Ambil Pesanan"
-  );
-
-  button.type="button";
-
-  button.addEventListener("click",()=>{
-   claimOrder(order.order_id,button);
-  });
-
-  card.appendChild(button);
+  card.appendChild(makeElement("p","state-note","Informasi penugasan tersedia untuk dibaca. Pengambilan pesanan dinonaktifkan pada G4."));
   container.appendChild(card);
  });
 }
@@ -509,24 +499,36 @@ async function showDeliveryDetails(orderId,button,container){
 }
 
 function addDetailButton(card,orderId){
- const button=makeElement(
-  "button",
-  "secondary",
-  "📍 Lihat Detail Pengantaran"
- );
-
+ const button=makeElement("button","secondary","📍 Lihat Detail Pengantaran");
  button.type="button";
-
- const container=makeElement(
-  "div",
-  "delivery-details hidden"
- );
-
- button.addEventListener("click",()=>{
-  if(button.onclick) return;
-  showDeliveryDetails(orderId,button,container);
+ const container=makeElement("div","delivery-details hidden");
+ let opened=false,loading=false;
+ button.addEventListener("click",async()=>{
+  if(loading||busy)return;
+  if(opened){
+   container.replaceChildren();container.classList.add("hidden");
+   opened=false;button.textContent="📍 Lihat Detail Pengantaran";return;
+  }
+  loading=true;button.disabled=true;button.textContent="Mengambil detail pengantaran...";
+  container.replaceChildren();container.classList.remove("hidden");
+  try{
+   const {data,error}=await db.rpc("get_antardesa_delivery_details",{p_order_id:orderId});
+   if(error)throw error;
+   if(!Array.isArray(data)||data.length!==1||data[0].order_id!==orderId)throw new Error("Detail tidak tersedia untuk penugasan ini.");
+   const item=data[0];
+   container.appendChild(makeElement("h4","","📍 Detail Pengantaran"));
+   [["Nama penerima",item.recipient_name],["Nomor telepon",item.recipient_phone],["Alamat lengkap",item.delivery_address],["Catatan pengantaran",item.delivery_note]].forEach(([label,value])=>{
+    const line=makeElement("div","line");
+    line.append(makeElement("strong","",label),makeElement("span","",value===null||value===undefined||value===""?"Belum tersedia":String(value)));
+    container.appendChild(line);
+   });
+   opened=true;button.textContent="Sembunyikan Detail Pengantaran";
+  }catch(error){
+   console.error("Gagal membaca detail pengantaran:",error);
+   container.replaceChildren(makeElement("p","delivery-error",g1("UI-06")));
+   button.textContent="Coba Lagi Lihat Detail";
+  }finally{loading=false;button.disabled=false}
  });
-
  card.append(button,container);
 }
 
@@ -555,7 +557,8 @@ async function loadMyDeliveries(){
  active.replaceChildren();
  history.replaceChildren();
 
- const rows=data||[];
+ if(!Array.isArray(data))throw new Error("Format pengiriman tidak sesuai.");
+ const rows=data;
 
  const activeRows=rows.filter(
   item=>item.order_status==="delivering"
@@ -594,19 +597,7 @@ async function loadMyDeliveries(){
 
   addDetailButton(card,order.order_id);
 
-  const button=makeElement(
-   "button",
-   "",
-   "Selesaikan Pengiriman"
-  );
-
-  button.type="button";
-
-  button.addEventListener("click",()=>{
-   completeOrder(order.order_id,button);
-  });
-
-  card.appendChild(button);
+  card.appendChild(makeElement("p","state-note","Status pengiriman ditampilkan baca-saja. Penyelesaian pengiriman dinonaktifkan pada G4."));
   active.appendChild(card);
  });
 
@@ -665,7 +656,7 @@ async function refreshDashboard(){
   console.error(error);
 
   showMessage(
-   g1("UI-06"),
+   !navigator.onLine ? (window.AntarDesaUI?.get?.("UI-05")||"Koneksi internet terputus. Periksa jaringan dan coba lagi.") : g1("UI-06"),
    "error"
   );
 
@@ -678,6 +669,7 @@ async function refreshDashboard(){
 /* AMBIL PESANAN */
 
 async function claimOrder(orderId,button){
+ if(G4_READ_ONLY)return;
  if(busy) return;
 
  if(!window.confirm(
@@ -723,6 +715,7 @@ async function claimOrder(orderId,button){
 /* SELESAIKAN PENGIRIMAN */
 
 async function completeOrder(orderId,button){
+ if(G4_READ_ONLY)return;
  if(busy) return;
 
  if(!window.confirm(
@@ -824,11 +817,7 @@ async function start(){
    SUPABASE_KEY
   );
 
-  const allowed=await checkCourier();
-
-  if(allowed){
-   await refreshDashboard();
-  }
+  await refreshDashboard();
 
  }catch(error){
   console.error(error);
