@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -309,6 +308,10 @@ const SHIPPING_FUNCTION =
  SUPABASE_URL + "/functions/v1/antardesa-shipping-v4";
 
 const CHECKOUT_V4_ENABLED = false;
+/* H2.3: preview build contains no transactional checkout implementation. */
+const CHECKOUT_PREVIEW_NOTICE =
+ "Checkout V4 belum diaktifkan. Halaman ini hanya untuk menguji ongkir dan Shipping Quote.";
+let checkoutSubmissionBusy = false;
 
 const $ = id => document.getElementById(id);
 
@@ -872,6 +875,29 @@ function renderPendingNotice(){
 
 /* FORMULIR PREVIEW */
 
+/* Fail-closed checkout entry point. A feature flag alone cannot enable orders. */
+function enforceCheckoutLock(){
+ const button = $("submitOrder");
+ button.disabled = true;
+ button.textContent = "Checkout V4 Belum Aktif";
+ button.setAttribute("aria-disabled","true");
+}
+function clearCheckoutPreviewState(){
+ checkoutSubmissionBusy = false;
+ enforceCheckoutLock();
+}
+function handleCheckoutSubmission(event){
+ if(event) event.preventDefault();
+ if(checkoutSubmissionBusy) return false;
+ checkoutSubmissionBusy = true;
+ try{
+  enforceCheckoutLock();
+  checkoutMessage(CHECKOUT_PREVIEW_NOTICE);
+  return false; // No create-order RPC or mutation exists in this build.
+ }finally{
+  checkoutSubmissionBusy = false;
+ }
+}
 function checkoutMessage(message,isError=false){
  const element = $("checkoutMessage");
  element.textContent = message;
@@ -969,7 +995,8 @@ function openCheckout(productId){
 
  $("gpsStatus").textContent = "Belum memilih titik tujuan.";
 
- checkoutMessage(customerUIMessage("UI-13"));
+ checkoutMessage(CHECKOUT_PREVIEW_NOTICE);
+ clearCheckoutPreviewState();
  invalidateShipping("Belum menghitung ongkir.");
 
  $("checkoutModal").hidden = false;
@@ -982,6 +1009,7 @@ function closeCheckout(){
  if(orderBusy || shippingBusy || gpsBusy) return;
 
  invalidateShipping("Pratinjau ditutup.");
+ clearCheckoutPreviewState();
 
  $("checkoutModal").hidden = true;
  selectedProduct = null;
@@ -1043,9 +1071,7 @@ function updateCheckoutTotal(){
   $("checkoutTotal").textContent = text;
  }
 
- $("submitOrder").disabled = true;
- $("submitOrder").textContent =
-  "Checkout V4 Belum Aktif";
+ enforceCheckoutLock();
 }
 
 function updateShippingButtons(){
@@ -1062,7 +1088,7 @@ function updateShippingButtons(){
  $("estimateShipping").disabled = !available;
  $("issueShippingQuote").disabled = !available;
  $("closeCheckout").disabled = shippingBusy || gpsBusy || orderBusy;
- $("submitOrder").disabled = true;
+ enforceCheckoutLock();
 }
 
 function setOrderBusy(value){
@@ -2004,15 +2030,9 @@ $("closeCheckout").addEventListener(
  closeCheckout
 );
 
-$("submitOrder").addEventListener(
- "click",
- ()=>{
-  alert(
-   "Checkout V4 belum diaktifkan.\n\n" +
-   "Halaman ini hanya untuk menguji ongkir dan Shipping Quote."
-  );
- }
-);
+$("submitOrder").addEventListener("click",handleCheckoutSubmission);
+$("checkoutModal").addEventListener("submit",handleCheckoutSubmission);
+enforceCheckoutLock();
 
 $("resumeOrder").addEventListener(
  "click",
@@ -2048,6 +2068,9 @@ logoutButton.addEventListener(
   logoutButton.disabled = true;
 
   invalidateShipping("Sesi akan diakhiri.");
+  clearCheckoutPreviewState();
+  selectedProduct = null;
+  $("checkoutModal").hidden = true;
   showAccessScreen("Sedang keluar dari akun...");
 
   try{
