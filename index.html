@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#16805d">
-<title>AntarDesa v0.1.0</title>
+<title>AntarDesa v0.3.0-RC</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="ui-components.css">
 <style>
@@ -40,12 +40,15 @@ nav button.active{color:#16805d;font-weight:bold}
 <p>Dekatkan Jarak, Mudahkan Urusan. 🛵</p>
 </header>
 <main>
+
 <section id="home" class="page">
 <div class="panel">
 <h2>Selamat datang! 👋</h2>
 <p class="muted">Apa yang kamu butuhkan hari ini?</p>
 </div>
+
 <h3>Layanan kami</h3>
+
 <div class="grid">
 <button class="service" onclick="choose('Antar Paket')"><span>📦</span>Antar Paket</button>
 <button class="service" onclick="choose('Titip Belanja')"><span>🛒</span>Titip Belanja</button>
@@ -54,26 +57,41 @@ nav button.active{color:#16805d;font-weight:bold}
 <button class="service" onclick="choose('Sekalian Jalan')"><span>🛵</span>Sekalian Jalan</button>
 <button class="service" onclick="choose('Angkut Desa')"><span>🚚</span>Angkut Desa</button>
 </div>
-<p class="muted">Versi 0.1.0 • Simulasi, belum menerima pesanan nyata.</p>
+
+<p class="muted">
+AntarDesa v0.3.0-RC • Kandidat rilis untuk simulasi.
+Belum menerima pesanan atau transaksi nyata.
+</p>
 </section>
+
 <section id="formpage" class="page hidden">
 <div class="panel">
 <button class="secondary" onclick="show('home')">← Kembali</button>
+
 <h2 id="formtitle" style="margin-top:18px">Buat pesanan</h2>
-<p class="muted">Gunakan data contoh saja. Jangan masukkan informasi pribadi asli.</p>
+
+<p class="muted">
+Gunakan data contoh saja. Jangan masukkan informasi pribadi asli.
+</p>
+
 <form id="orderform">
 <label for="name">Nama panggilan</label>
 <input id="name" maxlength="40" required placeholder="Contoh: Budi">
+
 <label for="pickup">Lokasi penjemputan</label>
 <input id="pickup" maxlength="120" required placeholder="Contoh: Pasar Kecamatan">
+
 <label for="destination">Tujuan pengantaran</label>
 <input id="destination" maxlength="120" required placeholder="Contoh: Desa A">
+
 <label for="detail">Detail kebutuhan</label>
 <textarea id="detail" maxlength="500" required placeholder="Jelaskan barang atau titipan"></textarea>
+
 <button class="primary" type="submit">Simulasikan pesanan</button>
 </form>
 </div>
 </section>
+
 <section id="orders" class="page hidden">
 <div class="panel">
 <h2>Pesanan simulasi</h2>
@@ -81,49 +99,66 @@ nav button.active{color:#16805d;font-weight:bold}
 <div id="orderlist" aria-live="polite"></div>
 </div>
 </section>
+
 <section id="profile" class="page hidden">
 <div class="panel">
 <h2>Profil</h2>
-<p>AntarDesa v0.1.0</p>
-<p class="muted">Sistem akun pelanggan, kurir, warung, dan administrator akan dikembangkan berikutnya.</p>
+<p>AntarDesa v0.3.0-RC</p>
+<p class="muted">
+Kandidat rilis ini menampilkan simulasi layanan.
+Pemesanan dan transaksi nyata belum diaktifkan.
+</p>
 </div>
 </section>
+
 </main>
+
 <nav aria-label="Navigasi utama">
 <button id="navhome" class="active" onclick="show('home')">⌂<br>Beranda</button>
 <button id="navorders" onclick="show('orders')">▤<br>Pesanan</button>
 <button id="navprofile" onclick="show('profile')">♙<br>Profil</button>
 </nav>
+
 <script>
 let selected='';
 const orders=[];
+
 function show(id){
  document.querySelectorAll('.page').forEach(p=>{
   p.classList.toggle('hidden',p.id!==id);
  });
+
  document.querySelectorAll('nav button').forEach(b=>{
   b.classList.toggle('active',b.id==='nav'+id);
  });
+
  window.scrollTo(0,0);
 }
+
 function choose(service){
  selected=service;
  document.getElementById('formtitle').textContent=service;
  document.getElementById('orderform').reset();
  show('formpage');
 }
+
 function renderEmptyOrders(){
  const list=document.getElementById('orderlist');
+
  if(window.AntarDesaUI){
   window.AntarDesaUI.showMessage(list,'UI-03');
  }else{
   list.textContent='Belum ada riwayat pesanan.';
  }
 }
+
 document.getElementById('orderform').addEventListener('submit',function(e){
  e.preventDefault();
+
  const get=id=>document.getElementById(id).value.trim();
+
  if(!['name','pickup','destination','detail'].every(get))return;
+
  orders.unshift({
   service:selected,
   name:get('name'),
@@ -131,11 +166,14 @@ document.getElementById('orderform').addEventListener('submit',function(e){
   destination:get('destination'),
   detail:get('detail')
  });
+
  const list=document.getElementById('orderlist');
  list.replaceChildren();
+
  orders.forEach((o,i)=>{
   const card=document.createElement('div');
   card.className='order';
+
   [
    `${i+1}. ${o.service}`,
    `Pemesan: ${o.name}`,
@@ -148,12 +186,15 @@ document.getElementById('orderform').addEventListener('submit',function(e){
    el.textContent=line;
    card.append(el);
   });
+
   list.append(card);
  });
+
  this.reset();
  show('orders');
 });
-document.addEventListener("DOMContentLoaded", renderEmptyOrders);
+
+document.addEventListener("DOMContentLoaded",renderEmptyOrders);
 </script>
 </body>
 </html>
