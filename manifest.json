@@ -1,0 +1,22 @@
+{
+  "id": "./",
+  "name": "AntarDesa",
+  "short_name": "AntarDesa",
+  "description": "Platform layanan digital masyarakat untuk membantu kebutuhan antar barang, titip belanja, makanan, dan layanan desa.",
+  "lang": "id-ID",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7f5",
+  "theme_color": "#16805d",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
