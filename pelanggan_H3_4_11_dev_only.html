@@ -483,11 +483,20 @@ const CUSTOMER_UI_FALLBACK = Object.freeze({
  "UI-06": "Data belum dapat dimuat. Silakan coba lagi.",
  "UI-07": "Sesi Anda berakhir. Silakan login kembali.",
  "UI-08": "Anda tidak memiliki akses ke halaman ini.",
- "UI-09": "Sebagian informasi belum tersedia."
+ "UI-09": "Sebagian informasi belum tersedia.",
+ "UI-10": "Estimasi ini bukan pesanan dan tidak menjamin ketersediaan stok.",
+ "UI-11": "Masa berlaku estimasi hampir berakhir.",
+ "UI-12": "Estimasi telah kedaluwarsa. Perbarui estimasi untuk melihat informasi terbaru.",
+ "UI-13": "Checkout belum tersedia.",
+ "UI-14": "Periksa kembali data yang dimasukkan.",
+ "UI-15": "Periksa email Anda untuk melanjutkan konfirmasi akun.",
+ "UI-16": "Permintaan verifikasi sedang ditinjau."
 });
 function customerUIMessage(code){
  try{
-  const value = window.AntarDesaUI?.get?.(code);
+  const api = window.AntarDesaUI;
+  const getter = api?.get || api?.getMessage;
+  const value = typeof getter === "function" ? getter.call(api,code) : null;
   if(typeof value === "string" && value) return value;
  }catch(error){ console.warn("G1 fallback:",error); }
  return CUSTOMER_UI_FALLBACK[code] || CUSTOMER_UI_FALLBACK["UI-06"];
@@ -1076,7 +1085,7 @@ function updateCheckoutTotal(){
   shippingQuote = null;
   $("shippingResult").hidden = true;
   $("quoteState").textContent = customerUIMessage("UI-12");
-  shippingStatus(customerUIMessage("UI-12"),"warning");
+  shippingStatus("Terbitkan Shipping Quote baru untuk memperbarui estimasi.","warning");
  }
  if(!selectedProduct){
   $("checkoutTotal").textContent = "Subtotal: Rp 0";
@@ -1556,7 +1565,7 @@ function checkQuoteExpiry(){
  if(remaining <= 0){
   shippingQuote = null;
   $("quoteState").textContent = customerUIMessage("UI-12");
-  shippingStatus(customerUIMessage("UI-12"),"warning");
+  shippingStatus("Terbitkan Shipping Quote baru untuk memperbarui estimasi.","warning");
   $("shippingResult").hidden = true;
   updateCheckoutTotal();
   return;
