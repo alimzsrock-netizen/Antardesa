@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -41,11 +42,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .product-stock.empty-stock{color:#b91c1c;font-weight:bold}
 .product-description{font-size:12px;color:#61746b;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
 .buy-button{width:100%;margin-top:12px;border:0;border-radius:8px;padding:10px;background:#16805d;color:white;font-weight:bold}
-.product-actions{display:grid;gap:8px;margin-top:12px}
-.product-actions .buy-button{margin-top:0}
-.detail-image{width:100%;max-height:230px;object-fit:contain;background:#edf3ee;border-radius:10px}
-.detail-row{margin:10px 0;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
-.detail-label{font-weight:bold;color:#20352a}
 .catalog-status{color:#61746b;font-size:13px;line-height:1.6;margin:12px 0}
 .catalog-status.error{color:#b91c1c}
 .order-card{border:1px solid #e2e9e4;border-radius:10px;padding:12px;margin-top:12px;overflow-wrap:anywhere}
@@ -81,10 +77,6 @@ nav a,nav button{text-decoration:none;color:#16805d;font-size:13px;font-weight:n
 .shipping-status{font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}
 .shipping-status.error{color:#b91c1c}
 .shipping-status.success{color:#146c3e}
-.estimate-state{font-size:12px;font-weight:bold;margin-top:12px;color:#51685a}
-.estimate-state[data-state="loading"]{color:#174e82}
-.estimate-state[data-state="success"]{color:#146c3e}
-.estimate-state[data-state="error"]{color:#b91c1c}
 .shipping-status.warning{color:#946200}
 .total-box{background:#e8f4ee;border-radius:9px;padding:12px;margin-top:15px;font-size:14px;line-height:1.9;white-space:pre-wrap}
 </style>
@@ -191,16 +183,6 @@ AntarDesa v0.2.9. Shipping V4 Preview dengan GPS otomatis, koordinat manual, est
 
 </div>
 
-<div id="productDetailModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="productDetailTitle" hidden>
-<div class="modal-panel">
-<h3 id="productDetailTitle">Informasi Produk</h3>
-<div id="productDetailContent"></div>
-<div class="modal-actions" style="grid-template-columns:1fr">
-<button id="closeProductDetail" class="secondary" type="button">Kembali ke Katalog</button>
-</div>
-</div>
-</div>
-
 <div id="checkoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" hidden>
 <div class="modal-panel">
 
@@ -261,10 +243,7 @@ Jika koordinat diubah, estimasi dan quote sebelumnya otomatis tidak berlaku untu
 
 <button id="issueShippingQuote" class="quote-button" type="button">Terbitkan Shipping Quote (10 Menit)</button>
 
-<p id="estimateState" class="estimate-state" data-state="idle" role="status" aria-live="polite">Estimasi: Belum dihitung</p>
-
 <p id="shippingStatus" class="shipping-status" role="status" aria-live="polite">Belum menghitung ongkir.</p>
-<p id="quoteState" class="shipping-status" role="status" aria-live="polite">Shipping Quote: Belum diterbitkan.</p>
 
 <div id="shippingResult" class="shipping-result" hidden></div>
 
@@ -272,7 +251,7 @@ Jika koordinat diubah, estimasi dan quote sebelumnya otomatis tidak berlaku untu
 
 <p id="checkoutTotal" class="total-box">Subtotal: Rp 0</p>
 
-<p id="checkoutMessage" role="status" aria-live="polite">Checkout belum tersedia.</p>
+<p id="checkoutMessage" role="status" aria-live="polite"></p>
 
 <div class="modal-actions">
 <button id="closeCheckout" class="secondary" type="button">Tutup</button>
@@ -308,10 +287,6 @@ const SHIPPING_FUNCTION =
  SUPABASE_URL + "/functions/v1/antardesa-shipping-v4";
 
 const CHECKOUT_V4_ENABLED = false;
-/* H2.3: preview build contains no transactional checkout implementation. */
-const CHECKOUT_PREVIEW_NOTICE =
- "Checkout V4 belum diaktifkan. Halaman ini hanya untuk menguji ongkir dan Shipping Quote.";
-let checkoutSubmissionBusy = false;
 
 const $ = id => document.getElementById(id);
 
@@ -327,12 +302,10 @@ let accessApproved = false;
 let checkingAccess = false;
 let catalogLoading = false;
 let catalogLoaded = false;
-let catalogStale = false;
 let ordersLoading = false;
 let catalogProducts = [];
 let currentUserId = null;
 let selectedProduct = null;
-let detailReturnFocus = null;
 let orderBusy = false;
 let pendingRequest = null;
 let pendingCorrupt = false;
@@ -472,23 +445,23 @@ function layanan(nama){
  );
 }
 
-/* G2: API G1 resmi dengan fallback defensif. */
+/* G1: adapter pesan UI yang kompatibel dengan API ui-messages.js.
+   Hanya mengubah teks/status tampilan, tanpa aksi jaringan atau transaksi. */
 const CUSTOMER_UI_FALLBACK = Object.freeze({
- "UI-01": "Sedang memuat data…",
- "UI-02": "Belum ada produk yang tersedia.",
- "UI-03": "Belum ada riwayat pesanan.",
- "UI-04": "Belum ada penugasan yang dapat ditampilkan.",
- "UI-05": "Koneksi internet terputus. Periksa jaringan dan coba lagi.",
- "UI-06": "Data belum dapat dimuat. Silakan coba lagi.",
- "UI-07": "Sesi Anda berakhir. Silakan login kembali.",
- "UI-08": "Anda tidak memiliki akses ke halaman ini.",
- "UI-09": "Sebagian informasi belum tersedia."
+ "UI-01":"Sedang memuat data…",
+ "UI-02":"Belum ada produk yang tersedia.",
+ "UI-03":"Belum ada riwayat pesanan.",
+ "UI-06":"Data belum dapat dimuat. Silakan coba lagi.",
+ "UI-11":"Masa berlaku estimasi hampir berakhir.",
+ "UI-12":"Estimasi telah kedaluwarsa. Perbarui estimasi untuk melihat informasi terbaru."
 });
 function customerUIMessage(code){
  try{
-  const value = window.AntarDesaUI?.get?.(code);
+  const api = window.AntarDesaUI;
+  const getter = api?.get || api?.getMessage;
+  const value = typeof getter === "function" ? getter.call(api,code) : null;
   if(typeof value === "string" && value) return value;
- }catch(error){ console.warn("G1 fallback:",error); }
+ }catch(error){ console.warn("AntarDesa UI fallback:",error); }
  return CUSTOMER_UI_FALLBACK[code] || CUSTOMER_UI_FALLBACK["UI-06"];
 }
 function showCustomerUIStatus(targetId,code){
@@ -496,7 +469,6 @@ function showCustomerUIStatus(targetId,code){
  if(!target) return;
  target.textContent = customerUIMessage(code);
 }
-
 
 /* KATALOG */
 
@@ -506,8 +478,9 @@ async function loadCatalog(){
  catalogLoading = true;
  $("refreshCatalog").disabled = true;
  $("catalogStatus").className = "catalog-status";
+ showCustomerUIStatus("catalogStatus","UI-01");
+
  try{
-  showCustomerUIStatus("catalogStatus","UI-01");
   const {data,error} = await supabaseClient
    .from("products")
    .select(
@@ -521,23 +494,14 @@ async function loadCatalog(){
 
   catalogProducts = data || [];
   catalogLoaded = true;
-  catalogStale = false;
   renderCatalog();
 
  }catch(error){
   console.error("Gagal memuat katalog:",error);
   $("catalogStatus").className = "catalog-status error";
   showCustomerUIStatus("catalogStatus","UI-06");
-  if(catalogLoaded){
-   catalogStale = true;
-   renderCatalog();
-   $("catalogStatus").className = "catalog-status error";
-   $("catalogStatus").textContent =
-    customerUIMessage("UI-06") +
-    " Produk yang terlihat berasal dari pemuatan sebelumnya dan tidak dapat digunakan untuk memulai pratinjau sampai refresh berhasil.";
-  }else{
-   $("catalogList").replaceChildren();
-  }
+
+  if(!catalogLoaded) $("catalogList").replaceChildren();
 
  }finally{
   catalogLoading = false;
@@ -656,8 +620,7 @@ function renderCatalog(){
    ownProduct ||
    !!pendingRequest ||
    pendingCorrupt ||
-   orderBusy ||
-   catalogStale;
+   orderBusy;
 
   if(ownProduct){
    buy.textContent = "Produk Milik Anda";
@@ -665,91 +628,17 @@ function renderCatalog(){
    buy.textContent = "Stok Habis";
   }else if(pendingRequest || pendingCorrupt){
    buy.textContent = "Periksa Transaksi Tertunda";
-  }else if(catalogStale){
-   buy.textContent = "Perbarui Katalog";
   }
 
   buy.addEventListener("click",()=>openCheckout(product.id));
 
-  const actions = document.createElement("div");
-  actions.className = "product-actions";
-  const detailsButton = document.createElement("button");
-  detailsButton.type = "button";
-  detailsButton.className = "secondary";
-  detailsButton.textContent = "Lihat Informasi Produk";
-  detailsButton.addEventListener("click",()=>openProductDetail(product.id,detailsButton));
-  actions.append(detailsButton,buy);
-
   content.append(
-   categoryText,name,price,stock,description,actions
+   categoryText,name,price,stock,description,buy
   );
 
   card.append(visual,content);
   list.appendChild(card);
  });
-}
-
-/* P-03: Detail lokal dari katalog yang sudah dibaca, tanpa query atau mutasi baru. */
-function openProductDetail(productId,trigger){
- if(!accessApproved || !catalogLoaded) return;
- const product = catalogProducts.find(item=>item.id === productId);
- if(!product) return;
- detailReturnFocus = trigger || null;
- const content = $("productDetailContent");
- content.replaceChildren();
-
- if(product.image_url && /^https:\/\//i.test(product.image_url)){
-  const photo = document.createElement("img");
-  photo.className = "detail-image";
-  photo.src = product.image_url;
-  photo.alt = "Foto " + (product.name || "produk");
-  photo.referrerPolicy = "no-referrer";
-  photo.onerror = ()=>photo.replaceWith(createProductPlaceholder());
-  content.appendChild(photo);
- }else{
-  content.appendChild(createProductPlaceholder());
- }
-
- function addDetail(label,value){
-  const row = document.createElement("p");
-  row.className = "detail-row";
-  const title = document.createElement("span");
-  title.className = "detail-label";
-  title.textContent = label + ": ";
-  const text = document.createElement("span");
-  text.textContent = value === null || value === undefined || String(value).trim() === ""
-   ? "Belum tersedia" : String(value);
-  row.append(title,text);
-  content.appendChild(row);
- }
- addDetail("Nama",product.name);
- addDetail("Kategori",product.category);
- addDetail("Harga",Number.isFinite(Number(product.price)) && product.price !== null
-  ? rupiah(product.price) : null);
- addDetail("Stok",Number.isFinite(Number(product.stock)) && product.stock !== null
-  ? (Number(product.stock) <= 0 ? "Stok habis" : String(product.stock)) : null);
- addDetail("Deskripsi",product.description);
- // Data katalog hanya berisi merchant_id, bukan nama/identitas Mitra publik.
- // Jangan menebak identitas atau memaparkan UUID internal.
- addDetail("Identitas Mitra",null);
- if(catalogStale){
-  const warning = document.createElement("p");
-  warning.className = "catalog-status error";
-  warning.textContent = "Data katalog berasal dari pemuatan sebelumnya. Muat ulang katalog untuk informasi terbaru.";
-  content.appendChild(warning);
- }
- const notice = document.createElement("p");
- notice.className = "notice";
- notice.textContent = "Informasi ini hanya untuk dilihat. Tidak membuat pesanan dan tidak menjamin ketersediaan stok.";
- content.appendChild(notice);
- $("productDetailModal").hidden = false;
- $("closeProductDetail").focus();
-}
-function closeProductDetail(){
- $("productDetailModal").hidden = true;
- $("productDetailContent").replaceChildren();
- if(detailReturnFocus?.isConnected) detailReturnFocus.focus();
- detailReturnFocus = null;
 }
 
 /* TRANSAKSI TERTUNDA V2 DAN V3 */
@@ -875,29 +764,6 @@ function renderPendingNotice(){
 
 /* FORMULIR PREVIEW */
 
-/* Fail-closed checkout entry point. A feature flag alone cannot enable orders. */
-function enforceCheckoutLock(){
- const button = $("submitOrder");
- button.disabled = true;
- button.textContent = "Checkout V4 Belum Aktif";
- button.setAttribute("aria-disabled","true");
-}
-function clearCheckoutPreviewState(){
- checkoutSubmissionBusy = false;
- enforceCheckoutLock();
-}
-function handleCheckoutSubmission(event){
- if(event) event.preventDefault();
- if(checkoutSubmissionBusy) return false;
- checkoutSubmissionBusy = true;
- try{
-  enforceCheckoutLock();
-  checkoutMessage(CHECKOUT_PREVIEW_NOTICE);
-  return false; // No create-order RPC or mutation exists in this build.
- }finally{
-  checkoutSubmissionBusy = false;
- }
-}
 function checkoutMessage(message,isError=false){
  const element = $("checkoutMessage");
  element.textContent = message;
@@ -911,25 +777,10 @@ function shippingStatus(message,type=""){
   "shipping-status" + (type ? " " + type : "");
 }
 
-/* P-04: status estimasi hanya presentasi, tanpa request tambahan. */
-function setEstimateState(state){
- const labels = {
-  idle:"Estimasi: Belum dihitung",
-  loading:"Estimasi: Sedang menghitung…",
-  success:"Estimasi: Berhasil dihitung",
-  error:"Estimasi: Belum berhasil dihitung"
- };
- const element = $("estimateState");
- element.dataset.state = state;
- element.textContent = labels[state] || labels.idle;
-}
-
 function invalidateShipping(message=""){
  shippingRevision++;
- $("quoteState").textContent = "Shipping Quote: Belum diterbitkan.";
  shippingQuote = null;
  shippingEstimate = null;
- setEstimateState("idle");
 
  if(shippingRequestController){
   shippingRequestController.abort();
@@ -948,7 +799,7 @@ function invalidateShipping(message=""){
 }
 
 function openCheckout(productId){
- if(!accessApproved || orderBusy || shippingBusy || gpsBusy || catalogStale) return;
+ if(!accessApproved || orderBusy || shippingBusy || gpsBusy) return;
 
  if(pendingRequest || pendingCorrupt){
   alert("Periksa transaksi tertunda terlebih dahulu.");
@@ -995,8 +846,7 @@ function openCheckout(productId){
 
  $("gpsStatus").textContent = "Belum memilih titik tujuan.";
 
- checkoutMessage(CHECKOUT_PREVIEW_NOTICE);
- clearCheckoutPreviewState();
+ checkoutMessage("");
  invalidateShipping("Belum menghitung ongkir.");
 
  $("checkoutModal").hidden = false;
@@ -1009,7 +859,6 @@ function closeCheckout(){
  if(orderBusy || shippingBusy || gpsBusy) return;
 
  invalidateShipping("Pratinjau ditutup.");
- clearCheckoutPreviewState();
 
  $("checkoutModal").hidden = true;
  selectedProduct = null;
@@ -1017,12 +866,6 @@ function closeCheckout(){
 }
 
 function updateCheckoutTotal(){
- if(shippingQuote && Date.now() >= shippingQuote.expiryTime){
-  shippingQuote = null;
-  $("shippingResult").hidden = true;
-  $("quoteState").textContent = customerUIMessage("UI-12");
-  shippingStatus(customerUIMessage("UI-12"),"warning");
- }
  if(!selectedProduct){
   $("checkoutTotal").textContent = "Subtotal: Rp 0";
   $("submitOrder").disabled = true;
@@ -1071,7 +914,9 @@ function updateCheckoutTotal(){
   $("checkoutTotal").textContent = text;
  }
 
- enforceCheckoutLock();
+ $("submitOrder").disabled = true;
+ $("submitOrder").textContent =
+  "Checkout V4 Belum Aktif";
 }
 
 function updateShippingButtons(){
@@ -1088,7 +933,7 @@ function updateShippingButtons(){
  $("estimateShipping").disabled = !available;
  $("issueShippingQuote").disabled = !available;
  $("closeCheckout").disabled = shippingBusy || gpsBusy || orderBusy;
- enforceCheckoutLock();
+ $("submitOrder").disabled = true;
 }
 
 function setOrderBusy(value){
@@ -1256,8 +1101,7 @@ async function runShipping(action){
  try{
   form = readShippingForm();
  }catch(error){
-  if(action === "estimate") setEstimateState("error");
-  shippingStatus("Periksa kembali data yang dimasukkan. " + error.message,"error");
+  shippingStatus(error.message,"error");
   return;
  }
 
@@ -1281,7 +1125,6 @@ async function runShipping(action){
    : "Sedang menghitung estimasi ongkir..."
  );
 
- if(action === "estimate") setEstimateState("loading");
  const revision = shippingRevision;
  const controller = new AbortController();
 
@@ -1391,7 +1234,6 @@ async function runShipping(action){
     );
    }
 
-   setEstimateState("success");
    shippingEstimate = {
     fee,
     distance,
@@ -1448,7 +1290,6 @@ async function runShipping(action){
     longitude:form.longitude
    };
 
-   $("quoteState").textContent = "Shipping Quote: Aktif. Masa berlaku mengikuti waktu kedaluwarsa dari server.";
    resultBox.textContent =
     "SHIPPING QUOTE V4 BERHASIL\n\n" +
     "Quote ID:\n" + shippingQuote.id +
@@ -1478,7 +1319,6 @@ async function runShipping(action){
   if(revision !== shippingRevision) return;
 
   console.error("Shipping V4:",error);
-  if(action === "estimate") setEstimateState("error");
 
   shippingStatus(
    "❌ " + error.message,
@@ -1497,22 +1337,18 @@ async function runShipping(action){
 
 function checkQuoteExpiry(){
  if(!shippingQuote) return;
- const remaining = shippingQuote.expiryTime - Date.now();
- if(remaining <= 0){
+
+ if(Date.now() >= shippingQuote.expiryTime){
   shippingQuote = null;
-  $("quoteState").textContent = customerUIMessage("UI-12");
-  shippingStatus(customerUIMessage("UI-12"),"warning");
+
+  shippingStatus(
+   customerUIMessage("UI-12") + " Terbitkan quote baru untuk melanjutkan pengujian.",
+   "warning"
+  );
+
   $("shippingResult").hidden = true;
   updateCheckoutTotal();
-  return;
  }
- const seconds = Math.ceil(remaining / 1000);
- const minutes = Math.floor(seconds / 60);
- const rest = String(seconds % 60).padStart(2,"0");
- $("quoteState").textContent = (remaining <= 60000
-  ? customerUIMessage("UI-11") + " "
-  : "Shipping Quote aktif. Sisa waktu: ") + minutes + ":" + rest +
-  ". Ini bukan pesanan dan tidak menjamin stok.";
 }
 
 document.addEventListener(
@@ -1686,8 +1522,9 @@ async function loadOrders(){
  ordersLoading = true;
  $("refreshOrders").disabled = true;
  $("ordersStatus").className = "catalog-status";
+ showCustomerUIStatus("ordersStatus","UI-01");
+
  try{
-  showCustomerUIStatus("ordersStatus","UI-01");
   const {data:orders,error} = await supabaseClient
    .from("orders")
    .select("id,status,total_amount,customer_note,created_at")
@@ -1697,10 +1534,10 @@ async function loadOrders(){
 
   if(error) throw error;
 
-  const list = document.createDocumentFragment();
+  const list = $("ordersList");
+  list.replaceChildren();
 
   if(!orders?.length){
-   $("ordersList").replaceChildren();
    showCustomerUIStatus("ordersStatus","UI-03");
    return;
   }
@@ -1932,7 +1769,6 @@ async function loadOrders(){
    card.append(deliveryButton,deliveryBox);
    list.appendChild(card);
   }
-  $("ordersList").replaceChildren(list);
 
  }catch(error){
   console.error(
@@ -1944,10 +1780,6 @@ async function loadOrders(){
    "catalog-status error";
 
   showCustomerUIStatus("ordersStatus","UI-06");
-  if($("ordersList").childElementCount){
-   $("ordersStatus").textContent +=
-    " Riwayat yang terlihat berasal dari pemuatan sebelumnya.";
-  }
 
  }finally{
   ordersLoading = false;
@@ -1957,12 +1789,6 @@ async function loadOrders(){
 
 /* EVENT */
 
-$("closeProductDetail").addEventListener("click",closeProductDetail);
-document.addEventListener("keydown",event=>{
- if(event.key === "Escape" && !$("productDetailModal").hidden){
-  closeProductDetail();
- }
-});
 $("searchProduct").addEventListener(
  "input",
  renderCatalog
@@ -2030,9 +1856,15 @@ $("closeCheckout").addEventListener(
  closeCheckout
 );
 
-$("submitOrder").addEventListener("click",handleCheckoutSubmission);
-$("checkoutModal").addEventListener("submit",handleCheckoutSubmission);
-enforceCheckoutLock();
+$("submitOrder").addEventListener(
+ "click",
+ ()=>{
+  alert(
+   "Checkout V4 belum diaktifkan.\n\n" +
+   "Halaman ini hanya untuk menguji ongkir dan Shipping Quote."
+  );
+ }
+);
 
 $("resumeOrder").addEventListener(
  "click",
@@ -2068,9 +1900,6 @@ logoutButton.addEventListener(
   logoutButton.disabled = true;
 
   invalidateShipping("Sesi akan diakhiri.");
-  clearCheckoutPreviewState();
-  selectedProduct = null;
-  $("checkoutModal").hidden = true;
   showAccessScreen("Sedang keluar dari akun...");
 
   try{
