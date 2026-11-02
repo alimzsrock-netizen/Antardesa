@@ -1,26 +1,35 @@
-
 /*
-  AntarDesa v0.2.0
-  File JavaScript Utama
+  AntarDesa v0.3.0-RC
+  Identitas dan inisialisasi aplikasi utama.
+
+  Logika halaman beranda tetap berada di index.html
+  pada Tahap A.
 */
 
-const APP = {
+"use strict";
+
+const APP = Object.freeze({
   name: "AntarDesa",
-  version: "0.2.0",
+  version: "0.3.0-RC",
   environment: "development"
-};
+});
 
 function initApp() {
-  console.log(
+  console.info(
     APP.name + " v" + APP.version
   );
 
-  console.log(
-    "Sistem AntarDesa siap dikembangkan."
+  console.info(
+    "Beranda publik siap. Checkout dan transaksi nyata tetap nonaktif."
   );
 }
 
-document.addEventListener(
-  "DOMContentLoaded",
-  initApp
-);
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    initApp,
+    { once: true }
+  );
+} else {
+  initApp();
+}
