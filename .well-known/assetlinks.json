@@ -1,0 +1,15 @@
+
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "dev.pages.antardesa.dev.twa",
+      "sha256_cert_fingerprints": [
+        "0E:9A:0C:09:3E:AC:17:7D:EB:8C:63:AB:3B:58:C4:12:31:03:2B:A3:F6:AA:B9:42:09:44:8E:E3:AF:D2:89:55"
+      ]
+    }
+  }
+]
