@@ -1,17 +1,20 @@
+
 /*
  * AntarDesa PWA Service Worker
  * Cache hanya aset statis yang ditentukan.
  * Tidak menyimpan HTML, akun, pesanan, atau respons API.
  */
 
-const CACHE_NAME = 'antardesa-static-v1';
+const CACHE_NAME = 'antardesa-static-v2';
 
 const STATIC_ASSETS = [
   './style.css',
   './ui-components.css',
   './ui-messages.js',
   './app.js',
-  './icons/icon.svg'
+  './icons/icon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', function(event) {
@@ -56,7 +59,6 @@ self.addEventListener('fetch', function(event) {
 
   if (url.origin !== self.location.origin) return;
 
-  // Jangan cache dokumen atau navigasi halaman.
   if (
     request.mode === 'navigate' ||
     request.destination === 'document'
