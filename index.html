@@ -8,38 +8,261 @@
 <meta name="application-name" content="AntarDesa">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AntarDesa">
+
 <title>AntarDesa v0.3.0-RC</title>
 
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icons/icon.svg">
-
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="ui-components.css">
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f4f7f5;color:#1c3028;font:15px Arial,sans-serif}
-header{background:#16805d;color:white;padding:24px 20px 32px;border-radius:0 0 24px 24px}
-header h1{margin:0;font-size:27px}
-header p{margin:7px 0 0;font-size:13px}
-main{max-width:650px;margin:auto;padding:18px 16px 90px}
-.panel{background:white;border:1px solid #e3ebe6;border-radius:16px;padding:18px;margin-bottom:18px}
-.panel h2{margin:0 0 8px;font-size:19px}
-.muted{color:#61746b;font-size:13px;line-height:1.5}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.service{background:white;border:1px solid #e0e9e3;border-radius:14px;padding:16px 4px;min-height:102px;font:inherit;font-size:12px;color:inherit;cursor:pointer}
-.service span{display:block;font-size:28px;margin-bottom:10px}
-.primary{background:#16805d;color:white;border:0;border-radius:11px;padding:13px 16px;font-weight:bold;width:100%}
-.secondary{background:white;color:#16805d;border:1px solid #16805d;border-radius:11px;padding:12px;width:100%}
-label{display:block;font-weight:bold;font-size:13px;margin:14px 0 6px}
-input,textarea{width:100%;padding:12px;border:1px solid #cbd9d0;border-radius:10px;font:inherit}
-textarea{min-height:95px}
-.hidden{display:none!important}
-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dde7df;display:flex;justify-content:space-around;padding:12px}
-nav button{background:none;border:0;font:inherit;font-size:12px;color:#486657}
-nav button.active{color:#16805d;font-weight:bold}
-.order{padding:12px;border:1px solid #e0e9e3;border-radius:10px;margin:10px 0;line-height:1.6}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f4f7f5;
+  color: #1c3028;
+  font: 15px Arial, sans-serif;
+}
+
+header {
+  background: #16805d;
+  color: white;
+  padding: 22px 18px 26px;
+  border-radius: 0 0 24px 24px;
+}
+
+.header-inner {
+  max-width: 650px;
+  margin: auto;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 27px;
+}
+
+header p {
+  margin: 7px 0 0;
+  font-size: 13px;
+}
+
+.account-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.account-actions a {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  padding: 9px 11px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.account-login {
+  background: white;
+  color: #16805d;
+}
+
+.account-register {
+  border: 1px solid rgba(255,255,255,.8);
+  color: white;
+}
+
+main {
+  max-width: 650px;
+  margin: auto;
+  padding: 18px 16px 92px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e3ebe6;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.panel h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+}
+
+.muted {
+  color: #61746b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.service {
+  background: white;
+  border: 1px solid #e0e9e3;
+  border-radius: 14px;
+  padding: 16px 4px;
+  min-height: 102px;
+  font: inherit;
+  font-size: 12px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.service span {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.service:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #8bcbb0;
+  outline-offset: 2px;
+}
+
+.primary {
+  background: #16805d;
+  color: white;
+  border: 0;
+  border-radius: 11px;
+  padding: 13px 16px;
+  font-weight: bold;
+  width: 100%;
+}
+
+.secondary {
+  background: white;
+  color: #16805d;
+  border: 1px solid #16805d;
+  border-radius: 11px;
+  padding: 12px;
+  width: 100%;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  font-size: 13px;
+  margin: 14px 0 6px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd9d0;
+  border-radius: 10px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 95px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #dde7df;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+  z-index: 5;
+}
+
+nav button {
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  color: #486657;
+  min-width: 72px;
+  padding: 4px;
+}
+
+nav button.active {
+  color: #16805d;
+  font-weight: bold;
+}
+
+.order {
+  padding: 12px;
+  border: 1px solid #e0e9e3;
+  border-radius: 10px;
+  margin: 10px 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.info-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.info-links a {
+  color: #16805d;
+  font-size: 13px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.version-note {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #edf5f0;
+}
+
+@media (max-width: 380px) {
+  .header-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .account-actions {
+    width: 100%;
+  }
+
+  .account-actions a {
+    flex: 1;
+  }
+
+  .grid {
+    gap: 8px;
+  }
+
+  .service {
+    min-height: 96px;
+  }
+}
 </style>
 
 <script src="ui-messages.js" defer></script>
@@ -47,174 +270,329 @@ nav button.active{color:#16805d;font-weight:bold}
 </head>
 
 <body>
+
 <header>
-<h1>AntarDesa.</h1>
-<p>Dekatkan Jarak, Mudahkan Urusan. 🛵</p>
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <h1>AntarDesa.</h1>
+        <p>Dekatkan Jarak, Mudahkan Urusan. 🛵</p>
+      </div>
+
+      <div class="account-actions" aria-label="Akses akun">
+        <a class="account-login" href="login.html">Masuk</a>
+        <a class="account-register" href="register.html">Daftar</a>
+      </div>
+    </div>
+  </div>
 </header>
 
 <main>
+
 <section id="home" class="page">
-<div class="panel">
-<h2>Selamat datang! 👋</h2>
-<p class="muted">Apa yang kamu butuhkan hari ini?</p>
-</div>
 
-<h3>Layanan kami</h3>
+  <div class="panel">
+    <h2>Selamat datang! 👋</h2>
 
-<div class="grid">
-<button class="service" onclick="choose('Antar Paket')"><span>📦</span>Antar Paket</button>
-<button class="service" onclick="choose('Titip Belanja')"><span>🛒</span>Titip Belanja</button>
-<button class="service" onclick="choose('Antar Makan')"><span>🍜</span>Antar Makan</button>
-<button class="service" onclick="choose('Pasar Desa')"><span>🏪</span>Pasar Desa</button>
-<button class="service" onclick="choose('Sekalian Jalan')"><span>🛵</span>Sekalian Jalan</button>
-<button class="service" onclick="choose('Angkut Desa')"><span>🚚</span>Angkut Desa</button>
-</div>
+    <p class="muted">
+      Jelajahi layanan AntarDesa tanpa harus masuk terlebih dahulu.
+      Masuk atau daftar hanya saat kamu ingin menggunakan fitur
+      yang membutuhkan akun.
+    </p>
 
-<p class="muted">
-AntarDesa v0.3.0-RC • Kandidat rilis untuk simulasi.
-Belum menerima pesanan atau transaksi nyata.
-</p>
+    <div class="info-links">
+      <a href="login.html">Sudah punya akun? Masuk</a>
+      <a href="register.html">Pengguna baru? Daftar</a>
+    </div>
+  </div>
+
+  <h3>Layanan AntarDesa</h3>
+
+  <p class="muted">
+    Pilih layanan untuk melihat contoh alur simulasi.
+  </p>
+
+  <div class="grid">
+    <button class="service" type="button"
+      onclick="choose('Antar Paket')">
+      <span>📦</span>Antar Paket
+    </button>
+
+    <button class="service" type="button"
+      onclick="choose('Titip Belanja')">
+      <span>🛒</span>Titip Belanja
+    </button>
+
+    <button class="service" type="button"
+      onclick="choose('Antar Makan')">
+      <span>🍜</span>Antar Makan
+    </button>
+
+    <button class="service" type="button"
+      onclick="choose('Pasar Desa')">
+      <span>🏪</span>Pasar Desa
+    </button>
+
+    <button class="service" type="button"
+      onclick="choose('Sekalian Jalan')">
+      <span>🛵</span>Sekalian Jalan
+    </button>
+
+    <button class="service" type="button"
+      onclick="choose('Angkut Desa')">
+      <span>🚚</span>Angkut Desa
+    </button>
+  </div>
+
+  <div class="panel version-note">
+    <strong>AntarDesa v0.3.0-RC</strong>
+
+    <p class="muted">
+      Kandidat rilis untuk pengujian.
+      Fitur layanan pada halaman ini masih berupa simulasi lokal.
+      Belum menerima pesanan atau transaksi nyata.
+    </p>
+  </div>
+
 </section>
 
 <section id="formpage" class="page hidden">
-<div class="panel">
-<button class="secondary" onclick="show('home')">← Kembali</button>
 
-<h2 id="formtitle" style="margin-top:18px">Buat pesanan</h2>
+  <div class="panel">
 
-<p class="muted">
-Gunakan data contoh saja. Jangan masukkan informasi pribadi asli.
-</p>
+    <button class="secondary" type="button"
+      onclick="show('home')">
+      ← Kembali ke Beranda
+    </button>
 
-<form id="orderform">
-<label for="name">Nama panggilan</label>
-<input id="name" maxlength="40" required placeholder="Contoh: Budi">
+    <h2 id="formtitle" style="margin-top:18px">
+      Simulasi layanan
+    </h2>
 
-<label for="pickup">Lokasi penjemputan</label>
-<input id="pickup" maxlength="120" required placeholder="Contoh: Pasar Kecamatan">
+    <p class="muted">
+      Gunakan data contoh saja. Jangan masukkan informasi pribadi asli.
+      Formulir ini tidak mengirim pesanan ke server.
+    </p>
 
-<label for="destination">Tujuan pengantaran</label>
-<input id="destination" maxlength="120" required placeholder="Contoh: Desa A">
+    <form id="orderform">
 
-<label for="detail">Detail kebutuhan</label>
-<textarea id="detail" maxlength="500" required placeholder="Jelaskan barang atau titipan"></textarea>
+      <label for="name">Nama panggilan</label>
+      <input id="name" maxlength="40" required
+        placeholder="Contoh: Budi">
 
-<button class="primary" type="submit">Simulasikan pesanan</button>
-</form>
-</div>
+      <label for="pickup">Lokasi penjemputan</label>
+      <input id="pickup" maxlength="120" required
+        placeholder="Contoh: Pasar Kecamatan">
+
+      <label for="destination">Tujuan pengantaran</label>
+      <input id="destination" maxlength="120" required
+        placeholder="Contoh: Desa A">
+
+      <label for="detail">Detail kebutuhan</label>
+      <textarea id="detail" maxlength="500" required
+        placeholder="Jelaskan barang atau titipan"></textarea>
+
+      <button class="primary" type="submit">
+        Simpan simulasi
+      </button>
+
+    </form>
+  </div>
 </section>
 
 <section id="orders" class="page hidden">
-<div class="panel">
-<h2>Pesanan simulasi</h2>
-<p class="muted">Data sementara. Akan hilang jika halaman dimuat ulang.</p>
-<div id="orderlist" aria-live="polite"></div>
-</div>
+
+  <div class="panel">
+    <h2>Riwayat simulasi</h2>
+
+    <p class="muted">
+      Data hanya tersimpan sementara di halaman ini dan akan hilang
+      saat halaman dimuat ulang. Ini bukan riwayat pesanan sungguhan.
+    </p>
+
+    <div id="orderlist" aria-live="polite"></div>
+  </div>
+
 </section>
 
 <section id="profile" class="page hidden">
-<div class="panel">
-<h2>Profil</h2>
-<p>AntarDesa v0.3.0-RC</p>
-<p class="muted">
-Kandidat rilis ini menampilkan simulasi layanan.
-Pemesanan dan transaksi nyata belum diaktifkan.
-</p>
-</div>
+
+  <div class="panel">
+    <h2>Akun dan profil</h2>
+
+    <p class="muted">
+      Kamu sedang menggunakan beranda publik.
+      Kamu tetap bisa menjelajahi layanan tanpa login.
+    </p>
+
+    <a class="primary" href="login.html"
+      style="display:block;text-align:center;text-decoration:none">
+      Masuk ke akun
+    </a>
+
+    <p style="height:8px;margin:0"></p>
+
+    <a class="secondary" href="register.html"
+      style="display:block;text-align:center;text-decoration:none">
+      Buat akun AntarDesa
+    </a>
+
+    <p class="muted" style="margin-top:14px">
+      Setelah login, kamu akan diarahkan ke dashboard sesuai
+      peran akun yang terdaftar dan hak aksesnya.
+    </p>
+  </div>
+
+  <div class="panel">
+    <strong>AntarDesa v0.3.0-RC</strong>
+
+    <p class="muted">
+      Kandidat rilis untuk simulasi.
+      Checkout dan transaksi nyata belum diaktifkan.
+    </p>
+  </div>
+
 </section>
+
 </main>
 
 <nav aria-label="Navigasi utama">
-<button id="navhome" class="active" onclick="show('home')">⌂<br>Beranda</button>
-<button id="navorders" onclick="show('orders')">▤<br>Pesanan</button>
-<button id="navprofile" onclick="show('profile')">♙<br>Profil</button>
+  <button id="navhome" class="active" type="button"
+    onclick="show('home')">
+    ⌂<br>Beranda
+  </button>
+
+  <button id="navorders" type="button"
+    onclick="show('orders')">
+    ▤<br>Simulasi
+  </button>
+
+  <button id="navprofile" type="button"
+    onclick="show('profile')">
+    ♙<br>Akun
+  </button>
 </nav>
 
 <script>
-let selected='';
-const orders=[];
+"use strict";
 
-function show(id){
- document.querySelectorAll('.page').forEach(p=>{
-  p.classList.toggle('hidden',p.id!==id);
- });
+let selectedService = "";
+const simulatedOrders = [];
 
- document.querySelectorAll('nav button').forEach(b=>{
-  b.classList.toggle('active',b.id==='nav'+id);
- });
-
- window.scrollTo(0,0);
-}
-
-function choose(service){
- selected=service;
- document.getElementById('formtitle').textContent=service;
- document.getElementById('orderform').reset();
- show('formpage');
-}
-
-function renderEmptyOrders(){
- const list=document.getElementById('orderlist');
-
- if(window.AntarDesaUI){
-  window.AntarDesaUI.showMessage(list,'UI-03');
- }else{
-  list.textContent='Belum ada riwayat pesanan.';
- }
-}
-
-document.getElementById('orderform').addEventListener('submit',function(e){
- e.preventDefault();
-
- const get=id=>document.getElementById(id).value.trim();
-
- if(!['name','pickup','destination','detail'].every(get))return;
-
- orders.unshift({
-  service:selected,
-  name:get('name'),
-  pickup:get('pickup'),
-  destination:get('destination'),
-  detail:get('detail')
- });
-
- const list=document.getElementById('orderlist');
- list.replaceChildren();
-
- orders.forEach((o,i)=>{
-  const card=document.createElement('div');
-  card.className='order';
-
-  [
-   `${i+1}. ${o.service}`,
-   `Pemesan: ${o.name}`,
-   `Dari: ${o.pickup}`,
-   `Ke: ${o.destination}`,
-   `Detail: ${o.detail}`,
-   'Status: Simulasi'
-  ].forEach((line,j)=>{
-   const el=document.createElement(j===0?'strong':'div');
-   el.textContent=line;
-   card.append(el);
+function show(pageId) {
+  document.querySelectorAll(".page").forEach(function(page) {
+    page.classList.toggle("hidden", page.id !== pageId);
   });
 
-  list.append(card);
- });
+  document.querySelectorAll("nav button").forEach(function(button) {
+    button.classList.toggle(
+      "active",
+      button.id === "nav" + pageId
+    );
+  });
 
- this.reset();
- show('orders');
-});
+  window.scrollTo(0, 0);
+}
 
-document.addEventListener("DOMContentLoaded",renderEmptyOrders);
+function choose(serviceName) {
+  selectedService = serviceName;
+
+  document.getElementById("formtitle").textContent =
+    "Simulasi: " + serviceName;
+
+  document.getElementById("orderform").reset();
+
+  show("formpage");
+}
+
+function renderEmptyOrders() {
+  const list = document.getElementById("orderlist");
+
+  if (
+    window.AntarDesaUI &&
+    typeof window.AntarDesaUI.showMessage === "function"
+  ) {
+    window.AntarDesaUI.showMessage(list, "UI-03");
+  } else {
+    list.textContent = "Belum ada simulasi layanan.";
+  }
+}
+
+document.getElementById("orderform").addEventListener(
+  "submit",
+  function(event) {
+    event.preventDefault();
+
+    const value = function(id) {
+      return document.getElementById(id).value.trim();
+    };
+
+    const fields = [
+      "name",
+      "pickup",
+      "destination",
+      "detail"
+    ];
+
+    if (!fields.every(function(id) {
+      return value(id).length > 0;
+    })) {
+      return;
+    }
+
+    simulatedOrders.unshift({
+      service: selectedService,
+      name: value("name"),
+      pickup: value("pickup"),
+      destination: value("destination"),
+      detail: value("detail")
+    });
+
+    const list = document.getElementById("orderlist");
+    list.replaceChildren();
+
+    simulatedOrders.forEach(function(order, index) {
+      const card = document.createElement("div");
+      card.className = "order";
+
+      [
+        (index + 1) + ". " + order.service,
+        "Pemesan: " + order.name,
+        "Dari: " + order.pickup,
+        "Ke: " + order.destination,
+        "Detail: " + order.detail,
+        "Status: Simulasi lokal, tidak dikirim"
+      ].forEach(function(line, lineIndex) {
+        const element = document.createElement(
+          lineIndex === 0 ? "strong" : "div"
+        );
+
+        element.textContent = line;
+        card.append(element);
+      });
+
+      list.append(card);
+    });
+
+    this.reset();
+    show("orders");
+  }
+);
+
+document.addEventListener(
+  "DOMContentLoaded",
+  renderEmptyOrders
+);
 </script>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./service-worker.js', {
-      scope: './'
-    }).catch(function(error) {
-      console.error('Service Worker gagal:', error);
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register(
+      "./service-worker.js",
+      {scope: "./"}
+    ).catch(function(error) {
+      console.error("Service Worker gagal:", error);
     });
   });
 }
