@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -18,7 +19,9 @@
 <link rel="stylesheet" href="ui-components.css">
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -182,12 +185,15 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 12px;
   border: 1px solid #cbd9d0;
   border-radius: 10px;
   font: inherit;
+  background: white;
+  color: #1c3028;
 }
 
 textarea {
@@ -289,6 +295,157 @@ nav button.active {
   margin-top: 10px;
 }
 
+/* =========================================
+   KATALOG PRODUK BERSAMA
+========================================= */
+
+.catalog-section {
+  margin-top: 26px;
+}
+
+.catalog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.catalog-heading h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.catalog-description {
+  margin: 0 0 15px;
+}
+
+.catalog-tools {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.catalog-tools input,
+.catalog-tools select {
+  min-width: 0;
+}
+
+.catalog-count {
+  color: #61746b;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.product-card {
+  background: white;
+  border: 1px solid #e0e9e3;
+  border-radius: 14px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.product-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #edf5f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #16805d;
+  font-size: 38px;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-content {
+  padding: 11px;
+}
+
+.product-category {
+  display: inline-block;
+  color: #16805d;
+  background: #edf5f0;
+  padding: 4px 7px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 7px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  margin: 0 0 7px;
+  overflow-wrap: anywhere;
+}
+
+.product-price {
+  color: #16805d;
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 7px;
+  overflow-wrap: anywhere;
+}
+
+.product-stock {
+  color: #61746b;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.product-description {
+  color: #61746b;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.product-placeholder {
+  font-size: 38px;
+}
+
+.catalog-state {
+  background: white;
+  border: 1px solid #e0e9e3;
+  border-radius: 12px;
+  padding: 20px 14px;
+  text-align: center;
+  color: #61746b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.catalog-refresh {
+  width: auto;
+  min-width: 86px;
+  padding: 9px 12px;
+  font-size: 12px;
+}
+
+.catalog-footer {
+  margin-top: 13px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #61746b;
+}
+
 @media (max-width: 380px) {
   .header-top {
     align-items: flex-start;
@@ -310,6 +467,14 @@ nav button.active {
 
   .service {
     min-height: 96px;
+  }
+
+  .product-grid {
+    gap: 8px;
+  }
+
+  .product-content {
+    padding: 9px;
   }
 }
 </style>
@@ -347,7 +512,10 @@ nav button.active {
 
 <main>
 
-<!-- BERANDA UTAMA -->
+<!-- =====================================
+     BERANDA UTAMA
+===================================== -->
+
 <section id="home" class="page">
 
   <div class="panel">
@@ -365,7 +533,7 @@ nav button.active {
       <a href="register.html">Pengguna baru? Daftar</a>
     </div>
 
-    <!-- INFORMASI AKUN YANG SUDAH LOGIN -->
+    <!-- INFORMASI AKUN -->
     <div
       id="accountPanel"
       class="account-card hidden"
@@ -459,6 +627,79 @@ nav button.active {
 
   </div>
 
+  <!-- =================================
+       KATALOG PRODUK BERSAMA
+  ================================== -->
+
+  <section class="catalog-section" aria-labelledby="catalogTitle">
+
+    <div class="catalog-heading">
+
+      <h2 id="catalogTitle">Pasar Desa 🏪</h2>
+
+      <button
+        id="refreshCatalogButton"
+        class="secondary catalog-refresh"
+        type="button"
+      >
+        Muat ulang
+      </button>
+
+    </div>
+
+    <p class="muted catalog-description">
+      Temukan hasil kebun dan produk dari Mitra AntarDesa.
+      Katalog ini dapat dijelajahi oleh semua pengguna.
+    </p>
+
+    <div class="catalog-tools">
+
+      <input
+        id="productSearch"
+        type="search"
+        maxlength="100"
+        placeholder="Cari nama atau produk..."
+        aria-label="Cari produk"
+      >
+
+      <select
+        id="productCategory"
+        aria-label="Filter kategori produk"
+      >
+        <option value="">Semua kategori</option>
+      </select>
+
+    </div>
+
+    <div
+      id="catalogCount"
+      class="catalog-count"
+      aria-live="polite"
+    >
+      Memuat katalog...
+    </div>
+
+    <div
+      id="catalogState"
+      class="catalog-state"
+      role="status"
+      aria-live="polite"
+    >
+      Sedang mengambil produk dari Mitra AntarDesa...
+    </div>
+
+    <div
+      id="productGrid"
+      class="product-grid hidden"
+    ></div>
+
+    <p class="catalog-footer">
+      Produk ditampilkan berdasarkan status aktif.
+      Fitur pembelian dan checkout belum diaktifkan.
+    </p>
+
+  </section>
+
   <div class="panel version-note">
 
     <strong>AntarDesa v0.3.0-RC</strong>
@@ -473,7 +714,11 @@ nav button.active {
 
 </section>
 
-<!-- FORM SIMULASI -->
+
+<!-- =====================================
+     FORM SIMULASI
+===================================== -->
+
 <section id="formpage" class="page hidden">
 
   <div class="panel">
@@ -520,7 +765,11 @@ nav button.active {
 
 </section>
 
-<!-- RIWAYAT SIMULASI -->
+
+<!-- =====================================
+     RIWAYAT SIMULASI
+===================================== -->
+
 <section id="orders" class="page hidden">
 
   <div class="panel">
@@ -538,7 +787,11 @@ nav button.active {
 
 </section>
 
-<!-- PROFIL -->
+
+<!-- =====================================
+     PROFIL
+===================================== -->
+
 <section id="profile" class="page hidden">
 
   <div class="panel">
@@ -614,7 +867,11 @@ nav button.active {
 
 </main>
 
-<!-- NAVIGASI BAWAH -->
+
+<!-- =====================================
+     NAVIGASI BAWAH
+===================================== -->
+
 <nav aria-label="Navigasi utama">
 
   <button id="navhome" class="active" type="button"
@@ -633,6 +890,7 @@ nav button.active {
   </button>
 
 </nav>
+
 
 <script>
 "use strict";
@@ -654,6 +912,24 @@ let currentRole = null;
 let selectedService = "";
 
 const simulatedOrders = [];
+
+
+/* =========================================
+   DATA KATALOG PRODUK
+========================================= */
+
+let publicProducts = [];
+
+const PRODUCT_LIMIT = 60;
+
+const rupiahFormatter = new Intl.NumberFormat(
+  "id-ID",
+  {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  }
+);
 
 
 /* =========================================
@@ -724,7 +1000,7 @@ function getRoleInfo(role, verified) {
     return {
       label: "Mitra terverifikasi",
       page: "mitra.html",
-      dashboard: "Dashboard Mitra"
+      dashboard: "Kelola Toko Saya"
     };
 
   }
@@ -807,7 +1083,7 @@ function showGuestState() {
     "Selamat datang! 👋";
 
   document.getElementById("welcomeDescription").textContent =
-    "Jelajahi layanan AntarDesa tanpa harus masuk terlebih dahulu. Masuk atau daftar hanya saat kamu ingin menggunakan fitur yang membutuhkan akun.";
+    "Jelajahi layanan dan produk AntarDesa tanpa harus masuk terlebih dahulu. Masuk atau daftar hanya saat menggunakan fitur yang membutuhkan akun.";
 
   document.getElementById("guestLinks")
     .classList.remove("hidden");
@@ -822,7 +1098,7 @@ function showGuestState() {
     .classList.add("hidden");
 
   document.getElementById("profileDescription").textContent =
-    "Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan tanpa login.";
+    "Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan dan katalog produk tanpa login.";
 
 }
 
@@ -961,14 +1237,16 @@ async function loadUserRole() {
       profileLink.classList.remove("hidden");
 
       setAccountMessage(
-        "Status akun berhasil diperiksa. Kamu tetap berada di dashboard utama sampai memilih dashboard peran.",
+        data.role === "mitra"
+          ? "Status Mitra terverifikasi. Kamu bisa menjelajahi seluruh katalog dan mengelola produk tokomu sendiri."
+          : "Status akun berhasil diperiksa. Kamu tetap berada di dashboard utama dan dapat menjelajahi katalog.",
         false
       );
 
     } else {
 
       setAccountMessage(
-        "Akun terdeteksi, tetapi dashboard khusus belum tersedia karena status peran atau verifikasi belum memenuhi syarat. Jika ini tidak sesuai, coba periksa lagi atau hubungi pengelola.",
+        "Akun terdeteksi, tetapi dashboard khusus belum tersedia karena status peran atau verifikasi belum memenuhi syarat. Kamu tetap dapat menjelajahi dashboard utama.",
         true
       );
 
@@ -1130,6 +1408,449 @@ document.getElementById("profileLogoutButton")
 
 
 /* =========================================
+   UTILITAS KATALOG
+========================================= */
+
+function formatPrice(value) {
+
+  const price = Number(value);
+
+  if (!Number.isFinite(price) || price < 0) {
+    return "Harga belum tersedia";
+  }
+
+  return rupiahFormatter.format(price);
+
+}
+
+
+function safeImageUrl(value) {
+
+  if (!value || typeof value !== "string") {
+    return "";
+  }
+
+  try {
+
+    const url = new URL(value);
+
+    if (
+      url.protocol !== "https:" &&
+      url.protocol !== "http:"
+    ) {
+      return "";
+    }
+
+    return url.href;
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+
+function createTextElement(tag, className, value) {
+
+  const element = document.createElement(tag);
+
+  if (className) {
+    element.className = className;
+  }
+
+  element.textContent =
+    value === null || value === undefined
+      ? ""
+      : String(value);
+
+  return element;
+
+}
+
+
+/* =========================================
+   PESAN STATUS KATALOG
+========================================= */
+
+function setCatalogState(message, isError) {
+
+  const state =
+    document.getElementById("catalogState");
+
+  const grid =
+    document.getElementById("productGrid");
+
+  state.textContent = message;
+
+  state.classList.remove("hidden");
+
+  grid.classList.add("hidden");
+
+  document.getElementById("catalogCount").textContent =
+    "";
+
+  if (isError) {
+    state.style.color = "#b42318";
+  } else {
+    state.style.color = "#61746b";
+  }
+
+}
+
+
+/* =========================================
+   KARTU PRODUK
+========================================= */
+
+function createProductCard(product) {
+
+  const card = document.createElement("article");
+
+  card.className = "product-card";
+
+  const imageContainer =
+    document.createElement("div");
+
+  imageContainer.className = "product-image";
+
+  const imageUrl = safeImageUrl(product.image_url);
+
+  if (imageUrl) {
+
+    const image = document.createElement("img");
+
+    image.src = imageUrl;
+    image.alt = product.name || "Foto produk";
+    image.loading = "lazy";
+    image.referrerPolicy = "no-referrer";
+
+    image.addEventListener("error", function() {
+
+      image.remove();
+
+      const placeholder =
+        createTextElement(
+          "span",
+          "product-placeholder",
+          "📦"
+        );
+
+      imageContainer.append(placeholder);
+
+    }, { once: true });
+
+    imageContainer.append(image);
+
+  } else {
+
+    imageContainer.append(
+      createTextElement(
+        "span",
+        "product-placeholder",
+        "📦"
+      )
+    );
+
+  }
+
+  const content =
+    document.createElement("div");
+
+  content.className = "product-content";
+
+  const category =
+    createTextElement(
+      "span",
+      "product-category",
+      product.category || "Produk Desa"
+    );
+
+  const name =
+    createTextElement(
+      "h3",
+      "product-name",
+      product.name
+    );
+
+  const price =
+    createTextElement(
+      "div",
+      "product-price",
+      formatPrice(product.price)
+    );
+
+  const stockValue = Number(product.stock);
+
+  const stockText =
+    Number.isFinite(stockValue) && stockValue > 0
+      ? "Stok tersedia: " + stockValue
+      : "Stok habis";
+
+  const stock =
+    createTextElement(
+      "div",
+      "product-stock",
+      stockText
+    );
+
+  const description =
+    createTextElement(
+      "div",
+      "product-description",
+      product.description || "Belum ada deskripsi produk."
+    );
+
+  content.append(
+    category,
+    name,
+    price,
+    stock,
+    description
+  );
+
+  card.append(
+    imageContainer,
+    content
+  );
+
+  return card;
+
+}
+
+
+/* =========================================
+   RENDER KATALOG
+========================================= */
+
+function renderProductCatalog() {
+
+  const searchInput =
+    document.getElementById("productSearch");
+
+  const categorySelect =
+    document.getElementById("productCategory");
+
+  const grid =
+    document.getElementById("productGrid");
+
+  const state =
+    document.getElementById("catalogState");
+
+  const count =
+    document.getElementById("catalogCount");
+
+  const keyword =
+    searchInput.value.trim().toLowerCase();
+
+  const selectedCategory =
+    categorySelect.value;
+
+  const filteredProducts =
+    publicProducts.filter(function(product) {
+
+      const searchableText = [
+
+        product.name,
+        product.description,
+        product.category
+
+      ].join(" ").toLowerCase();
+
+      const matchesKeyword =
+        searchableText.includes(keyword);
+
+      const matchesCategory =
+        !selectedCategory ||
+        product.category === selectedCategory;
+
+      return matchesKeyword && matchesCategory;
+
+    });
+
+  grid.replaceChildren();
+
+  state.classList.add("hidden");
+
+  if (filteredProducts.length === 0) {
+
+    grid.classList.add("hidden");
+
+    state.textContent =
+      publicProducts.length === 0
+        ? "Belum ada produk aktif dari Mitra AntarDesa."
+        : "Produk yang kamu cari belum ditemukan. Coba kata kunci atau kategori lain.";
+
+    state.style.color = "#61746b";
+    state.classList.remove("hidden");
+
+    count.textContent =
+      "Tidak ada produk yang cocok.";
+
+    return;
+
+  }
+
+  filteredProducts.forEach(function(product) {
+
+    grid.append(
+      createProductCard(product)
+    );
+
+  });
+
+  grid.classList.remove("hidden");
+
+  count.textContent =
+    "Menampilkan " +
+    filteredProducts.length +
+    " dari " +
+    publicProducts.length +
+    " produk aktif.";
+
+}
+
+
+/* =========================================
+   FILTER KATEGORI OTOMATIS
+========================================= */
+
+function populateProductCategories() {
+
+  const select =
+    document.getElementById("productCategory");
+
+  const previousValue = select.value;
+
+  const categories = Array.from(
+    new Set(
+      publicProducts
+        .map(function(product) {
+          return String(product.category || "").trim();
+        })
+        .filter(Boolean)
+    )
+  ).sort(function(a, b) {
+    return a.localeCompare(b, "id");
+  });
+
+  select.replaceChildren();
+
+  const allOption =
+    document.createElement("option");
+
+  allOption.value = "";
+  allOption.textContent = "Semua kategori";
+
+  select.append(allOption);
+
+  categories.forEach(function(category) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = category;
+    option.textContent = category;
+
+    select.append(option);
+
+  });
+
+  if (categories.includes(previousValue)) {
+    select.value = previousValue;
+  }
+
+}
+
+
+/* =========================================
+   MEMUAT PRODUK PUBLIK DARI SUPABASE
+========================================= */
+
+async function loadPublicProducts() {
+
+  const refreshButton =
+    document.getElementById("refreshCatalogButton");
+
+  refreshButton.disabled = true;
+  refreshButton.textContent = "Memuat...";
+
+  setCatalogState(
+    "Sedang mengambil produk aktif dari seluruh Mitra AntarDesa...",
+    false
+  );
+
+  try {
+
+    if (!supabaseClient) {
+
+      throw new Error("SUPABASE_NOT_AVAILABLE");
+
+    }
+
+    const { data, error } = await supabaseClient
+      .from("products")
+      .select(
+        "id,name,description,category,price,stock,image_url,created_at"
+      )
+      .eq("is_active", true)
+      .order("created_at", {
+        ascending: false
+      })
+      .limit(PRODUCT_LIMIT);
+
+    if (error) {
+      throw error;
+    }
+
+    publicProducts = Array.isArray(data)
+      ? data
+      : [];
+
+    populateProductCategories();
+
+    renderProductCatalog();
+
+  } catch (error) {
+
+    console.error(
+      "Gagal memuat katalog produk:",
+      error
+    );
+
+    publicProducts = [];
+
+    setCatalogState(
+      "Katalog belum dapat dimuat. Periksa koneksi internet atau akses Data API Supabase, lalu tekan Muat ulang.",
+      true
+    );
+
+  } finally {
+
+    refreshButton.disabled = false;
+    refreshButton.textContent = "Muat ulang";
+
+  }
+
+}
+
+
+/* =========================================
+   EVENT PENCARIAN DAN FILTER
+========================================= */
+
+document.getElementById("productSearch")
+  .addEventListener("input", renderProductCatalog);
+
+document.getElementById("productCategory")
+  .addEventListener("change", renderProductCatalog);
+
+document.getElementById("refreshCatalogButton")
+  .addEventListener("click", loadPublicProducts);
+
+
+/* =========================================
    FORM SIMULASI LAYANAN
 ========================================= */
 
@@ -1247,7 +1968,7 @@ document.addEventListener(
 
 
 /* =========================================
-   INISIALISASI SUPABASE DAN PEMULIHAN SESI
+   INISIALISASI SUPABASE
 ========================================= */
 
 if (
@@ -1273,8 +1994,15 @@ if (
   );
 
   /*
-    Periksa sesi tersimpan.
-    Halaman tidak berpindah otomatis ke dashboard peran.
+    Katalog publik dimuat tanpa mengharuskan login.
+    RLS membatasi hasil pada produk aktif.
+  */
+
+  loadPublicProducts();
+
+  /*
+    Pulihkan sesi akun.
+    Pengguna tetap berada di dashboard utama.
   */
 
   refreshSession();
@@ -1305,11 +2033,6 @@ if (
 
         showSignedInState(session.user);
 
-        /*
-          Pemeriksaan peran dijalankan setelah callback selesai.
-          Tidak melakukan signOut jika pemeriksaan gagal.
-        */
-
         window.setTimeout(function() {
           loadUserRole();
         }, 0);
@@ -1322,6 +2045,11 @@ if (
 } else {
 
   showGuestState();
+
+  setCatalogState(
+    "Katalog belum dapat dimuat karena Supabase SDK gagal dimuat.",
+    true
+  );
 
   document.getElementById("welcomeDescription").textContent =
     "Dashboard utama tetap dapat digunakan. Layanan pemeriksaan akun belum tersedia karena Supabase SDK gagal dimuat.";
