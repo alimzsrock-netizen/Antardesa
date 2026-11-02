@@ -1,2385 +1,1613 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#16805d">
-<meta name="description" content="AntarDesa membantu masyarakat mengakses layanan antar barang, titip belanja, antar makanan, pasar desa, dan kebutuhan lokal.">
-<meta name="application-name" content="AntarDesa">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="AntarDesa">
-
-<title>AntarDesa v0.3.0-RC</title>
-
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icons/icon.svg">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="ui-components.css">
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: #f4f7f5;
-  color: #1c3028;
-  font: 15px Arial, sans-serif;
-}
-
-header {
-  background: #16805d;
-  color: white;
-  padding: 22px 18px 26px;
-  border-radius: 0 0 24px 24px;
-}
-
-.header-inner {
-  max-width: 650px;
-  margin: auto;
-}
-
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 27px;
-}
-
-header p {
-  margin: 7px 0 0;
-  font-size: 13px;
-}
-
-.account-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.account-actions a,
-.account-actions button {
-  display: inline-block;
-  text-decoration: none;
-  text-align: center;
-  padding: 9px 11px;
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.account-login {
-  background: white;
-  color: #16805d;
-}
-
-.account-register {
-  border: 1px solid rgba(255,255,255,.8);
-  color: white;
-}
-
-main {
-  max-width: 650px;
-  margin: auto;
-  padding: 18px 16px 92px;
-}
-
-.panel {
-  background: white;
-  border: 1px solid #e3ebe6;
-  border-radius: 16px;
-  padding: 18px;
-  margin-bottom: 18px;
-}
-
-.panel h2 {
-  margin: 0 0 8px;
-  font-size: 19px;
-}
-
-.muted {
-  color: #61746b;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.service {
-  background: white;
-  border: 1px solid #e0e9e3;
-  border-radius: 14px;
-  padding: 16px 4px;
-  min-height: 102px;
-  font: inherit;
-  font-size: 12px;
-  color: inherit;
-  cursor: pointer;
-}
-
-.service span {
-  display: block;
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.service:focus-visible,
-button:focus-visible,
-a:focus-visible {
-  outline: 3px solid #8bcbb0;
-  outline-offset: 2px;
-}
-
-.primary {
-  background: #16805d;
-  color: white;
-  border: 0;
-  border-radius: 11px;
-  padding: 13px 16px;
-  font-weight: bold;
-  width: 100%;
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.secondary {
-  background: white;
-  color: #16805d;
-  border: 1px solid #16805d;
-  border-radius: 11px;
-  padding: 12px;
-  width: 100%;
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: .6;
-  cursor: wait;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  font-size: 13px;
-  margin: 14px 0 6px;
-}
-
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd9d0;
-  border-radius: 10px;
-  font: inherit;
-  background: white;
-  color: #1c3028;
-}
-
-textarea { min-height: 95px; }
-
-.hidden { display: none !important; }
-
-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  border-top: 1px solid #dde7df;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-  z-index: 5;
-}
-
-nav button {
-  background: none;
-  border: 0;
-  font: inherit;
-  font-size: 12px;
-  color: #486657;
-  min-width: 72px;
-  padding: 4px;
-}
-
-nav button.active {
-  color: #16805d;
-  font-weight: bold;
-}
-
-.order {
-  padding: 12px;
-  border: 1px solid #e0e9e3;
-  border-radius: 10px;
-  margin: 10px 0;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.info-links {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.info-links a {
-  color: #16805d;
-  font-size: 13px;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.version-note {
-  margin-top: 18px;
-  padding: 12px;
-  border-radius: 10px;
-  background: #edf5f0;
-}
-
-.account-card {
-  border: 1px solid #d9e9df;
-  background: #f6fbf7;
-  border-radius: 12px;
-  padding: 13px;
-  margin-top: 14px;
-}
-
-.account-email {
-  overflow-wrap: anywhere;
-  font-weight: bold;
-  margin: 5px 0 8px;
-}
-
-.account-status {
-  color: #16805d;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.account-actions-main {
-  display: grid;
-  gap: 9px;
-  margin-top: 12px;
-}
-
-.account-message {
-  color: #61746b;
-  font-size: 12px;
-  line-height: 1.5;
-  margin-top: 10px;
-}
-
-/* KATALOG PRODUK */
-
-.catalog-section { margin-top: 26px; }
-
-.catalog-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 7px;
-}
-
-.catalog-heading h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.catalog-description { margin: 0 0 15px; }
-
-.catalog-tools {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.catalog-tools input,
-.catalog-tools select { min-width: 0; }
-
-.catalog-count {
-  color: #61746b;
-  font-size: 12px;
-  margin-bottom: 12px;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.product-card {
-  background: white;
-  border: 1px solid #e0e9e3;
-  border-radius: 14px;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.product-image {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background: #edf5f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  color: #16805d;
-  font-size: 38px;
-}
-
-.product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.product-content { padding: 11px; }
-
-.product-category {
-  display: inline-block;
-  color: #16805d;
-  background: #edf5f0;
-  padding: 4px 7px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: bold;
-  margin-bottom: 7px;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.product-name {
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 1.4;
-  margin: 0 0 7px;
-  overflow-wrap: anywhere;
-}
-
-.product-price {
-  color: #16805d;
-  font-weight: bold;
-  font-size: 15px;
-  margin-bottom: 7px;
-  overflow-wrap: anywhere;
-}
-
-.product-stock {
-  color: #61746b;
-  font-size: 11px;
-  margin-bottom: 8px;
-}
-
-.product-description {
-  color: #61746b;
-  font-size: 11px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-  white-space: pre-line;
-}
-
-.product-placeholder { font-size: 38px; }
-
-.catalog-state {
-  background: white;
-  border: 1px solid #e0e9e3;
-  border-radius: 12px;
-  padding: 20px 14px;
-  text-align: center;
-  color: #61746b;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.catalog-refresh {
-  width: auto;
-  min-width: 86px;
-  padding: 9px 12px;
-  font-size: 12px;
-}
-
-.catalog-footer {
-  margin-top: 13px;
-  font-size: 11px;
-  line-height: 1.5;
-  color: #61746b;
-}
-
-/* PROFIL P1 */
-
-.profile-card {
-  border: 1px solid #d9e9df;
-  background: #f8fbf9;
-  border-radius: 14px;
-  padding: 16px;
-  margin-top: 14px;
-}
-
-.profile-identity {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.profile-avatar {
-  width: 86px;
-  height: 86px;
-  min-width: 86px;
-  border-radius: 50%;
-  background: #dcefe4;
-  border: 2px solid #c8e2d2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  color: #16805d;
-  font-size: 30px;
-  font-weight: bold;
-}
-
-.profile-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.profile-identity-text {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.profile-identity-text strong {
-  display: block;
-  font-size: 17px;
-  margin-bottom: 5px;
-}
-
-.profile-identity-text span {
-  display: block;
-  color: #61746b;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.profile-upload-button {
-  margin-top: 14px;
-  width: 100%;
-}
-
-.profile-detail {
-  padding: 11px 0;
-  border-bottom: 1px solid #e3ebe6;
-}
-
-.profile-detail:last-child { border-bottom: 0; }
-
-.profile-detail-label {
-  display: block;
-  color: #61746b;
-  font-size: 11px;
-  margin-bottom: 5px;
-}
-
-.profile-detail-value {
-  display: block;
-  font-size: 14px;
-  font-weight: bold;
-  overflow-wrap: anywhere;
-}
-
-.profile-status-note {
-  margin-top: 12px;
-  padding: 11px;
-  border-radius: 9px;
-  background: #edf5f0;
-  color: #486657;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.profile-message {
-  font-size: 12px;
-  line-height: 1.5;
-  margin-top: 10px;
-  color: #61746b;
-  overflow-wrap: anywhere;
-}
-
-.profile-message.error { color: #b42318; }
-.profile-message.success { color: #16805d; }
-
-@media (max-width: 380px) {
-  .header-top {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .account-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .account-actions a { flex: 1; }
-
-  .grid { gap: 8px; }
-  .service { min-height: 96px; }
-  .product-grid { gap: 8px; }
-  .product-content { padding: 9px; }
-
-  .profile-avatar {
-    width: 72px;
-    height: 72px;
-    min-width: 72px;
-  }
-}
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="ui-messages.js" defer></script>
-<script src="app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntarDesa v0.3.0-RC</title>
+  <link rel="stylesheet" href="ui-components.css">
+  <style>
+    * { box-sizing: border-box; }
+    
+    :root {
+      --bg-color: #f4f7f5;
+      --text-color: #1c3028;
+      --panel-bg: #ffffff;
+      --panel-border: #e3ebe6;
+      --muted-color: #61746b;
+      --input-bg: #ffffff;
+      --input-border: #cbd9d0;
+      --header-bg: #16805d;
+      --card-sub-bg: #f8fbf9;
+      --accent-color: #16805d;
+      --nav-bg: #ffffff;
+      --nav-border: #dde7df;
+      --font-scale: 15px;
+    }
+
+    html.dark-theme {
+      --bg-color: #121e19;
+      --text-color: #e2ebe6;
+      --panel-bg: #1a2923;
+      --panel-border: #283d34;
+      --muted-color: #9cb3a8;
+      --input-bg: #22342c;
+      --input-border: #354e42;
+      --header-bg: #0f5c43;
+      --card-sub-bg: #16241e;
+      --accent-color: #24a177;
+      --nav-bg: #1a2923;
+      --nav-border: #283d34;
+    }
+
+    html.font-small { --font-scale: 13px; }
+    html.font-normal { --font-scale: 15px; }
+    html.font-large { --font-scale: 17px; }
+
+    body { 
+      margin: 0; 
+      background: var(--bg-color); 
+      color: var(--text-color); 
+      font: var(--font-scale) Arial, sans-serif; 
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    header { 
+      background: var(--header-bg); 
+      color: white; 
+      padding: 22px 18px 26px; 
+      border-radius: 0 0 24px 24px; 
+    }
+    .header-inner { max-width: 650px; margin: auto; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    header h1 { margin: 0; font-size: 1.8em; }
+    header p { margin: 7px 0 0; font-size: 0.85em; }
+
+    .account-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    .account-actions a, .account-actions button { 
+      display: inline-block; 
+      text-decoration: none; 
+      text-align: center; 
+      padding: 9px 11px; 
+      border-radius: 9px; 
+      font-size: 12px; 
+      font-weight: bold; 
+      cursor: pointer; 
+    }
+    .account-login { background: white; color: #16805d; border: 0; }
+    .account-register { border: 1px solid rgba(255,255,255,.8); color: white; background: transparent; }
+
+    main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
+    
+    .panel { 
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-radius: 16px; 
+      padding: 18px; 
+      margin-bottom: 18px; 
+    }
+    .panel h2 { margin: 0 0 8px; font-size: 1.25em; }
+    .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
+
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .service { 
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-radius: 14px; 
+      padding: 16px 4px; 
+      min-height: 102px; 
+      font: inherit; 
+      font-size: 0.8em; 
+      color: inherit; 
+      cursor: pointer; 
+    }
+    .service span { display: block; font-size: 28px; margin-bottom: 10px; }
+    .service:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #8bcbb0; outline-offset: 2px; }
+
+    .primary { 
+      background: var(--accent-color); 
+      color: white; 
+      border: 0; 
+      border-radius: 11px; 
+      padding: 13px 16px; 
+      font-weight: bold; 
+      width: 100%; 
+      display: block; 
+      text-align: center; 
+      text-decoration: none; 
+      cursor: pointer; 
+      font-size: 0.95em;
+    }
+    .secondary { 
+      background: var(--panel-bg); 
+      color: var(--accent-color); 
+      border: 1px solid var(--accent-color); 
+      border-radius: 11px; 
+      padding: 12px; 
+      width: 100%; 
+      display: block; 
+      text-align: center; 
+      text-decoration: none; 
+      cursor: pointer; 
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+    .danger-button {
+      background: var(--panel-bg);
+      color: #b42318;
+      border: 1px solid #f8a59d;
+      border-radius: 11px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    button:disabled { opacity: .6; cursor: wait; }
+
+    label { display: block; font-weight: bold; font-size: 0.85em; margin: 14px 0 6px; }
+    input, textarea, select { 
+      width: 100%; 
+      padding: 12px; 
+      border: 1px solid var(--input-border); 
+      border-radius: 10px; 
+      font: inherit; 
+      background: var(--input-bg); 
+      color: var(--text-color); 
+    }
+    textarea { min-height: 95px; }
+
+    .hidden { display: none !important; }
+
+    nav { 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      background: var(--nav-bg); 
+      border-top: 1px solid var(--nav-border); 
+      display: flex; 
+      justify-content: space-around; 
+      padding: 10px 8px calc(10px + env(safe-area-inset-bottom)); 
+      z-index: 5; 
+    }
+    nav button { 
+      background: none; 
+      border: 0; 
+      font: inherit; 
+      font-size: 0.8em; 
+      color: var(--muted-color); 
+      min-width: 72px; 
+      padding: 4px; 
+      cursor: pointer;
+    }
+    nav button.active { color: var(--accent-color); font-weight: bold; }
+
+    .order { 
+      padding: 12px; 
+      border: 1px solid var(--panel-border); 
+      border-radius: 10px; 
+      margin: 10px 0; 
+      line-height: 1.6; 
+      overflow-wrap: anywhere; 
+    }
+    .info-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+    .info-links a { color: var(--accent-color); font-size: 0.85em; font-weight: bold; text-decoration: none; }
+    .version-note { margin-top: 18px; padding: 12px; border-radius: 10px; background: var(--card-sub-bg); border: 1px solid var(--panel-border); }
+
+    .account-card { 
+      border: 1px solid var(--panel-border); 
+      background: var(--card-sub-bg); 
+      border-radius: 12px; 
+      padding: 13px; 
+      margin-top: 14px; 
+    }
+    .account-email { overflow-wrap: anywhere; font-weight: bold; margin: 5px 0 8px; }
+    .account-status { color: var(--accent-color); font-size: 0.8em; font-weight: bold; }
+    .account-actions-main { display: grid; gap: 9px; margin-top: 12px; }
+    .account-message { color: var(--muted-color); font-size: 0.8em; line-height: 1.5; margin-top: 10px; }
+
+    /* KATALOG PRODUK */
+    .catalog-section { margin-top: 26px; }
+    .catalog-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+    .catalog-heading h2 { margin: 0; font-size: 1.3em; }
+    .catalog-description { margin: 0 0 15px; }
+    .catalog-tools { display: grid; gap: 10px; margin-bottom: 15px; }
+    .catalog-tools input, .catalog-tools select { min-width: 0; }
+    .catalog-count { color: var(--muted-color); font-size: 0.8em; margin-bottom: 12px; }
+    .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .product-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 14px; overflow: hidden; min-width: 0; }
+    .product-image { width: 100%; aspect-ratio: 1 / 1; background: var(--card-sub-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 38px; }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .product-content { padding: 11px; }
+    .product-category { display: inline-block; color: var(--accent-color); background: var(--card-sub-bg); padding: 4px 7px; border-radius: 6px; font-size: 0.7em; font-weight: bold; margin-bottom: 7px; max-width: 100%; overflow-wrap: anywhere; }
+    .product-name { font-size: 0.95em; font-weight: bold; line-height: 1.4; margin: 0 0 7px; overflow-wrap: anywhere; }
+    .product-price { color: var(--accent-color); font-weight: bold; font-size: 1em; margin-bottom: 7px; overflow-wrap: anywhere; }
+    .product-stock { color: var(--muted-color); font-size: 0.75em; margin-bottom: 8px; }
+    .product-description { color: var(--muted-color); font-size: 0.75em; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-line; }
+    .product-placeholder { font-size: 38px; }
+    .catalog-state { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px 14px; text-align: center; color: var(--muted-color); font-size: 0.85em; line-height: 1.6; }
+    .catalog-refresh { width: auto; min-width: 86px; padding: 9px 12px; font-size: 0.8em; }
+    .catalog-footer { margin-top: 13px; font-size: 0.75em; line-height: 1.5; color: var(--muted-color); }
+
+    /* PROFIL P1 */
+    .profile-card { border: 1px solid var(--panel-border); background: var(--card-sub-bg); border-radius: 14px; padding: 16px; margin-top: 14px; }
+    .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .profile-avatar { width: 86px; height: 86px; min-width: 86px; border-radius: 50%; background: var(--panel-bg); border: 2px solid var(--panel-border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 30px; font-weight: bold; }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .profile-identity-text { min-width: 0; overflow-wrap: anywhere; }
+    .profile-identity-text strong { display: block; font-size: 1.1em; margin-bottom: 5px; }
+    .profile-identity-text span { display: block; color: var(--muted-color); font-size: 0.8em; line-height: 1.5; }
+    .profile-avatar-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .profile-detail { padding: 11px 0; border-bottom: 1px solid var(--panel-border); }
+    .profile-detail:last-child { border-bottom: 0; }
+    .profile-detail-header { display: flex; justify-content: space-between; align-items: center; }
+    .profile-detail-label { display: block; color: var(--muted-color); font-size: 0.75em; margin-bottom: 3px; }
+    .profile-detail-value { display: block; font-size: 0.9em; font-weight: bold; overflow-wrap: anywhere; }
+    .profile-detail-edit-btn { background: none; border: none; color: var(--accent-color); font-size: 0.8em; font-weight: bold; cursor: pointer; padding: 4px 8px; text-decoration: underline; }
+    .profile-edit-box { margin-top: 8px; padding: 10px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px; }
+    .profile-edit-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .profile-status-note { margin-top: 12px; padding: 11px; border-radius: 9px; background: var(--card-sub-bg); border: 1px solid var(--panel-border); color: var(--muted-color); font-size: 0.8em; line-height: 1.5; }
+    .profile-message { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); overflow-wrap: anywhere; }
+    .profile-message.error { color: #b42318; font-weight: bold; }
+    .profile-message.success { color: var(--accent-color); font-weight: bold; }
+
+    .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; }
+    .checkbox-group input[type="checkbox"] { width: auto; margin-top: 3px; }
+    .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.85em; }
+
+    @media (max-width: 380px) {
+      .header-top { align-items: flex-start; flex-direction: column; }
+      .account-actions { width: 100%; justify-content: flex-start; }
+      .account-actions a { flex: 1; }
+      .grid { gap: 8px; }
+      .service { min-height: 96px; }
+      .product-grid { gap: 8px; }
+      .product-content { padding: 9px; }
+      .profile-avatar { width: 72px; height: 72px; min-width: 72px; }
+      .profile-avatar-actions { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="header-top">
-      <div>
-        <h1>AntarDesa.</h1>
-        <p>Dekatkan Jarak, Mudahkan Urusan. 🛵</p>
-      </div>
-
-      <div
-        class="account-actions"
-        id="headerAccountActions"
-        aria-label="Akses akun"
-      >
-        <a class="account-login" href="login.html">Masuk</a>
-        <a class="account-register" href="register.html">Daftar</a>
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="header-top">
+        <div>
+          <h1>AntarDesa</h1>
+          <p>Dekatkan Jarak, Mudahkan Urusan. 🛵</p>
+        </div>
+        <div class="account-actions" id="headerAccountActions" aria-label="Akses akun">
+          <a class="account-login" href="login.html">Masuk</a>
+          <a class="account-register" href="register.html">Daftar</a>
+        </div>
       </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main>
+  <!-- UTAMA -->
+  <main>
 
-<!-- BERANDA -->
-
-<section id="home" class="page">
-
-  <div class="panel">
-    <h2 id="welcomeTitle">Selamat datang! 👋</h2>
-
-    <p class="muted" id="welcomeDescription">
-      Jelajahi layanan AntarDesa tanpa harus masuk terlebih dahulu.
-      Masuk atau daftar hanya saat menggunakan fitur yang membutuhkan akun.
-    </p>
-
-    <div id="guestLinks" class="info-links">
-      <a href="login.html">Sudah punya akun? Masuk</a>
-      <a href="register.html">Pengguna baru? Daftar</a>
-    </div>
-
-    <div id="accountPanel" class="account-card hidden" aria-live="polite">
-      <div class="account-status" id="accountRoleLabel">
-        Akun terdeteksi
-      </div>
-
-      <div class="account-email" id="accountName"></div>
-      <div class="muted" id="accountEmail"></div>
-
-      <div class="account-actions-main">
-        <a id="roleDashboardLink" class="primary hidden" href="#">
-          Buka Dashboard
-        </a>
-
-        <button id="retryRoleButton" class="secondary hidden" type="button">
-          Coba periksa peran lagi
-        </button>
-
-        <button id="logoutButton" class="secondary" type="button">
-          Keluar dari akun
-        </button>
-      </div>
-
-      <p id="accountMessage" class="account-message"
-        role="status" aria-live="polite">
-        Memeriksa status akun...
-      </p>
-    </div>
-  </div>
-
-  <h3>Layanan AntarDesa</h3>
-  <p class="muted">
-    Pilih layanan untuk melihat contoh alur simulasi.
-  </p>
-
-  <div class="grid">
-    <button class="service" type="button" onclick="choose('Antar Paket')">
-      <span>📦</span>Antar Paket
-    </button>
-
-    <button class="service" type="button" onclick="choose('Titip Belanja')">
-      <span>🛒</span>Titip Belanja
-    </button>
-
-    <button class="service" type="button" onclick="choose('Antar Makan')">
-      <span>🍜</span>Antar Makan
-    </button>
-
-    <button class="service" type="button" onclick="choose('Pasar Desa')">
-      <span>🏪</span>Pasar Desa
-    </button>
-
-    <button class="service" type="button" onclick="choose('Sekalian Jalan')">
-      <span>🛵</span>Sekalian Jalan
-    </button>
-
-    <button class="service" type="button" onclick="choose('Angkut Desa')">
-      <span>🚚</span>Angkut Desa
-    </button>
-  </div>
-
-  <!-- KATALOG PRODUK -->
-
-  <section class="catalog-section" aria-labelledby="catalogTitle">
-    <div class="catalog-heading">
-      <h2 id="catalogTitle">Pasar Desa 🏪</h2>
-
-      <button id="refreshCatalogButton"
-        class="secondary catalog-refresh" type="button">
-        Muat ulang
-      </button>
-    </div>
-
-    <p class="muted catalog-description">
-      Temukan hasil kebun dan produk dari Mitra AntarDesa.
-      Katalog ini dapat dijelajahi oleh semua pengguna.
-    </p>
-
-    <div class="catalog-tools">
-      <input id="productSearch" type="search" maxlength="100"
-        placeholder="Cari nama atau produk..." aria-label="Cari produk">
-
-      <select id="productCategory" aria-label="Filter kategori produk">
-        <option value="">Semua kategori</option>
-      </select>
-    </div>
-
-    <div id="catalogCount" class="catalog-count" aria-live="polite">
-      Memuat katalog...
-    </div>
-
-    <div id="catalogState" class="catalog-state"
-      role="status" aria-live="polite">
-      Sedang mengambil produk dari Mitra AntarDesa...
-    </div>
-
-    <div id="productGrid" class="product-grid hidden"></div>
-
-    <p class="catalog-footer">
-      Produk ditampilkan berdasarkan status aktif.
-      Fitur pembelian dan checkout belum diaktifkan.
-    </p>
-  </section>
-
-  <div class="panel version-note">
-    <strong>AntarDesa v0.3.0-RC</strong>
-    <p class="muted">
-      Kandidat rilis untuk pengujian.
-      Fitur layanan pada halaman ini masih berupa simulasi lokal.
-      Belum menerima pesanan atau transaksi nyata.
-    </p>
-  </div>
-
-</section>
-
-
-<!-- FORM SIMULASI -->
-
-<section id="formpage" class="page hidden">
-  <div class="panel">
-    <button class="secondary" type="button" onclick="show('home')">
-      ← Kembali ke Beranda
-    </button>
-
-    <h2 id="formtitle" style="margin-top:18px">
-      Simulasi layanan
-    </h2>
-
-    <p class="muted">
-      Gunakan data contoh saja. Jangan masukkan informasi pribadi asli.
-      Formulir ini tidak mengirim pesanan ke server.
-    </p>
-
-    <form id="orderform">
-      <label for="name">Nama panggilan</label>
-      <input id="name" maxlength="40" required placeholder="Contoh: Budi">
-
-      <label for="pickup">Lokasi penjemputan</label>
-      <input id="pickup" maxlength="120" required
-        placeholder="Contoh: Pasar Kecamatan">
-
-      <label for="destination">Tujuan pengantaran</label>
-      <input id="destination" maxlength="120" required
-        placeholder="Contoh: Desa A">
-
-      <label for="detail">Detail kebutuhan</label>
-      <textarea id="detail" maxlength="500" required
-        placeholder="Jelaskan barang atau titipan"></textarea>
-
-      <button class="primary" type="submit">Simpan simulasi</button>
-    </form>
-  </div>
-</section>
-
-
-<!-- RIWAYAT SIMULASI -->
-
-<section id="orders" class="page hidden">
-  <div class="panel">
-    <h2>Riwayat simulasi</h2>
-
-    <p class="muted">
-      Data hanya tersimpan sementara di halaman ini dan akan hilang
-      saat halaman dimuat ulang. Ini bukan riwayat pesanan sungguhan.
-    </p>
-
-    <div id="orderlist" aria-live="polite"></div>
-  </div>
-</section>
-
-
-<!-- PROFIL PENGGUNA -->
-
-<section id="profile" class="page hidden">
-
-  <div class="panel">
-    <h2>Akun dan profil</h2>
-
-    <p class="muted" id="profileDescription">
-      Kamu sedang menggunakan beranda publik.
-      Kamu tetap bisa menjelajahi layanan tanpa login.
-    </p>
-
-    <!-- TAMU -->
-
-    <div id="profileGuestActions">
-      <a class="primary" href="login.html">Masuk ke akun</a>
-      <p style="height:8px;margin:0"></p>
-      <a class="secondary" href="register.html">Buat akun AntarDesa</a>
-    </div>
-
-    <!-- PENGGUNA LOGIN -->
-
-    <div id="profileAccountActions" class="hidden">
-
-      <div class="profile-card">
-
-        <div class="profile-identity">
-
-          <div class="profile-avatar" id="profileAvatar">
-            <span id="profileAvatarFallback">A</span>
-            <img id="profileAvatarImage" class="hidden"
-              alt="Foto profil pengguna">
-          </div>
-
-          <div class="profile-identity-text">
-            <strong id="profileFullName">Memuat nama...</strong>
-            <span>Profil AntarDesa</span>
-            <span id="profileEmail"></span>
-          </div>
-
+    <!-- HALAMAN BERANDA -->
+    <section id="home" class="page">
+      <div class="panel">
+        <h2 id="welcomeTitle">Selamat datang! 👋</h2>
+        <p class="muted" id="welcomeDescription">
+          Jelajahi layanan AntarDesa tanpa harus masuk terlebih dahulu. Masuk atau daftar hanya saat menggunakan fitur yang membutuhkan akun.
+        </p>
+        
+        <div id="guestLinks" class="info-links">
+          <a href="login.html">Sudah punya akun? Masuk</a>
+          <a href="register.html">Pengguna baru? Daftar</a>
         </div>
 
-        <input
-          id="profileAvatarInput"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          class="hidden"
-          aria-label="Pilih foto profil"
-        >
+        <div id="accountPanel" class="account-card hidden" aria-live="polite">
+          <div class="account-status" id="accountRoleLabel">Akun terdeteksi</div>
+          <div class="account-email" id="accountName"></div>
+          <div class="muted" id="accountEmail"></div>
+          <div class="account-actions-main">
+            <a id="roleDashboardLink" class="primary hidden" href="#">Buka Dashboard</a>
+            <button id="retryRoleButton" class="secondary hidden" type="button">Coba periksa peran lagi</button>
+            <button id="logoutButton" class="secondary" type="button">Keluar dari akun</button>
+          </div>
+          <p id="accountMessage" class="account-message" role="status" aria-live="polite">Memeriksa status akun...</p>
+        </div>
+      </div>
 
-        <button
-          id="profileAvatarButton"
-          class="secondary profile-upload-button"
-          type="button"
-        >
-          📷 Ganti foto profil
-        </button>
+      <!-- LAYANAN SIMULASI -->
+      <div class="panel">
+        <h2>Layanan AntarDesa</h2>
+        <p class="muted">Pilih layanan untuk melihat contoh alur simulasi.</p>
+        <div class="grid">
+          <button class="service" type="button" onclick="choose('Antar Paket')">
+            <span>📦</span>Antar Paket
+          </button>
+          <button class="service" type="button" onclick="choose('Titip Belanja')">
+            <span>🛒</span>Titip Belanja
+          </button>
+          <button class="service" type="button" onclick="choose('Antar Makan')">
+            <span>🍜</span>Antar Makan
+          </button>
+          <button class="service" type="button" onclick="choose('Pasar Desa')">
+            <span>🏪</span>Pasar Desa
+          </button>
+          <button class="service" type="button" onclick="choose('Sekalian Jalan')">
+            <span>🛵</span>Sekalian Jalan
+          </button>
+          <button class="service" type="button" onclick="choose('Angkut Desa')">
+            <span>🚚</span>Angkut Desa
+          </button>
+        </div>
+      </div>
 
-        <p class="muted" style="font-size:11px;margin-bottom:0">
-          JPG, PNG, atau WebP. Maksimal 5 MB.
-          Foto profil dapat dilihat publik.
+      <!-- KATALOG PRODUK -->
+      <div class="panel catalog-section">
+        <div class="catalog-heading">
+          <h2>Pasar Desa 🏪</h2>
+          <button id="refreshCatalogButton" class="secondary catalog-refresh" type="button">Muat ulang</button>
+        </div>
+        <p class="muted catalog-description">
+          Temukan hasil kebun dan produk dari Mitra AntarDesa. Katalog ini dapat dijelajahi oleh semua pengguna.
         </p>
 
-        <p id="profileMessage" class="profile-message"
-          role="status" aria-live="polite"></p>
+        <div class="catalog-tools">
+          <input id="productSearch" type="search" maxlength="100" placeholder="Cari nama atau produk..." aria-label="Cari produk">
+          <select id="productCategory" aria-label="Filter kategori produk">
+            <option value="">Semua kategori</option>
+          </select>
+        </div>
 
+        <div id="catalogCount" class="catalog-count" aria-live="polite">Memuat katalog...</div>
+        <div id="catalogState" class="catalog-state" role="status" aria-live="polite">Sedang mengambil produk dari Mitra AntarDesa...</div>
+        <div id="productGrid" class="product-grid hidden"></div>
+
+        <p class="catalog-footer">
+          Produk ditampilkan berdasarkan status aktif. Fitur pembelian dan checkout belum diaktifkan.
+        </p>
       </div>
 
-      <div class="profile-card">
-
-        <div class="profile-detail">
-          <span class="profile-detail-label">Nama lengkap</span>
-          <span class="profile-detail-value" id="profileNameDetail">
-            Belum tersedia
-          </span>
-        </div>
-
-        <div class="profile-detail">
-          <span class="profile-detail-label">Email akun</span>
-          <span class="profile-detail-value" id="profileEmailDetail">
-            Belum tersedia
-          </span>
-        </div>
-
-        <div class="profile-detail">
-          <span class="profile-detail-label">Nomor HP</span>
-          <span class="profile-detail-value" id="profilePhone">
-            Belum tersedia
-          </span>
-        </div>
-
-        <div class="profile-detail">
-          <span class="profile-detail-label">Jenis akun dan verifikasi</span>
-          <span class="profile-detail-value" id="profileRole">
-            Memeriksa peran akun...
-          </span>
-        </div>
-
+      <div class="version-note muted">
+        <strong>AntarDesa v0.3.0-RC</strong><br>
+        Kandidat rilis untuk pengujian. Fitur layanan pada halaman ini masih berupa simulasi lokal. Belum menerima pesanan atau transaksi nyata.
       </div>
-
-      <a id="profileDashboardLink" class="primary hidden" href="#">
-        Buka Dashboard
-      </a>
-
-      <p id="profileAccountMessage" class="muted"
-        style="margin-top:12px" role="status" aria-live="polite">
-        Memeriksa status akun...
-      </p>
-
-      <button id="profileLogoutButton" class="secondary" type="button">
-        Keluar dari akun
-      </button>
-
-    </div>
-
-    <div class="profile-status-note">
-      Dashboard utama tetap menjadi halaman awal untuk semua pengguna.
-      Pengaturan nama, email, nomor HP, dan password akan tersedia
-      pada paket pengembangan berikutnya.
-    </div>
-
-  </div>
-
-  <div class="panel">
-    <strong>AntarDesa v0.3.0-RC</strong>
-    <p class="muted">
-      Kandidat rilis untuk simulasi.
-      Checkout dan transaksi nyata belum diaktifkan.
-    </p>
-  </div>
-
-</section>
-
-</main>
-
-
-<!-- NAVIGASI BAWAH -->
-
-<nav aria-label="Navigasi utama">
-  <button id="navhome" class="active" type="button"
-    onclick="show('home')">
-    ⌂<br>Beranda
-  </button>
-
-  <button id="navorders" type="button" onclick="show('orders')">
-    ▤<br>Simulasi
-  </button>
-
-  <button id="navprofile" type="button" onclick="show('profile')">
-    ♙<br>Akun
-  </button>
-</nav>
-
-
-<script>
-"use strict";
-
-/* =========================================
-   KONFIGURASI SUPABASE
-========================================= */
-
-const SUPABASE_URL =
-  "https://gswlkajcizcvrhcfabtg.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
-
-const AVATAR_BUCKET = "profile-avatars";
-const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
-
-let supabaseClient = null;
-let currentUser = null;
-let currentRole = null;
-let currentProfile = null;
-let selectedService = "";
-
-const simulatedOrders = [];
-
-
-/* =========================================
-   DATA KATALOG
-========================================= */
-
-let publicProducts = [];
-
-const PRODUCT_LIMIT = 60;
-
-const rupiahFormatter = new Intl.NumberFormat(
-  "id-ID",
-  {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0
-  }
-);
-
-
-/* =========================================
-   UTILITAS DOM
-========================================= */
-
-function byId(id) {
-  return document.getElementById(id);
-}
-
-function setText(id, value) {
-  byId(id).textContent =
-    value === null || value === undefined
-      ? ""
-      : String(value);
-}
-
-function setHidden(id, hidden) {
-  byId(id).classList.toggle("hidden", hidden);
-}
-
-
-/* =========================================
-   NAVIGASI
-========================================= */
-
-function show(pageId) {
-
-  document.querySelectorAll(".page").forEach(function(page) {
-    page.classList.toggle("hidden", page.id !== pageId);
-  });
-
-  document.querySelectorAll("nav button").forEach(function(button) {
-    button.classList.toggle(
-      "active",
-      button.id === "nav" + pageId
-    );
-  });
-
-  window.scrollTo(0, 0);
-}
-
-
-/* =========================================
-   SIMULASI LAYANAN
-========================================= */
-
-function choose(serviceName) {
-
-  selectedService = serviceName;
-  setText("formtitle", "Simulasi: " + serviceName);
-
-  byId("orderform").reset();
-  show("formpage");
-}
-
-
-/* =========================================
-   PEMETAAN ROLE
-========================================= */
-
-function getRoleInfo(role, verified) {
-
-  if (role === "pelanggan") {
-    return {
-      label: "Pelanggan",
-      page: "pelanggan.html",
-      dashboard: "Dashboard Pelanggan"
-    };
-  }
-
-  if (role === "mitra" && verified === true) {
-    return {
-      label: "Mitra terverifikasi",
-      page: "mitra.html",
-      dashboard: "Kelola Toko Saya"
-    };
-  }
-
-  if (role === "kurir" && verified === true) {
-    return {
-      label: "Kurir terverifikasi",
-      page: "kurir.html",
-      dashboard: "Dashboard Kurir"
-    };
-  }
-
-  if (role === "mitra") {
-    return {
-      label: "Mitra menunggu verifikasi",
-      page: null,
-      dashboard: null
-    };
-  }
-
-  if (role === "kurir") {
-    return {
-      label: "Kurir menunggu verifikasi",
-      page: null,
-      dashboard: null
-    };
-  }
-
-  return {
-    label: "Peran akun belum dikenali",
-    page: null,
-    dashboard: null
-  };
-}
-
-
-/* =========================================
-   PESAN STATUS
-========================================= */
-
-function setAccountMessage(message, isError) {
-
-  setText("accountMessage", message);
-  setText("profileAccountMessage", message);
-
-  byId("accountMessage").style.color =
-    isError ? "#b42318" : "#61746b";
-}
-
-function setProfileMessage(message, type) {
-
-  const element = byId("profileMessage");
-
-  element.textContent = message;
-  element.className = "profile-message";
-
-  if (type === "error") {
-    element.classList.add("error");
-  }
-
-  if (type === "success") {
-    element.classList.add("success");
-  }
-}
-
-
-/* =========================================
-   AVATAR DAN IDENTITAS PROFIL
-========================================= */
-
-function getInitials(name) {
-
-  const value = String(name || "").trim();
-
-  if (!value) {
-    return "A";
-  }
-
-  const words = value.split(/\s+/).filter(Boolean);
-
-  if (words.length === 1) {
-    return words[0].substring(0, 1).toUpperCase();
-  }
-
-  return (
-    words[0].substring(0, 1) +
-    words[1].substring(0, 1)
-  ).toUpperCase();
-}
-
-
-function displayAvatar(name, avatarPath) {
-
-  const image = byId("profileAvatarImage");
-  const fallback = byId("profileAvatarFallback");
-
-  fallback.textContent = getInitials(name);
-
-  if (!avatarPath || !supabaseClient) {
-    image.removeAttribute("src");
-    image.classList.add("hidden");
-    fallback.classList.remove("hidden");
-    return;
-  }
-
-  const result = supabaseClient
-    .storage
-    .from(AVATAR_BUCKET)
-    .getPublicUrl(avatarPath);
-
-  const publicUrl = result &&
-    result.data &&
-    result.data.publicUrl
-      ? result.data.publicUrl
-      : "";
-
-  if (!publicUrl) {
-    image.removeAttribute("src");
-    image.classList.add("hidden");
-    fallback.classList.remove("hidden");
-    return;
-  }
-
-  image.onload = function() {
-    image.classList.remove("hidden");
-    fallback.classList.add("hidden");
-  };
-
-  image.onerror = function() {
-    image.classList.add("hidden");
-    fallback.classList.remove("hidden");
-  };
-
-  image.src = publicUrl + "?v=" + Date.now();
-}
-
-
-function showProfileIdentity(name, email, phone) {
-
-  const safeName =
-    String(name || "").trim() || "Nama belum diatur";
-
-  setText("profileFullName", safeName);
-  setText("profileNameDetail", safeName);
-  setText("profileEmail", email || "Email tidak tersedia");
-  setText("profileEmailDetail", email || "Email tidak tersedia");
-  setText("profilePhone", phone || "Nomor HP belum tersedia");
-
-  displayAvatar(
-    safeName,
-    currentProfile ? currentProfile.avatar_path : null
-  );
-
-  setText("accountName", safeName);
-}
-
-
-/* =========================================
-   MEMUAT DATA PROFIL
-========================================= */
-
-async function loadUserProfile() {
-
-  if (!supabaseClient || !currentUser) {
-    return;
-  }
-
-  setProfileMessage("Sedang memuat data profil...", "");
-
-  try {
-
-    const { data, error } = await supabaseClient
-      .from("profiles")
-      .select("user_id,full_name,avatar_path,created_at,updated_at")
-      .eq("user_id", currentUser.id)
-      .maybeSingle();
-
-    if (error) {
-      throw error;
+    </section>
+
+    <!-- HALAMAN FORM SIMULASI -->
+    <section id="formpage" class="page hidden">
+      <div class="panel">
+        <button class="secondary" type="button" onclick="show('home')" style="margin-bottom:12px; width:auto; display:inline-block;">
+          ← Kembali ke Beranda
+        </button>
+        <h2 id="formtitle">Simulasi layanan</h2>
+        <p class="muted">
+          Gunakan data contoh saja. Jangan masukkan informasi pribadi asli. Formulir ini tidak mengirim pesanan ke server.
+        </p>
+
+        <form id="orderform">
+          <label for="name">Nama panggilan</label>
+          <input id="name" maxlength="40" required placeholder="Contoh: Budi">
+
+          <label for="pickup">Lokasi penjemputan</label>
+          <input id="pickup" maxlength="120" required placeholder="Contoh: Pasar Kecamatan">
+
+          <label for="destination">Tujuan pengantaran</label>
+          <input id="destination" maxlength="120" required placeholder="Contoh: Desa A">
+
+          <label for="detail">Detail kebutuhan</label>
+          <textarea id="detail" maxlength="500" required placeholder="Jelaskan barang atau titipan"></textarea>
+
+          <button class="primary" type="submit" style="margin-top:14px;">Simpan simulasi</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- HALAMAN RIWAYAT SIMULASI -->
+    <section id="services" class="page hidden">
+      <div class="panel">
+        <h2>Riwayat simulasi</h2>
+        <p class="muted">
+          Data hanya tersimpan sementara di halaman ini dan akan hilang saat halaman dimuat ulang. Ini bukan riwayat pesanan sungguhan.
+        </p>
+        <div id="orderlist" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- HALAMAN AKUN DAN PROFIL -->
+    <section id="profile" class="page hidden">
+      <div class="panel">
+        <h2>Akun dan profil</h2>
+        <p class="muted" id="profileDescription">
+          Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan tanpa login.
+        </p>
+
+        <!-- PENGGUNA TAMU -->
+        <div id="profileGuestActions">
+          <a class="primary" href="login.html">Masuk ke akun</a>
+          <p style="height:8px;margin:0"></p>
+          <a class="secondary" href="register.html">Buat akun AntarDesa</a>
+        </div>
+
+        <!-- PENGGUNA LOGIN -->
+        <div id="profileAccountActions" class="hidden">
+          
+          <!-- KARTU 1: AVATAR & IDENTITAS -->
+          <div class="profile-card">
+            <div class="profile-identity">
+              <div class="profile-avatar" id="profileAvatar">
+                <span id="profileAvatarFallback">A</span>
+                <img id="profileAvatarImage" class="hidden" alt="Foto profil pengguna">
+              </div>
+              <div class="profile-identity-text">
+                <strong id="profileFullName">Memuat nama...</strong>
+                <span>Profil AntarDesa</span>
+                <span id="profileEmail"></span>
+              </div>
+            </div>
+
+            <input id="profileAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" aria-label="Pilih foto profil">
+            
+            <div class="profile-avatar-actions">
+              <button id="profileAvatarButton" class="secondary" type="button">📷 Ganti foto</button>
+              <button id="profileAvatarRemoveButton" class="danger-button" type="button">🗑️ Hapus foto</button>
+            </div>
+            
+            <p class="muted" style="font-size:0.75em;margin-top:8px;margin-bottom:0">
+              JPG, PNG, atau WebP. Maksimal 5 MB. Foto profil dapat dilihat publik.
+            </p>
+            <p id="profileMessage" class="profile-message" role="status" aria-live="polite"></p>
+          </div>
+
+          <!-- KARTU 2: DETAIL AKUN & EDIT DATA -->
+          <div class="profile-card">
+            <!-- NAMA LENGKAP -->
+            <div class="profile-detail">
+              <div class="profile-detail-header">
+                <div>
+                  <span class="profile-detail-label">Nama lengkap</span>
+                  <span class="profile-detail-value" id="profileNameDetail">Belum tersedia</span>
+                </div>
+                <button id="toggleEditNameBtn" class="profile-detail-edit-btn" type="button">Ubah</button>
+              </div>
+              <div id="editNameBox" class="profile-edit-box hidden">
+                <label for="inputEditName" style="margin-top:0;">Nama baru (1-120 karakter):</label>
+                <input id="inputEditName" type="text" maxlength="120" placeholder="Masukkan nama lengkap">
+                <div class="profile-edit-actions">
+                  <button id="saveNameBtn" class="primary" type="button">Simpan nama</button>
+                  <button id="cancelNameBtn" class="secondary" type="button">Batal</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="profile-detail">
+              <div class="profile-detail-header">
+                <div>
+                  <span class="profile-detail-label">Email akun</span>
+                  <span class="profile-detail-value" id="profileEmailDetail">Belum tersedia</span>
+                </div>
+                <button id="toggleEditEmailBtn" class="profile-detail-edit-btn" type="button">Ubah</button>
+              </div>
+              <div id="editEmailBox" class="profile-edit-box hidden">
+                <label for="inputEditEmail" style="margin-top:0;">Email baru (perlu konfirmasi):</label>
+                <input id="inputEditEmail" type="email" placeholder="contoh@domain.com">
+                <p class="muted" style="font-size:0.75em; margin: 4px 0;">Perubahan email membutuhkan konfirmasi pesan pada email baru.</p>
+                <div class="profile-edit-actions">
+                  <button id="saveEmailBtn" class="primary" type="button">Kirim konfirmasi</button>
+                  <button id="cancelEmailBtn" class="secondary" type="button">Batal</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- NOMOR HP (DITUNDA) -->
+            <div class="profile-detail">
+              <span class="profile-detail-label">Nomor HP</span>
+              <span class="profile-detail-value" id="profilePhone">Belum tersedia</span>
+              <span class="muted" style="font-size:0.7em; display:block; margin-top:2px;">*Perubahan nomor HP saat ini ditunda.</span>
+            </div>
+
+            <!-- PERAN & VERIFIKASI -->
+            <div class="profile-detail">
+              <span class="profile-detail-label">Jenis akun dan verifikasi</span>
+              <span class="profile-detail-value" id="profileRole">Memeriksa peran akun...</span>
+            </div>
+          </div>
+
+          <!-- KARTU 3: UBAH PASSWORD -->
+          <div class="profile-card">
+            <h3 style="margin:0 0 10px; font-size:1em;">Ubah Password</h3>
+            <button id="toggleEditPasswordBtn" class="secondary" type="button">Keamanan & Ubah Password</button>
+            <div id="editPasswordBox" class="profile-edit-box hidden" style="margin-top:10px;">
+              <label for="inputCurrentPassword" style="margin-top:0;">Password saat ini:</label>
+              <input id="inputCurrentPassword" type="password" placeholder="Masukkan password saat ini">
+
+              <label for="inputNewPassword">Password baru (min. 8 karakter):</label>
+              <input id="inputNewPassword" type="password" placeholder="Masukkan password baru">
+
+              <label for="inputConfirmPassword">Konfirmasi password baru:</label>
+              <input id="inputConfirmPassword" type="password" placeholder="Ulangi password baru">
+
+              <div class="profile-edit-actions" style="margin-top:12px;">
+                <button id="savePasswordBtn" class="primary" type="button">Perbarui password</button>
+                <button id="cancelPasswordBtn" class="secondary" type="button">Batal</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KARTU 4: PENGATURAN APLIKASI -->
+          <div class="profile-card">
+            <h3 style="margin:0 0 10px; font-size:1em;">Pengaturan Tampilan & Preferensi</h3>
+            
+            <label for="settingTheme" style="margin-top:4px;">Tema Aplikasi:</label>
+            <select id="settingTheme">
+              <option value="system">Mengikuti Sistem HP</option>
+              <option value="light">Mode Terang</option>
+              <option value="dark">Mode Gelap</option>
+            </select>
+
+            <label for="settingFontSize">Ukuran Teks Aplikasi:</label>
+            <select id="settingFontSize">
+              <option value="small">Kecil</option>
+              <option value="normal" selected>Normal</option>
+              <option value="large">Besar</option>
+            </select>
+
+            <label style="margin-top:12px;">Preferensi Notifikasi Lokal:</label>
+            <div class="checkbox-group">
+              <input type="checkbox" id="notifAccount" checked>
+              <label for="notifAccount">Informasi penting akun dan status layanan</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="notifPromo">
+              <label for="notifPromo">Informasi promosi dan produk desa terbaru</label>
+            </div>
+            <p class="muted" style="font-size:0.75em; margin-top:2px;">
+              *Preferensi ini disimpan secara lokal di perangkat Anda (belum mencakup push notification).
+            </p>
+          </div>
+
+          <div style="margin-top:14px;">
+            <a id="profileDashboardLink" class="primary hidden" href="#">Buka Dashboard</a>
+            <p id="profileAccountMessage" class="muted" style="margin-top:12px" role="status" aria-live="polite">Memeriksa status akun...</p>
+            <button id="profileLogoutButton" class="secondary" type="button" style="margin-top:10px;">Keluar dari akun</button>
+          </div>
+
+        </div>
+
+        <div class="profile-status-note">
+          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Pengaturan akun telah diperbarui pada rilis v0.3.0-RC Modul P1.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVIGASI BAWAH -->
+  <nav aria-label="Navigasi Utama">
+    <button id="navhome" class="active" type="button" onclick="show('home')">
+      <span>⌂</span><br>Beranda
+    </button>
+    <button id="navservices" type="button" onclick="show('services')">
+      <span>▤</span><br>Simulasi
+    </button>
+    <button id="navprofile" type="button" onclick="show('profile')">
+      <span>♙</span><br>Akun
+    </button>
+  </nav>
+
+  <!-- EXTERNAL SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="ui-messages.js"></script>
+
+  <!-- SKRIP APLIKASI -->
+  <script>
+    "use strict";
+
+    /* ========================================= KONFIGURASI SUPABASE ========================================= */
+    const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+    const AVATAR_BUCKET = "profile-avatars";
+    const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let currentRole = null;
+    let currentProfile = null;
+    let selectedService = "";
+    const simulatedOrders = [];
+
+    /* ========================================= DATA KATALOG ========================================= */
+    let publicProducts = [];
+    const PRODUCT_LIMIT = 60;
+    const rupiahFormatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    });
+
+    /* ========================================= UTILITAS DOM ========================================= */
+    function byId(id) { return document.getElementById(id); }
+    function setText(id, value) { byId(id).textContent = value === null || value === undefined ? "" : String(value); }
+    function setHidden(id, hidden) { byId(id).classList.toggle("hidden", hidden); }
+
+    /* ========================================= NAVIGASI & TAB TERAKHIR ========================================= */
+    function show(pageId) {
+      document.querySelectorAll(".page").forEach(function(page) {
+        page.classList.toggle("hidden", page.id !== pageId);
+      });
+      document.querySelectorAll("nav button").forEach(function(button) {
+        button.classList.toggle("active", button.id === "nav" + pageId);
+      });
+      window.scrollTo(0, 0);
+
+      /* Mengingat tab yang boleh diingat: home, services, profile */
+      if (["home", "services", "profile"].includes(pageId)) {
+        try {
+          localStorage.setItem("antardesa_last_tab", pageId);
+        } catch(e) {
+          console.warn("Gagal menyimpan tab terakhir:", e);
+        }
+      }
     }
 
-    currentProfile = data || null;
-
-    const metadata =
-      currentUser.user_metadata || {};
-
-    const fullName =
-      (currentProfile && currentProfile.full_name) ||
-      metadata.full_name ||
-      "";
-
-    const phone =
-      metadata.phone ||
-      currentUser.phone ||
-      "";
-
-    showProfileIdentity(
-      fullName,
-      currentUser.email,
-      phone
-    );
-
-    displayAvatar(
-      fullName,
-      currentProfile ? currentProfile.avatar_path : null
-    );
-
-    if (!currentProfile) {
-      setProfileMessage(
-        "Data profil belum ditemukan. Silakan muat ulang halaman atau hubungi pengelola aplikasi.",
-        "error"
-      );
-      return;
+    function restoreLastTab() {
+      try {
+        const lastTab = localStorage.getItem("antardesa_last_tab");
+        if (lastTab && ["home", "services", "profile"].includes(lastTab)) {
+          show(lastTab);
+        } else {
+          show("home");
+        }
+      } catch (e) {
+        show("home");
+      }
     }
 
-    setProfileMessage(
-      "Data profil berhasil dimuat.",
-      "success"
-    );
-
-  } catch (error) {
-
-    console.error("Gagal memuat profil:", error);
-
-    const metadata =
-      currentUser.user_metadata || {};
-
-    showProfileIdentity(
-      metadata.full_name || "",
-      currentUser.email,
-      metadata.phone || currentUser.phone || ""
-    );
-
-    setProfileMessage(
-      "Data profil dari database belum dapat dimuat. Informasi akun dasar tetap ditampilkan.",
-      "error"
-    );
-  }
-}
-
-
-/* =========================================
-   UNGGAH FOTO PROFIL
-========================================= */
-
-async function uploadProfileAvatar(file) {
-
-  if (!supabaseClient || !currentUser) {
-    setProfileMessage(
-      "Silakan login terlebih dahulu untuk mengunggah foto.",
-      "error"
-    );
-    return;
-  }
-
-  if (!file) {
-    return;
-  }
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp"
-  ];
-
-  if (!allowedTypes.includes(file.type)) {
-    setProfileMessage(
-      "Format foto harus JPG, PNG, atau WebP.",
-      "error"
-    );
-    return;
-  }
-
-  if (file.size > AVATAR_MAX_SIZE) {
-    setProfileMessage(
-      "Ukuran foto terlalu besar. Maksimal 5 MB.",
-      "error"
-    );
-    return;
-  }
-
-  const extensionByType = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp"
-  };
-
-  const extension = extensionByType[file.type];
-
-  const newPath =
-    currentUser.id + "/avatar." + extension;
-
-  const oldPath =
-    currentProfile && currentProfile.avatar_path
-      ? currentProfile.avatar_path
-      : null;
-
-  const button = byId("profileAvatarButton");
-  const input = byId("profileAvatarInput");
-
-  button.disabled = true;
-  button.textContent = "Mengunggah foto...";
-
-  setProfileMessage(
-    "Foto sedang diunggah. Jangan tutup halaman dahulu.",
-    ""
-  );
-
-  try {
-
-    const { error: uploadError } =
-      await supabaseClient
-        .storage
-        .from(AVATAR_BUCKET)
-        .upload(newPath, file, {
-          cacheControl: "60",
-          contentType: file.type,
-          upsert: true
-        });
-
-    if (uploadError) {
-      throw uploadError;
+    /* ========================================= PENGATURAN TEMA & TEKS ========================================= */
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      root.classList.remove("dark-theme");
+      
+      if (theme === "dark") {
+        root.classList.add("dark-theme");
+      } else if (theme === "system") {
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          root.classList.add("dark-theme");
+        }
+      }
     }
 
-    const { data: updatedProfile, error: updateError } =
-      await supabaseClient
-        .from("profiles")
-        .update({
-          avatar_path: newPath,
-          updated_at: new Date().toISOString()
-        })
-        .eq("user_id", currentUser.id)
-        .select("user_id,full_name,avatar_path")
-        .single();
-
-    if (updateError) {
-      throw updateError;
+    function applyFontSize(size) {
+      const root = document.documentElement;
+      root.classList.remove("font-small", "font-normal", "font-large");
+      if (["small", "normal", "large"].includes(size)) {
+        root.classList.add("font-" + size);
+      } else {
+        root.classList.add("font-normal");
+      }
     }
 
-    currentProfile = updatedProfile;
+    function loadAppSettings() {
+      try {
+        const theme = localStorage.getItem("antardesa_theme") || "system";
+        const fontSize = localStorage.getItem("antardesa_font_size") || "normal";
+        const notifAccount = localStorage.getItem("antardesa_notif_account") !== "false";
+        const notifPromo = localStorage.getItem("antardesa_notif_promo") === "true";
 
-    displayAvatar(
-      currentProfile.full_name ||
-      currentUser.user_metadata?.full_name ||
-      "",
-      newPath
-    );
+        byId("settingTheme").value = theme;
+        byId("settingFontSize").value = fontSize;
+        byId("notifAccount").checked = notifAccount;
+        byId("notifPromo").checked = notifPromo;
 
-    setProfileMessage(
-      "Foto profil berhasil diperbarui.",
-      "success"
-    );
+        applyTheme(theme);
+        applyFontSize(fontSize);
+      } catch(e) {
+        console.warn("Gagal membaca pengaturan lokal:", e);
+      }
+    }
 
-    /*
-      Hapus foto lama jika lokasinya berbeda.
-      Penghapusan tetap dibatasi pada folder pengguna sendiri.
-    */
+    byId("settingTheme").addEventListener("change", function() {
+      const theme = this.value;
+      applyTheme(theme);
+      try { localStorage.setItem("antardesa_theme", theme); } catch(e){}
+    });
 
-    if (oldPath && oldPath !== newPath) {
+    byId("settingFontSize").addEventListener("change", function() {
+      const size = this.value;
+      applyFontSize(size);
+      try { localStorage.setItem("antardesa_font_size", size); } catch(e){}
+    });
 
-      const { error: removeError } =
-        await supabaseClient
+    byId("notifAccount").addEventListener("change", function() {
+      try { localStorage.setItem("antardesa_notif_account", this.checked); } catch(e){}
+    });
+
+    byId("notifPromo").addEventListener("change", function() {
+      try { localStorage.setItem("antardesa_notif_promo", this.checked); } catch(e){}
+    });
+
+    if (window.matchMedia) {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function() {
+        if (byId("settingTheme").value === "system") {
+          applyTheme("system");
+        }
+      });
+    }
+
+    /* ========================================= SIMULASI LAYANAN ========================================= */
+    function choose(serviceName) {
+      selectedService = serviceName;
+      setText("formtitle", "Simulasi: " + serviceName);
+      byId("orderform").reset();
+      show("formpage");
+    }
+
+    /* ========================================= PEMETAAN ROLE ========================================= */
+    function getRoleInfo(role, verified) {
+      if (role === "pelanggan") {
+        return { label: "Pelanggan", page: "pelanggan.html", dashboard: "Dashboard Pelanggan" };
+      }
+      if (role === "mitra" && verified === true) {
+        return { label: "Mitra terverifikasi", page: "mitra.html", dashboard: "Kelola Toko Saya" };
+      }
+      if (role === "kurir" && verified === true) {
+        return { label: "Kurir terverifikasi", page: "kurir.html", dashboard: "Dashboard Kurir" };
+      }
+      if (role === "mitra") {
+        return { label: "Mitra menunggu verifikasi", page: null, dashboard: null };
+      }
+      if (role === "kurir") {
+        return { label: "Kurir menunggu verifikasi", page: null, dashboard: null };
+      }
+      return { label: "Peran akun belum dikenali", page: null, dashboard: null };
+    }
+
+    /* ========================================= PESAN STATUS ========================================= */
+    function setAccountMessage(message, isError) {
+      setText("accountMessage", message);
+      setText("profileAccountMessage", message);
+      byId("accountMessage").style.color = isError ? "#b42318" : "#61746b";
+    }
+
+    function setProfileMessage(message, type) {
+      const element = byId("profileMessage");
+      element.textContent = message;
+      element.className = "profile-message";
+      if (type === "error") { element.classList.add("error"); }
+      if (type === "success") { element.classList.add("success"); }
+    }
+
+    /* ========================================= AVATAR DAN IDENTITAS PROFIL ========================================= */
+    function getInitials(name) {
+      const value = String(name || "").trim();
+      if (!value) { return "A"; }
+      const words = value.split(/\s+/).filter(Boolean);
+      if (words.length === 1) { return words[0].substring(0, 1).toUpperCase(); }
+      return (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
+    }
+
+    function displayAvatar(name, avatarPath) {
+      const image = byId("profileAvatarImage");
+      const fallback = byId("profileAvatarFallback");
+      fallback.textContent = getInitials(name);
+
+      if (!avatarPath || !supabaseClient) {
+        image.removeAttribute("src");
+        image.classList.add("hidden");
+        fallback.classList.remove("hidden");
+        return;
+      }
+
+      const result = supabaseClient.storage.from(AVATAR_BUCKET).getPublicUrl(avatarPath);
+      const publicUrl = result && result.data && result.data.publicUrl ? result.data.publicUrl : "";
+
+      if (!publicUrl) {
+        image.removeAttribute("src");
+        image.classList.add("hidden");
+        fallback.classList.remove("hidden");
+        return;
+      }
+
+      image.onload = function() {
+        image.classList.remove("hidden");
+        fallback.classList.add("hidden");
+      };
+      image.onerror = function() {
+        image.classList.add("hidden");
+        fallback.classList.remove("hidden");
+      };
+      image.src = publicUrl + "?v=" + Date.now();
+    }
+
+    function showProfileIdentity(name, email, phone) {
+      const safeName = String(name || "").trim() || "Nama belum diatur";
+      setText("profileFullName", safeName);
+      setText("profileNameDetail", safeName);
+      setText("profileEmail", email || "Email tidak tersedia");
+      setText("profileEmailDetail", email || "Email tidak tersedia");
+      setText("profilePhone", phone || "Nomor HP belum tersedia");
+      displayAvatar(safeName, currentProfile ? currentProfile.avatar_path : null);
+      setText("accountName", safeName);
+    }
+
+    /* ========================================= MEMUAT DATA PROFIL ========================================= */
+    async function loadUserProfile() {
+      if (!supabaseClient || !currentUser) { return; }
+      setProfileMessage("Sedang memuat data profil...", "");
+      try {
+        const { data, error } = await supabaseClient
+          .from("profiles")
+          .select("user_id,full_name,avatar_path,created_at,updated_at")
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if (error) { throw error; }
+
+        currentProfile = data || null;
+        const metadata = currentUser.user_metadata || {};
+        const fullName = (currentProfile && currentProfile.full_name) || metadata.full_name || "";
+        const phone = metadata.phone || currentUser.phone || "";
+
+        showProfileIdentity(fullName, currentUser.email, phone);
+
+        if (!currentProfile) {
+          setProfileMessage("Data profil belum ditemukan. Silakan muat ulang halaman atau hubungi pengelola aplikasi.", "error");
+          return;
+        }
+        setProfileMessage("Data profil berhasil dimuat.", "success");
+      } catch (error) {
+        console.error("Gagal memuat profil:", error);
+        const metadata = currentUser.user_metadata || {};
+        showProfileIdentity(metadata.full_name || "", currentUser.email, metadata.phone || currentUser.phone || "");
+        setProfileMessage("Data profil dari database belum dapat dimuat. Informasi akun dasar tetap ditampilkan.", "error");
+      }
+    }
+
+    /* ========================================= UNGGAH FOTO PROFIL ========================================= */
+    async function uploadProfileAvatar(file) {
+      if (!supabaseClient || !currentUser) {
+        setProfileMessage("Silakan login terlebih dahulu untuk mengunggah foto.", "error");
+        return;
+      }
+      if (!file) { return; }
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        setProfileMessage("Format foto harus JPG, PNG, atau WebP.", "error");
+        return;
+      }
+      if (file.size > AVATAR_MAX_SIZE) {
+        setProfileMessage("Ukuran foto terlalu besar. Maksimal 5 MB.", "error");
+        return;
+      }
+
+      const extensionByType = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+      const extension = extensionByType[file.type];
+      const newPath = currentUser.id + "/avatar." + extension;
+      const oldPath = currentProfile && currentProfile.avatar_path ? currentProfile.avatar_path : null;
+
+      const button = byId("profileAvatarButton");
+      const removeBtn = byId("profileAvatarRemoveButton");
+      const input = byId("profileAvatarInput");
+
+      button.disabled = true;
+      removeBtn.disabled = true;
+      button.textContent = "Mengunggah...";
+      setProfileMessage("Foto sedang diunggah. Jangan tutup halaman dahulu.", "");
+
+      try {
+        const { error: uploadError } = await supabaseClient
+          .storage
+          .from(AVATAR_BUCKET)
+          .upload(newPath, file, { cacheControl: "60", contentType: file.type, upsert: true });
+
+        if (uploadError) { throw uploadError; }
+
+        const { data: updatedProfile, error: updateError } = await supabaseClient
+          .from("profiles")
+          .update({ avatar_path: newPath, updated_at: new Date().toISOString() })
+          .eq("user_id", currentUser.id)
+          .select("user_id,full_name,avatar_path")
+          .single();
+
+        if (updateError) { throw updateError; }
+
+        currentProfile = updatedProfile;
+        displayAvatar(currentProfile.full_name || currentUser.user_metadata?.full_name || "", newPath);
+        setProfileMessage("Foto profil berhasil diperbarui.", "success");
+
+        if (oldPath && oldPath !== newPath) {
+          const { error: removeError } = await supabaseClient.storage.from(AVATAR_BUCKET).remove([oldPath]);
+          if (removeError) { console.warn("Foto lama belum berhasil dibersihkan:", removeError.message); }
+        }
+      } catch (error) {
+        console.error("Unggah avatar gagal:", error);
+        setProfileMessage("Foto belum berhasil disimpan. Periksa koneksi dan izin penyimpanan, lalu coba lagi.", "error");
+      } finally {
+        button.disabled = false;
+        removeBtn.disabled = false;
+        button.textContent = "📷 Ganti foto";
+        input.value = "";
+      }
+    }
+
+    /* ========================================= HAPUS FOTO PROFIL ========================================= */
+    async function removeProfileAvatar() {
+      if (!supabaseClient || !currentUser) {
+        setProfileMessage("Silakan login terlebih dahulu.", "error");
+        return;
+      }
+
+      if (!currentProfile || !currentProfile.avatar_path) {
+        setProfileMessage("Belum ada foto profil untuk dihapus.", "error");
+        return;
+      }
+
+      const oldPath = currentProfile.avatar_path;
+      /* Memastikan path berada di folder UUID pengguna sendiri */
+      if (!oldPath.startsWith(currentUser.id + "/")) {
+        setProfileMessage("Akses lokasi penyimpanan foto tidak valid.", "error");
+        return;
+      }
+
+      const button = byId("profileAvatarButton");
+      const removeBtn = byId("profileAvatarRemoveButton");
+      button.disabled = true;
+      removeBtn.disabled = true;
+      removeBtn.textContent = "Menghapus...";
+      setProfileMessage("Menghapus foto profil...", "");
+
+      try {
+        /* 1. Update database profiles */
+        const { data: updatedProfile, error: updateError } = await supabaseClient
+          .from("profiles")
+          .update({ avatar_path: null, updated_at: new Date().toISOString() })
+          .eq("user_id", currentUser.id)
+          .select("user_id,full_name,avatar_path")
+          .single();
+
+        if (updateError) { throw updateError; }
+        currentProfile = updatedProfile;
+
+        /* 2. Tampilkan fallback avatar */
+        const name = currentProfile.full_name || currentUser.user_metadata?.full_name || "";
+        displayAvatar(name, null);
+
+        /* 3. Hapus dari Supabase Storage */
+        const { error: storageRemoveError } = await supabaseClient
           .storage
           .from(AVATAR_BUCKET)
           .remove([oldPath]);
 
-      if (removeError) {
-        console.warn(
-          "Foto lama belum berhasil dibersihkan:",
-          removeError.message
-        );
+        if (storageRemoveError) {
+          console.warn("Penghapusan storage mengalami kendala:", storageRemoveError);
+          setProfileMessage("Foto profil dihapus dari akun. Catatan: File lama di penyimpanan mungkin belum terhapus sempurna.", "success");
+        } else {
+          setProfileMessage("Foto profil berhasil dihapus.", "success");
+        }
+      } catch (error) {
+        console.error("Gagal menghapus avatar:", error);
+        setProfileMessage("Gagal menghapus foto profil. Periksa koneksi lalu coba lagi.", "error");
+      } finally {
+        button.disabled = false;
+        removeBtn.disabled = false;
+        removeBtn.textContent = "🗑️ Hapus foto";
       }
     }
 
-  } catch (error) {
-
-    console.error("Unggah avatar gagal:", error);
-
-    setProfileMessage(
-      "Foto belum berhasil disimpan. Periksa koneksi dan izin penyimpanan, lalu coba lagi.",
-      "error"
-    );
-
-  } finally {
-
-    button.disabled = false;
-    button.textContent = "📷 Ganti foto profil";
-    input.value = "";
-
-  }
-}
-
-
-byId("profileAvatarButton").addEventListener("click", function() {
-  byId("profileAvatarInput").click();
-});
-
-byId("profileAvatarInput").addEventListener("change", function() {
-  const file = this.files && this.files[0];
-
-  if (file) {
-    uploadProfileAvatar(file);
-  }
-});
-
-
-/* =========================================
-   TAMPILAN PENGGUNA TAMU
-========================================= */
-
-function showGuestState() {
-
-  currentUser = null;
-  currentRole = null;
-  currentProfile = null;
-
-  byId("headerAccountActions").innerHTML = `
-    <a class="account-login" href="login.html">Masuk</a>
-    <a class="account-register" href="register.html">Daftar</a>
-  `;
-
-  setText("welcomeTitle", "Selamat datang! 👋");
-
-  setText(
-    "welcomeDescription",
-    "Jelajahi layanan dan produk AntarDesa tanpa harus masuk terlebih dahulu. Masuk atau daftar hanya saat menggunakan fitur yang membutuhkan akun."
-  );
-
-  setHidden("guestLinks", false);
-  setHidden("accountPanel", true);
-  setHidden("profileGuestActions", false);
-  setHidden("profileAccountActions", true);
-
-  setText(
-    "profileDescription",
-    "Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan dan katalog produk tanpa login."
-  );
-
-  setProfileMessage("", "");
-
-  byId("profileAvatarImage").removeAttribute("src");
-  byId("profileAvatarImage").classList.add("hidden");
-  byId("profileAvatarFallback").classList.remove("hidden");
-  setText("profileAvatarFallback", "A");
-}
-
-
-/* =========================================
-   TAMPILAN PENGGUNA LOGIN
-========================================= */
-
-function showSignedInState(user) {
-
-  currentUser = user;
-  currentRole = null;
-  currentProfile = null;
-
-  byId("headerAccountActions").innerHTML = `
-    <a
-      class="account-login"
-      href="#profile"
-      onclick="show('profile'); return false;"
-    >Akun saya</a>
-  `;
-
-  setText("welcomeTitle", "Selamat datang kembali! 👋");
-
-  setText(
-    "welcomeDescription",
-    "Kamu sudah masuk ke AntarDesa. Jelajahi layanan dan produk dari dashboard utama."
-  );
-
-  setHidden("guestLinks", true);
-  setHidden("accountPanel", false);
-  setHidden("profileGuestActions", true);
-  setHidden("profileAccountActions", false);
-
-  setText("accountEmail", user.email || "Akun AntarDesa");
-  setText("accountName", "Memuat profil...");
-
-  setText("profileFullName", "Memuat nama...");
-  setText("profileNameDetail", "Memuat...");
-  setText("profileEmail", user.email || "Akun AntarDesa");
-  setText("profileEmailDetail", user.email || "Akun AntarDesa");
-
-  const metadata = user.user_metadata || {};
-
-  setText(
-    "profilePhone",
-    metadata.phone || user.phone || "Nomor HP belum tersedia"
-  );
-
-  setText("profileRole", "Memeriksa peran akun...");
-
-  setHidden("roleDashboardLink", true);
-  setHidden("profileDashboardLink", true);
-  setHidden("retryRoleButton", true);
-
-  setText("accountRoleLabel", "Akun terdeteksi");
-
-  setAccountMessage(
-    "Memeriksa peran akun...",
-    false
-  );
-
-  setProfileMessage(
-    "Memuat informasi profil...",
-    ""
-  );
-
-  displayAvatar(
-    metadata.full_name || "",
-    null
-  );
-}
-
-
-/* =========================================
-   PEMERIKSAAN ROLE DATABASE
-========================================= */
-
-async function loadUserRole() {
-
-  if (!supabaseClient || !currentUser) {
-    return;
-  }
-
-  const retryButton = byId("retryRoleButton");
-
-  retryButton.disabled = true;
-  retryButton.classList.add("hidden");
-
-  setAccountMessage(
-    "Sedang memeriksa hak akses akun...",
-    false
-  );
-
-  try {
-
-    const { data, error } = await supabaseClient
-      .from("user_roles")
-      .select("role,is_verified")
-      .eq("user_id", currentUser.id)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    if (!data) {
-      throw new Error("ROLE_NOT_FOUND");
-    }
-
-    currentRole = data;
-
-    const roleInfo = getRoleInfo(
-      data.role,
-      data.is_verified
-    );
-
-    setText("accountRoleLabel", roleInfo.label);
-    setText("profileRole", roleInfo.label);
-
-    if (roleInfo.page) {
-
-      const topLink = byId("roleDashboardLink");
-      const profileLink = byId("profileDashboardLink");
-
-      topLink.href = roleInfo.page;
-      profileLink.href = roleInfo.page;
-
-      topLink.textContent = roleInfo.dashboard;
-      profileLink.textContent = roleInfo.dashboard;
-
-      topLink.classList.remove("hidden");
-      profileLink.classList.remove("hidden");
-
-      setAccountMessage(
-        data.role === "mitra"
-          ? "Status Mitra terverifikasi. Kamu bisa menjelajahi katalog dan mengelola produk tokomu sendiri."
-          : "Status akun berhasil diperiksa. Kamu tetap berada di dashboard utama dan dapat menjelajahi katalog.",
-        false
-      );
-
-    } else {
-
-      setAccountMessage(
-        "Akun terdeteksi, tetapi dashboard khusus belum tersedia karena status peran atau verifikasi belum memenuhi syarat. Kamu tetap dapat menjelajahi dashboard utama.",
-        true
-      );
-    }
-
-  } catch (error) {
-
-    console.error("Pemeriksaan peran gagal:", error);
-
-    setText(
-      "accountRoleLabel",
-      "Status peran belum dapat diperiksa"
-    );
-
-    setText(
-      "profileRole",
-      "Status peran belum dapat diperiksa"
-    );
-
-    setAccountMessage(
-      "Sesi akun tetap dipertahankan. Periksa koneksi internet, lalu tekan tombol coba periksa lagi.",
-      true
-    );
-
-    retryButton.classList.remove("hidden");
-
-  } finally {
-
-    retryButton.disabled = false;
-
-  }
-}
-
-
-/* =========================================
-   PEMULIHAN SESI
-========================================= */
-
-async function refreshSession() {
-
-  if (!supabaseClient) {
-
-    showGuestState();
-
-    setText(
-      "welcomeDescription",
-      "Dashboard utama tetap dapat digunakan. Koneksi akun belum tersedia."
-    );
-
-    return;
-  }
-
-  try {
-
-    const { data, error } =
-      await supabaseClient.auth.getSession();
-
-    if (error) {
-      throw error;
-    }
-
-    if (!data.session || !data.session.user) {
-      showGuestState();
-      return;
-    }
-
-    showSignedInState(data.session.user);
-
-    await Promise.all([
-      loadUserRole(),
-      loadUserProfile()
-    ]);
-
-  } catch (error) {
-
-    console.error("Pemulihan sesi gagal:", error);
-
-    /*
-      Jangan menjalankan signOut().
-      Jangan menghapus localStorage.
-      Dashboard publik tetap dapat digunakan.
-    */
-
-    showGuestState();
-
-    setText(
-      "welcomeDescription",
-      "Dashboard utama tetap dapat digunakan. Status akun belum dapat diperiksa karena koneksi atau pemulihan sesi mengalami kendala. Silakan muat ulang halaman saat koneksi stabil."
-    );
-  }
-}
-
-
-/* =========================================
-   LOGOUT MANUAL
-========================================= */
-
-async function logoutFromApp() {
-
-  if (!supabaseClient) {
-    return;
-  }
-
-  const buttons = [
-    byId("logoutButton"),
-    byId("profileLogoutButton")
-  ];
-
-  buttons.forEach(function(button) {
-    button.disabled = true;
-  });
-
-  try {
-
-    const { error } =
-      await supabaseClient.auth.signOut();
-
-    if (error) {
-      throw error;
-    }
-
-    showGuestState();
-    show("home");
-
-  } catch (error) {
-
-    console.error("Logout gagal:", error);
-
-    setAccountMessage(
-      "Belum berhasil keluar. Periksa koneksi lalu coba lagi.",
-      true
-    );
-
-  } finally {
-
-    buttons.forEach(function(button) {
-      button.disabled = false;
+    byId("profileAvatarButton").addEventListener("click", function() { byId("profileAvatarInput").click(); });
+    byId("profileAvatarInput").addEventListener("change", function() {
+      const file = this.files && this.files[0];
+      if (file) { uploadProfileAvatar(file); }
     });
-
-  }
-}
-
-
-/* EVENT AKUN */
-
-byId("retryRoleButton").addEventListener(
-  "click",
-  loadUserRole
-);
-
-byId("logoutButton").addEventListener(
-  "click",
-  logoutFromApp
-);
-
-byId("profileLogoutButton").addEventListener(
-  "click",
-  logoutFromApp
-);
-
-
-/* =========================================
-   UTILITAS KATALOG
-========================================= */
-
-function formatPrice(value) {
-
-  const price = Number(value);
-
-  if (!Number.isFinite(price) || price < 0) {
-    return "Harga belum tersedia";
-  }
-
-  return rupiahFormatter.format(price);
-}
-
-
-function safeImageUrl(value) {
-
-  if (!value || typeof value !== "string") {
-    return "";
-  }
-
-  try {
-
-    const url = new URL(value);
-
-    if (
-      url.protocol !== "https:" &&
-      url.protocol !== "http:"
-    ) {
-      return "";
-    }
-
-    return url.href;
-
-  } catch (error) {
-    return "";
-  }
-}
-
-
-function createTextElement(tag, className, value) {
-
-  const element = document.createElement(tag);
-
-  if (className) {
-    element.className = className;
-  }
-
-  element.textContent =
-    value === null || value === undefined
-      ? ""
-      : String(value);
-
-  return element;
-}
-
-
-/* =========================================
-   STATUS KATALOG
-========================================= */
-
-function setCatalogState(message, isError) {
-
-  const state = byId("catalogState");
-  const grid = byId("productGrid");
-
-  state.textContent = message;
-  state.classList.remove("hidden");
-
-  grid.classList.add("hidden");
-
-  byId("catalogCount").textContent = "";
-
-  state.style.color =
-    isError ? "#b42318" : "#61746b";
-}
-
-
-/* =========================================
-   KARTU PRODUK
-========================================= */
-
-function createProductCard(product) {
-
-  const card = document.createElement("article");
-  card.className = "product-card";
-
-  const imageContainer = document.createElement("div");
-  imageContainer.className = "product-image";
-
-  const imageUrl = safeImageUrl(product.image_url);
-
-  if (imageUrl) {
-
-    const image = document.createElement("img");
-
-    image.src = imageUrl;
-    image.alt = product.name || "Foto produk";
-    image.loading = "lazy";
-    image.referrerPolicy = "no-referrer";
-
-    image.addEventListener("error", function() {
-
-      image.remove();
-
-      imageContainer.append(
-        createTextElement("span", "product-placeholder", "📦")
-      );
-
-    }, { once: true });
-
-    imageContainer.append(image);
-
-  } else {
-
-    imageContainer.append(
-      createTextElement("span", "product-placeholder", "📦")
-    );
-  }
-
-  const content = document.createElement("div");
-  content.className = "product-content";
-
-  const category = createTextElement(
-    "span",
-    "product-category",
-    product.category || "Produk Desa"
-  );
-
-  const name = createTextElement(
-    "h3",
-    "product-name",
-    product.name
-  );
-
-  const price = createTextElement(
-    "div",
-    "product-price",
-    formatPrice(product.price)
-  );
-
-  const stockValue = Number(product.stock);
-
-  const stockText =
-    Number.isFinite(stockValue) && stockValue > 0
-      ? "Stok tersedia: " + stockValue
-      : "Stok habis";
-
-  const stock = createTextElement(
-    "div",
-    "product-stock",
-    stockText
-  );
-
-  const description = createTextElement(
-    "div",
-    "product-description",
-    product.description || "Belum ada deskripsi produk."
-  );
-
-  content.append(
-    category,
-    name,
-    price,
-    stock,
-    description
-  );
-
-  card.append(imageContainer, content);
-
-  return card;
-}
-
-
-/* =========================================
-   RENDER KATALOG
-========================================= */
-
-function renderProductCatalog() {
-
-  const searchInput = byId("productSearch");
-  const categorySelect = byId("productCategory");
-  const grid = byId("productGrid");
-  const state = byId("catalogState");
-  const count = byId("catalogCount");
-
-  const keyword = searchInput.value.trim().toLowerCase();
-  const selectedCategory = categorySelect.value;
-
-  const filteredProducts = publicProducts.filter(function(product) {
-
-    const searchableText = [
-      product.name,
-      product.description,
-      product.category
-    ].join(" ").toLowerCase();
-
-    const matchesKeyword =
-      searchableText.includes(keyword);
-
-    const matchesCategory =
-      !selectedCategory ||
-      product.category === selectedCategory;
-
-    return matchesKeyword && matchesCategory;
-  });
-
-  grid.replaceChildren();
-  state.classList.add("hidden");
-
-  if (filteredProducts.length === 0) {
-
-    grid.classList.add("hidden");
-
-    state.textContent =
-      publicProducts.length === 0
-        ? "Belum ada produk aktif dari Mitra AntarDesa."
-        : "Produk yang kamu cari belum ditemukan. Coba kata kunci atau kategori lain.";
-
-    state.style.color = "#61746b";
-    state.classList.remove("hidden");
-
-    count.textContent = "Tidak ada produk yang cocok.";
-
-    return;
-  }
-
-  filteredProducts.forEach(function(product) {
-    grid.append(createProductCard(product));
-  });
-
-  grid.classList.remove("hidden");
-
-  count.textContent =
-    "Menampilkan " +
-    filteredProducts.length +
-    " dari " +
-    publicProducts.length +
-    " produk aktif.";
-}
-
-
-/* =========================================
-   FILTER KATEGORI
-========================================= */
-
-function populateProductCategories() {
-
-  const select = byId("productCategory");
-  const previousValue = select.value;
-
-  const categories = Array.from(
-    new Set(
-      publicProducts
-        .map(function(product) {
-          return String(product.category || "").trim();
-        })
-        .filter(Boolean)
-    )
-  ).sort(function(a, b) {
-    return a.localeCompare(b, "id");
-  });
-
-  select.replaceChildren();
-
-  const allOption = document.createElement("option");
-
-  allOption.value = "";
-  allOption.textContent = "Semua kategori";
-
-  select.append(allOption);
-
-  categories.forEach(function(category) {
-
-    const option = document.createElement("option");
-
-    option.value = category;
-    option.textContent = category;
-
-    select.append(option);
-  });
-
-  if (categories.includes(previousValue)) {
-    select.value = previousValue;
-  }
-}
-
-
-/* =========================================
-   MEMUAT PRODUK PUBLIK
-========================================= */
-
-async function loadPublicProducts() {
-
-  const refreshButton = byId("refreshCatalogButton");
-
-  refreshButton.disabled = true;
-  refreshButton.textContent = "Memuat...";
-
-  setCatalogState(
-    "Sedang mengambil produk aktif dari seluruh Mitra AntarDesa...",
-    false
-  );
-
-  try {
-
-    if (!supabaseClient) {
-      throw new Error("SUPABASE_NOT_AVAILABLE");
-    }
-
-    const { data, error } = await supabaseClient
-      .from("products")
-      .select(
-        "id,name,description,category,price,stock,image_url,created_at"
-      )
-      .eq("is_active", true)
-      .order("created_at", {
-        ascending: false
-      })
-      .limit(PRODUCT_LIMIT);
-
-    if (error) {
-      throw error;
-    }
-
-    publicProducts = Array.isArray(data) ? data : [];
-
-    populateProductCategories();
-    renderProductCatalog();
-
-  } catch (error) {
-
-    console.error("Gagal memuat katalog produk:", error);
-
-    publicProducts = [];
-
-    setCatalogState(
-      "Katalog belum dapat dimuat. Periksa koneksi internet atau akses Data API Supabase, lalu tekan Muat ulang.",
-      true
-    );
-
-  } finally {
-
-    refreshButton.disabled = false;
-    refreshButton.textContent = "Muat ulang";
-
-  }
-}
-
-
-/* EVENT KATALOG */
-
-byId("productSearch").addEventListener(
-  "input",
-  renderProductCatalog
-);
-
-byId("productCategory").addEventListener(
-  "change",
-  renderProductCatalog
-);
-
-byId("refreshCatalogButton").addEventListener(
-  "click",
-  loadPublicProducts
-);
-
-
-/* =========================================
-   FORM SIMULASI LAYANAN
-========================================= */
-
-byId("orderform").addEventListener(
-  "submit",
-  function(event) {
-
-    event.preventDefault();
-
-    const value = function(id) {
-      return byId(id).value.trim();
-    };
-
-    const fields = [
-      "name",
-      "pickup",
-      "destination",
-      "detail"
-    ];
-
-    if (!fields.every(function(id) {
-      return value(id).length > 0;
-    })) {
-      return;
-    }
-
-    simulatedOrders.unshift({
-      service: selectedService,
-      name: value("name"),
-      pickup: value("pickup"),
-      destination: value("destination"),
-      detail: value("detail")
-    });
-
-    const list = byId("orderlist");
-
-    list.replaceChildren();
-
-    simulatedOrders.forEach(function(order, index) {
-
-      const card = document.createElement("div");
-      card.className = "order";
-
-      [
-        (index + 1) + ". " + order.service,
-        "Pemesan: " + order.name,
-        "Dari: " + order.pickup,
-        "Ke: " + order.destination,
-        "Detail: " + order.detail,
-        "Status: Simulasi lokal, tidak dikirim"
-      ].forEach(function(line, lineIndex) {
-
-        const element = document.createElement(
-          lineIndex === 0 ? "strong" : "div"
-        );
-
-        element.textContent = line;
-        card.append(element);
-      });
-
-      list.append(card);
-    });
-
-    this.reset();
-    show("orders");
-  }
-);
-
-
-/* =========================================
-   PESAN KOSONG RIWAYAT SIMULASI
-========================================= */
-
-function renderEmptyOrders() {
-
-  const list = byId("orderlist");
-
-  if (
-    window.AntarDesaUI &&
-    typeof window.AntarDesaUI.showMessage === "function"
-  ) {
-
-    window.AntarDesaUI.showMessage(list, "UI-03");
-
-  } else {
-
-    list.textContent = "Belum ada simulasi layanan.";
-  }
-}
-
-document.addEventListener(
-  "DOMContentLoaded",
-  renderEmptyOrders
-);
-
-
-/* =========================================
-   INISIALISASI SUPABASE
-========================================= */
-
-if (
-  window.supabase &&
-  window.supabase.createClient
-) {
-
-  supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY,
-    {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage
+    byId("profileAvatarRemoveButton").addEventListener("click", removeProfileAvatar);
+
+    /* ========================================= EDIT NAMA LENGKAP ========================================= */
+    byId("toggleEditNameBtn").addEventListener("click", function() {
+      const box = byId("editNameBox");
+      const isHidden = box.classList.contains("hidden");
+      box.classList.toggle("hidden", !isHidden);
+      if (isHidden) {
+        byId("inputEditName").value = (currentProfile && currentProfile.full_name) || currentUser.user_metadata?.full_name || "";
       }
-    }
-  );
+    });
 
-  /*
-    Katalog publik tetap dapat dibuka tanpa login.
-  */
+    byId("cancelNameBtn").addEventListener("click", function() {
+      byId("editNameBox").classList.add("hidden");
+    });
 
-  loadPublicProducts();
+    byId("saveNameBtn").addEventListener("click", async function() {
+      if (!supabaseClient || !currentUser) return;
+      const newName = byId("inputEditName").value.trim();
 
-  /*
-    Pulihkan sesi pengguna dan muat profilnya.
-  */
-
-  refreshSession();
-
-  /*
-    Pantau perubahan autentikasi.
-  */
-
-  supabaseClient.auth.onAuthStateChange(
-    function(event, session) {
-
-      if (event === "SIGNED_OUT") {
-        showGuestState();
+      if (newName.length < 1 || newName.length > 120) {
+        setProfileMessage("Nama lengkap harus diisi antara 1 sampai 120 karakter.", "error");
         return;
       }
 
-      if (
-        session &&
-        (
-          event === "SIGNED_IN" ||
-          event === "TOKEN_REFRESHED" ||
-          event === "USER_UPDATED"
-        )
-      ) {
+      this.disabled = true;
+      this.textContent = "Menyimpan...";
+      setProfileMessage("Menyimpan perubahan nama...", "");
 
-        showSignedInState(session.user);
+      try {
+        const { data: updatedProfile, error: updateError } = await supabaseClient
+          .from("profiles")
+          .update({ full_name: newName, updated_at: new Date().toISOString() })
+          .eq("user_id", currentUser.id)
+          .select("user_id,full_name,avatar_path")
+          .single();
 
-        /*
-          Pekerjaan Supabase dijalankan setelah callback auth.
-          Ini menghindari pekerjaan database langsung di dalam callback.
-        */
+        if (updateError) { throw updateError; }
 
-        window.setTimeout(function() {
+        currentProfile = updatedProfile;
 
-          if (
-            currentUser &&
-            currentUser.id === session.user.id
-          ) {
+        /* Sinkronkan ke user_metadata auth */
+        await supabaseClient.auth.updateUser({ data: { full_name: newName } });
 
-            Promise.all([
-              loadUserRole(),
-              loadUserProfile()
-            ]);
-
-          }
-
-        }, 0);
+        showProfileIdentity(newName, currentUser.email, currentUser.user_metadata?.phone || currentUser.phone || "");
+        setProfileMessage("Nama lengkap berhasil diperbarui.", "success");
+        byId("editNameBox").classList.add("hidden");
+      } catch (error) {
+        console.error("Gagal memperbarui nama:", error);
+        setProfileMessage("Nama belum berhasil disimpan. Periksa koneksi dan coba lagi.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Simpan nama";
       }
-
-    }
-  );
-
-} else {
-
-  showGuestState();
-
-  setCatalogState(
-    "Katalog belum dapat dimuat karena Supabase SDK gagal dimuat.",
-    true
-  );
-
-  setText(
-    "welcomeDescription",
-    "Dashboard utama tetap dapat digunakan. Layanan pemeriksaan akun belum tersedia karena Supabase SDK gagal dimuat."
-  );
-}
-
-
-/* =========================================
-   SERVICE WORKER
-========================================= */
-
-if ("serviceWorker" in navigator) {
-
-  window.addEventListener("load", function() {
-
-    navigator.serviceWorker.register(
-      "./service-worker.js",
-      { scope: "./" }
-    ).catch(function(error) {
-
-      console.error(
-        "Service Worker gagal:",
-        error
-      );
-
     });
 
-  });
+    /* ========================================= EDIT EMAIL ========================================= */
+    byId("toggleEditEmailBtn").addEventListener("click", function() {
+      const box = byId("editEmailBox");
+      const isHidden = box.classList.contains("hidden");
+      box.classList.toggle("hidden", !isHidden);
+      if (isHidden) {
+        byId("inputEditEmail").value = "";
+      }
+    });
 
-}
-</script>
+    byId("cancelEmailBtn").addEventListener("click", function() {
+      byId("editEmailBox").classList.add("hidden");
+    });
 
+    byId("saveEmailBtn").addEventListener("click", async function() {
+      if (!supabaseClient || !currentUser) return;
+      const newEmail = byId("inputEditEmail").value.trim();
+
+      if (!newEmail || !newEmail.includes("@") || newEmail.length < 5) {
+        setProfileMessage("Masukkan format email yang valid.", "error");
+        return;
+      }
+
+      if (newEmail.toLowerCase() === (currentUser.email || "").toLowerCase()) {
+        setProfileMessage("Email baru sama dengan email saat ini.", "error");
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = "Mengirim...";
+      setProfileMessage("Mengirim permintaan pengubahan email...", "");
+
+      try {
+        const { error } = await supabaseClient.auth.updateUser({ email: newEmail });
+        if (error) { throw error; }
+
+        setProfileMessage("Tautan konfirmasi telah dikirim ke email baru. Silakan periksa kotak masuk untuk menyelesaikan konfirmasi. Email aktif kamu tetap email saat ini sampai konfirmasi berhasil.", "success");
+        byId("editEmailBox").classList.add("hidden");
+      } catch (error) {
+        console.error("Gagal mengubah email:", error);
+        setProfileMessage(error.message || "Pengubahan email gagal. Periksa format email atau coba lagi nanti.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Kirim konfirmasi";
+      }
+    });
+
+    /* ========================================= EDIT PASSWORD ========================================= */
+    byId("toggleEditPasswordBtn").addEventListener("click", function() {
+      const box = byId("editPasswordBox");
+      box.classList.toggle("hidden");
+      if (!box.classList.contains("hidden")) {
+        byId("inputCurrentPassword").value = "";
+        byId("inputNewPassword").value = "";
+        byId("inputConfirmPassword").value = "";
+      }
+    });
+
+    byId("cancelPasswordBtn").addEventListener("click", function() {
+      byId("editPasswordBox").classList.add("hidden");
+      byId("inputCurrentPassword").value = "";
+      byId("inputNewPassword").value = "";
+      byId("inputConfirmPassword").value = "";
+    });
+
+    byId("savePasswordBtn").addEventListener("click", async function() {
+      if (!supabaseClient || !currentUser) return;
+
+      const currentPassword = byId("inputCurrentPassword").value;
+      const newPassword = byId("inputNewPassword").value;
+      const confirmPassword = byId("inputConfirmPassword").value;
+
+      if (!currentPassword) {
+        setProfileMessage("Masukkan password saat ini untuk re-otentikasi.", "error");
+        return;
+      }
+      if (newPassword.length < 8) {
+        setProfileMessage("Password baru minimal 8 karakter.", "error");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setProfileMessage("Password baru dan konfirmasi password tidak cocok.", "error");
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = "Memverifikasi...";
+      setProfileMessage("Memverifikasi password saat ini...", "");
+
+      try {
+        /* Re-otentikasi password lama terlebih dahulu */
+        const { error: reauthError } = await supabaseClient.auth.signInWithPassword({
+          email: currentUser.email,
+          password: currentPassword
+        });
+
+        if (reauthError) {
+          setProfileMessage("Password saat ini tidak cocok. Periksa kembali password lama kamu.", "error");
+          this.disabled = false;
+          this.textContent = "Perbarui password";
+          return;
+        }
+
+        setProfileMessage("Memperbarui password baru...", "");
+
+        /* Perbarui password */
+        const { error: updateError } = await supabaseClient.auth.updateUser({ password: newPassword });
+        if (updateError) { throw updateError; }
+
+        setProfileMessage("Password berhasil diperbarui.", "success");
+
+        /* Bersihkan input password */
+        byId("inputCurrentPassword").value = "";
+        byId("inputNewPassword").value = "";
+        byId("inputConfirmPassword").value = "";
+        byId("editPasswordBox").classList.add("hidden");
+      } catch (error) {
+        console.error("Gagal memperbarui password:", error);
+        setProfileMessage(error.message || "Pembaruan password gagal. Coba lagi.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Perbarui password";
+      }
+    });
+
+    /* ========================================= TAMPILAN PENGGUNA TAMU ========================================= */
+    function showGuestState() {
+      currentUser = null;
+      currentRole = null;
+      currentProfile = null;
+      byId("headerAccountActions").innerHTML = `
+        <a class="account-login" href="login.html">Masuk</a>
+        <a class="account-register" href="register.html">Daftar</a>
+      `;
+      setText("welcomeTitle", "Selamat datang! 👋");
+      setText("welcomeDescription", "Jelajahi layanan dan produk AntarDesa tanpa harus masuk terlebih dahulu. Masuk atau daftar hanya saat menggunakan fitur yang membutuhkan akun.");
+      setHidden("guestLinks", false);
+      setHidden("accountPanel", true);
+      setHidden("profileGuestActions", false);
+      setHidden("profileAccountActions", true);
+      setText("profileDescription", "Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan dan katalog produk tanpa login.");
+      setProfileMessage("", "");
+      byId("profileAvatarImage").removeAttribute("src");
+      byId("profileAvatarImage").classList.add("hidden");
+      byId("profileAvatarFallback").classList.remove("hidden");
+      setText("profileAvatarFallback", "A");
+    }
+
+    /* ========================================= TAMPILAN PENGGUNA LOGIN ========================================= */
+    function showSignedInState(user) {
+      currentUser = user;
+      currentRole = null;
+      currentProfile = null;
+      byId("headerAccountActions").innerHTML = `
+        <a class="account-login" href="#profile" onclick="show('profile'); return false;">Akun saya</a>
+      `;
+      setText("welcomeTitle", "Selamat datang kembali! 👋");
+      setText("welcomeDescription", "Kamu sudah masuk ke AntarDesa. Jelajahi layanan dan produk dari dashboard utama.");
+      setHidden("guestLinks", true);
+      setHidden("accountPanel", false);
+      setHidden("profileGuestActions", true);
+      setHidden("profileAccountActions", false);
+      setText("accountEmail", user.email || "Akun AntarDesa");
+      setText("accountName", "Memuat profil...");
+      setText("profileFullName", "Memuat nama...");
+      setText("profileNameDetail", "Memuat...");
+      setText("profileEmail", user.email || "Akun AntarDesa");
+      setText("profileEmailDetail", user.email || "Akun AntarDesa");
+      const metadata = user.user_metadata || {};
+      setText("profilePhone", metadata.phone || user.phone || "Nomor HP belum tersedia");
+      setText("profileRole", "Memeriksa peran akun...");
+      setHidden("roleDashboardLink", true);
+      setHidden("profileDashboardLink", true);
+      setHidden("retryRoleButton", true);
+      setText("accountRoleLabel", "Akun terdeteksi");
+      setAccountMessage("Memeriksa peran akun...", false);
+      setProfileMessage("Memuat informasi profil...", "");
+      displayAvatar(metadata.full_name || "", null);
+    }
+
+    /* ========================================= PEMERIKSAAN ROLE DATABASE ========================================= */
+    async function loadUserRole() {
+      if (!supabaseClient || !currentUser) { return; }
+      const retryButton = byId("retryRoleButton");
+      retryButton.disabled = true;
+      retryButton.classList.add("hidden");
+      setAccountMessage("Sedang memeriksa hak akses akun...", false);
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("user_roles")
+          .select("role,is_verified")
+          .eq("user_id", currentUser.id)
+          .single();
+
+        if (error) { throw error; }
+        if (!data) { throw new Error("ROLE_NOT_FOUND"); }
+
+        currentRole = data;
+        const roleInfo = getRoleInfo(data.role, data.is_verified);
+        setText("accountRoleLabel", roleInfo.label);
+        setText("profileRole", roleInfo.label);
+
+        if (roleInfo.page) {
+          const topLink = byId("roleDashboardLink");
+          const profileLink = byId("profileDashboardLink");
+          topLink.href = roleInfo.page;
+          profileLink.href = roleInfo.page;
+          topLink.textContent = roleInfo.dashboard;
+          profileLink.textContent = roleInfo.dashboard;
+          topLink.classList.remove("hidden");
+          profileLink.classList.remove("hidden");
+          setAccountMessage(
+            data.role === "mitra" 
+              ? "Status Mitra terverifikasi. Kamu bisa menjelajahi katalog dan mengelola produk tokomu sendiri."
+              : "Status akun berhasil diperiksa. Kamu tetap berada di dashboard utama dan dapat menjelajahi katalog.", 
+            false
+          );
+        } else {
+          setAccountMessage("Akun terdeteksi, tetapi dashboard khusus belum tersedia karena status peran atau verifikasi belum memenuhi syarat. Kamu tetap dapat menjelajahi dashboard utama.", true);
+        }
+      } catch (error) {
+        console.error("Pemeriksaan peran gagal:", error);
+        setText("accountRoleLabel", "Status peran belum dapat diperiksa");
+        setText("profileRole", "Status peran belum dapat diperiksa");
+        setAccountMessage("Sesi akun tetap dipertahankan. Periksa koneksi internet, lalu tekan tombol coba periksa lagi.", true);
+        retryButton.classList.remove("hidden");
+      } finally {
+        retryButton.disabled = false;
+      }
+    }
+
+    /* ========================================= PEMULIHAN SESI ========================================= */
+    async function refreshSession() {
+      if (!supabaseClient) {
+        showGuestState();
+        setText("welcomeDescription", "Dashboard utama tetap dapat digunakan. Koneksi akun belum tersedia.");
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) { throw error; }
+        if (!data.session || !data.session.user) {
+          showGuestState();
+          return;
+        }
+        showSignedInState(data.session.user);
+        await Promise.all([loadUserRole(), loadUserProfile()]);
+      } catch (error) {
+        console.error("Pemulihan sesi gagal:", error);
+        showGuestState();
+        setText("welcomeDescription", "Dashboard utama tetap dapat digunakan. Status akun belum dapat diperiksa karena koneksi atau pemulihan sesi mengalami kendala. Silakan muat ulang halaman saat koneksi stabil.");
+      }
+    }
+
+    /* ========================================= LOGOUT MANUAL ========================================= */
+    async function logoutFromApp() {
+      if (!supabaseClient) { return; }
+      const buttons = [byId("logoutButton"), byId("profileLogoutButton")];
+      buttons.forEach(function(button) { button.disabled = true; });
+
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) { throw error; }
+        showGuestState();
+        show("home");
+      } catch (error) {
+        console.error("Logout gagal:", error);
+        setAccountMessage("Belum berhasil keluar. Periksa koneksi lalu coba lagi.", true);
+      } finally {
+        buttons.forEach(function(button) { button.disabled = false; });
+      }
+    }
+
+    /* EVENT AKUN */
+    byId("retryRoleButton").addEventListener("click", loadUserRole);
+    byId("logoutButton").addEventListener("click", logoutFromApp);
+    byId("profileLogoutButton").addEventListener("click", logoutFromApp);
+
+    /* ========================================= UTILITAS KATALOG ========================================= */
+    function formatPrice(value) {
+      const price = Number(value);
+      if (!Number.isFinite(price) || price < 0) { return "Harga belum tersedia"; }
+      return rupiahFormatter.format(price);
+    }
+
+    function safeImageUrl(value) {
+      if (!value || typeof value !== "string") { return ""; }
+      try {
+        const url = new URL(value);
+        if (url.protocol !== "https:" && url.protocol !== "http:") { return ""; }
+        return url.href;
+      } catch (error) { return ""; }
+    }
+
+    function createTextElement(tag, className, value) {
+      const element = document.createElement(tag);
+      if (className) { element.className = className; }
+      element.textContent = value === null || value === undefined ? "" : String(value);
+      return element;
+    }
+
+    /* ========================================= STATUS KATALOG ========================================= */
+    function setCatalogState(message, isError) {
+      const state = byId("catalogState");
+      const grid = byId("productGrid");
+      state.textContent = message;
+      state.classList.remove("hidden");
+      grid.classList.add("hidden");
+      byId("catalogCount").textContent = "";
+      state.style.color = isError ? "#b42318" : "#61746b";
+    }
+
+    /* ========================================= KARTU PRODUK ========================================= */
+    function createProductCard(product) {
+      const card = document.createElement("article");
+      card.className = "product-card";
+
+      const imageContainer = document.createElement("div");
+      imageContainer.className = "product-image";
+      const imageUrl = safeImageUrl(product.image_url);
+
+      if (imageUrl) {
+        const image = document.createElement("img");
+        image.src = imageUrl;
+        image.alt = product.name || "Foto produk";
+        image.loading = "lazy";
+        image.referrerPolicy = "no-referrer";
+        image.addEventListener("error", function() {
+          image.remove();
+          imageContainer.append(createTextElement("span", "product-placeholder", "📦"));
+        }, { once: true });
+        imageContainer.append(image);
+      } else {
+        imageContainer.append(createTextElement("span", "product-placeholder", "📦"));
+      }
+
+      const content = document.createElement("div");
+      content.className = "product-content";
+      const category = createTextElement("span", "product-category", product.category || "Produk Desa");
+      const name = createTextElement("h3", "product-name", product.name);
+      const price = createTextElement("div", "product-price", formatPrice(product.price));
+      const stockValue = Number(product.stock);
+      const stockText = Number.isFinite(stockValue) && stockValue > 0 ? "Stok tersedia: " + stockValue : "Stok habis";
+      const stock = createTextElement("div", "product-stock", stockText);
+      const description = createTextElement("div", "product-description", product.description || "Belum ada deskripsi produk.");
+
+      content.append(category, name, price, stock, description);
+      card.append(imageContainer, content);
+      return card;
+    }
+
+    /* ========================================= RENDER KATALOG ========================================= */
+    function renderProductCatalog() {
+      const searchInput = byId("productSearch");
+      const categorySelect = byId("productCategory");
+      const grid = byId("productGrid");
+      const state = byId("catalogState");
+      const count = byId("catalogCount");
+
+      const keyword = searchInput.value.trim().toLowerCase();
+      const selectedCategory = categorySelect.value;
+
+      const filteredProducts = publicProducts.filter(function(product) {
+        const searchableText = [product.name, product.description, product.category].join(" ").toLowerCase();
+        const matchesKeyword = searchableText.includes(keyword);
+        const matchesCategory = !selectedCategory || product.category === selectedCategory;
+        return matchesKeyword && matchesCategory;
+      });
+
+      grid.replaceChildren();
+      state.classList.add("hidden");
+
+      if (filteredProducts.length === 0) {
+        grid.classList.add("hidden");
+        state.textContent = publicProducts.length === 0 ? "Belum ada produk aktif dari Mitra AntarDesa." : "Produk yang kamu cari belum ditemukan. Coba kata kunci atau kategori lain.";
+        state.style.color = "#61746b";
+        state.classList.remove("hidden");
+        count.textContent = "Tidak ada produk yang cocok.";
+        return;
+      }
+
+      filteredProducts.forEach(function(product) {
+        grid.append(createProductCard(product));
+      });
+
+      grid.classList.remove("hidden");
+      count.textContent = "Menampilkan " + filteredProducts.length + " dari " + publicProducts.length + " produk aktif.";
+    }
+
+    /* ========================================= FILTER KATEGORI ========================================= */
+    function populateProductCategories() {
+      const select = byId("productCategory");
+      const previousValue = select.value;
+      const categories = Array.from(new Set(
+        publicProducts.map(function(product) { return String(product.category || "").trim(); }).filter(Boolean)
+      )).sort(function(a, b) { return a.localeCompare(b, "id"); });
+
+      select.replaceChildren();
+      const allOption = document.createElement("option");
+      allOption.value = "";
+      allOption.textContent = "Semua kategori";
+      select.append(allOption);
+
+      categories.forEach(function(category) {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        select.append(option);
+      });
+
+      if (categories.includes(previousValue)) {
+        select.value = previousValue;
+      }
+    }
+
+    /* ========================================= MEMUAT PRODUK PUBLIK ========================================= */
+    async function loadPublicProducts() {
+      const refreshButton = byId("refreshCatalogButton");
+      refreshButton.disabled = true;
+      refreshButton.textContent = "Memuat...";
+      setCatalogState("Sedang mengambil produk aktif dari seluruh Mitra AntarDesa...", false);
+
+      try {
+        if (!supabaseClient) { throw new Error("SUPABASE_NOT_AVAILABLE"); }
+        const { data, error } = await supabaseClient
+          .from("products")
+          .select("id,name,description,category,price,stock,image_url,created_at")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(PRODUCT_LIMIT);
+
+        if (error) { throw error; }
+
+        publicProducts = Array.isArray(data) ? data : [];
+        populateProductCategories();
+        renderProductCatalog();
+      } catch (error) {
+        console.error("Gagal memuat katalog produk:", error);
+        publicProducts = [];
+        setCatalogState("Katalog belum dapat dimuat. Periksa koneksi internet atau akses Data API Supabase, lalu tekan Muat ulang.", true);
+      } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = "Muat ulang";
+      }
+    }
+
+    /* EVENT KATALOG */
+    byId("productSearch").addEventListener("input", renderProductCatalog);
+    byId("productCategory").addEventListener("change", renderProductCatalog);
+    byId("refreshCatalogButton").addEventListener("click", loadPublicProducts);
+
+    /* ========================================= FORM SIMULASI LAYANAN ========================================= */
+    byId("orderform").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const value = function(id) { return byId(id).value.trim(); };
+      const fields = ["name", "pickup", "destination", "detail"];
+
+      if (!fields.every(function(id) { return value(id).length > 0; })) { return; }
+
+      simulatedOrders.unshift({
+        service: selectedService,
+        name: value("name"),
+        pickup: value("pickup"),
+        destination: value("destination"),
+        detail: value("detail")
+      });
+
+      const list = byId("orderlist");
+      list.replaceChildren();
+
+      simulatedOrders.forEach(function(order, index) {
+        const card = document.createElement("div");
+        card.className = "order";
+        [
+          (index + 1) + ". " + order.service,
+          "Pemesan: " + order.name,
+          "Dari: " + order.pickup,
+          "Ke: " + order.destination,
+          "Detail: " + order.detail,
+          "Status: Simulasi lokal, tidak dikirim"
+        ].forEach(function(line, lineIndex) {
+          const element = document.createElement(lineIndex === 0 ? "strong" : "div");
+          element.textContent = line;
+          card.append(element);
+        });
+        list.append(card);
+      });
+
+      this.reset();
+      show("orders");
+    });
+
+    /* ========================================= PESAN KOSONG RIWAYAT SIMULASI ========================================= */
+    function renderEmptyOrders() {
+      const list = byId("orderlist");
+      if (window.AntarDesaUI && typeof window.AntarDesaUI.showMessage === "function") {
+        window.AntarDesaUI.showMessage(list, "UI-03");
+      } else {
+        list.textContent = "Belum ada simulasi layanan.";
+      }
+    }
+
+    /* ========================================= INISIALISASI UTAMA ========================================= */
+    document.addEventListener("DOMContentLoaded", function() {
+      renderEmptyOrders();
+      loadAppSettings();
+      restoreLastTab();
+
+      if (window.supabase && window.supabase.createClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storage: window.localStorage
+          }
+        });
+
+        loadPublicProducts();
+        refreshSession();
+
+        supabaseClient.auth.onAuthStateChange(function(event, session) {
+          if (event === "SIGNED_OUT") {
+            showGuestState();
+            return;
+          }
+          if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED")) {
+            showSignedInState(session.user);
+            window.setTimeout(function() {
+              if (currentUser && currentUser.id === session.user.id) {
+                Promise.all([loadUserRole(), loadUserProfile()]);
+              }
+            }, 0);
+          }
+        });
+      } else {
+        showGuestState();
+        setCatalogState("Katalog belum dapat dimuat karena Supabase SDK gagal dimuat.", true);
+        setText("welcomeDescription", "Dashboard utama tetap dapat digunakan. Layanan pemeriksaan akun belum tersedia karena Supabase SDK gagal dimuat.");
+      }
+    });
+
+    /* ========================================= SERVICE WORKER ========================================= */
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("./service-worker.js", { scope: "./" }).catch(function(error) {
+          console.error("Service Worker gagal:", error);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
