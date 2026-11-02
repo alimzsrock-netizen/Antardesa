@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#16805d">
 
 <title>Masuk | AntarDesa</title>
 
@@ -103,11 +103,13 @@ a {
   <div class="auth-card">
 
     <h2>Selamat Datang 👋</h2>
+
     <p>Masuk ke akun AntarDesa</p>
 
     <form id="loginForm">
 
       <label for="email">Email</label>
+
       <input
         type="email"
         id="email"
@@ -117,6 +119,7 @@ a {
       >
 
       <label for="password">Password</label>
+
       <input
         type="password"
         id="password"
@@ -131,7 +134,11 @@ a {
 
     </form>
 
-    <p id="message" role="status" aria-live="polite"></p>
+    <p
+      id="message"
+      role="status"
+      aria-live="polite"
+    ></p>
 
     <p class="note">
       Belum punya akun?
@@ -143,24 +150,23 @@ a {
     </p>
 
     <p class="note" style="color:#777">
-      AntarDesa v0.2.0
+      AntarDesa v0.3.0-RC
     </p>
 
   </div>
 
 </main>
 
-<!-- Supabase JavaScript SDK -->
+<!-- SUPABASE SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
 "use strict";
 
-/*
-  Konfigurasi Supabase AntarDesa.
-  Hanya gunakan publishable key.
-  Jangan memasukkan secret key.
-*/
+
+/* =========================================
+   KONFIGURASI SUPABASE
+========================================= */
 
 const SUPABASE_URL =
   "https://gswlkajcizcvrhcfabtg.supabase.co";
@@ -168,186 +174,219 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
 
-const message = document.getElementById("message");
-const loginButton = document.getElementById("loginButton");
-const loginForm = document.getElementById("loginForm");
 
-function showMessage(text, isError = false) {
+/* =========================================
+   ELEMEN HALAMAN
+========================================= */
+
+const message =
+  document.getElementById("message");
+
+const loginButton =
+  document.getElementById("loginButton");
+
+const loginForm =
+  document.getElementById("loginForm");
+
+
+/* =========================================
+   PESAN STATUS
+========================================= */
+
+function showMessage(text, isError) {
+
   message.textContent = text;
-  message.style.color = isError ? "#b42318" : "#16805d";
+
+  message.style.color =
+    isError ? "#b42318" : "#16805d";
+
 }
 
-const isConfigured =
-  SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_");
+
+/* =========================================
+   INISIALISASI SUPABASE
+========================================= */
 
 let supabaseClient = null;
 
-if (isConfigured && window.supabase) {
+if (
+  window.supabase &&
+  window.supabase.createClient
+) {
+
   supabaseClient = window.supabase.createClient(
+
     SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
+
+    SUPABASE_PUBLISHABLE_KEY,
+
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage
+      }
+    }
+
   );
+
 } else {
+
   loginButton.disabled = true;
+
   showMessage(
-    "Koneksi Supabase belum siap. Periksa konfigurasi aplikasi.",
+    "Koneksi Supabase belum siap. Periksa koneksi internet.",
     true
   );
+
 }
 
-/*
-  Menentukan tujuan berdasarkan peran resmi
-  dari database, bukan metadata registrasi.
-*/
 
-async function getRedirectPage(userId) {
+/* =========================================
+   PROSES LOGIN
+========================================= */
 
-  const { data: userRole, error } =
-    await supabaseClient
-      .from("user_roles")
-      .select("role,is_verified")
-      .eq("user_id", userId)
-      .single();
+loginForm.addEventListener(
+  "submit",
+  async function(event) {
 
-  if (error || !userRole) {
-    throw new Error("ROLE_NOT_FOUND");
-  }
+    event.preventDefault();
 
-  if (userRole.role === "pelanggan") {
-    return "pelanggan.html";
-  }
+    if (!supabaseClient) {
 
-  if (
-    userRole.role === "mitra" &&
-    userRole.is_verified === true
-  ) {
-    return "mitra.html";
-  }
+      showMessage(
+        "Koneksi Supabase belum tersedia.",
+        true
+      );
 
-  if (
-    userRole.role === "kurir" &&
-    userRole.is_verified === true
-  ) {
-    return "kurir.html";
-  }
+      return;
 
-  throw new Error("ROLE_NOT_ALLOWED");
-}
-
-loginForm.addEventListener("submit", async function(event) {
-
-  event.preventDefault();
-
-  if (!supabaseClient) {
-    showMessage("Koneksi Supabase belum tersedia.", true);
-    return;
-  }
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  loginButton.disabled = true;
-  loginButton.textContent = "Memproses...";
-
-  showMessage("Sedang memeriksa akun...");
-
-  let redirecting = false;
-
-  try {
-
-    const { data, error } =
-      await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-    if (error) {
-      throw error;
     }
 
-    if (!data.session || !data.user) {
-      throw new Error("SESSION_NOT_FOUND");
-    }
+    const email =
+      document.getElementById("email").value.trim();
 
-    showMessage("Login berhasil. Memeriksa hak akses...");
+    const password =
+      document.getElementById("password").value;
 
-    let destination;
+    loginButton.disabled = true;
+
+    loginButton.textContent =
+      "Memproses...";
+
+    showMessage(
+      "Sedang memeriksa akun...",
+      false
+    );
+
+    let redirecting = false;
 
     try {
-      destination = await getRedirectPage(data.user.id);
 
-    } catch (roleError) {
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
 
-      // Jangan mempertahankan sesi jika pemeriksaan
-      // hak akses tidak berhasil.
-      await supabaseClient.auth.signOut();
+          email: email,
+          password: password
 
-      throw roleError;
-    }
+        });
 
-    showMessage("Hak akses terverifikasi. Mengalihkan halaman...");
+      if (error) {
+        throw error;
+      }
 
-    redirecting = true;
+      if (!data.session || !data.user) {
 
-    window.location.replace(destination);
+        throw new Error("SESSION_NOT_FOUND");
 
-  } catch (error) {
+      }
 
-    console.error("Login gagal:", error.message);
+      /*
+        LOGIN BERHASIL.
 
-    const errorText =
-      String(error.message || "").toLowerCase();
+        Jangan langsung memeriksa user_roles di sini.
+        Jangan menjalankan signOut karena pemeriksaan
+        peran belum dilakukan.
 
-    if (error.message === "ROLE_NOT_FOUND") {
-
-      showMessage(
-        "Peran akun belum ditemukan. Hubungi pengelola AntarDesa.",
-        true
-      );
-
-    } else if (error.message === "ROLE_NOT_ALLOWED") {
+        Dashboard utama akan memeriksa peran pengguna.
+      */
 
       showMessage(
-        "Hak akses akun belum valid. Hubungi pengelola AntarDesa.",
-        true
+        "Login berhasil. Membuka dashboard utama...",
+        false
       );
 
-    } else if (errorText.includes("invalid login credentials")) {
+      redirecting = true;
 
-      showMessage(
-        "Email atau password salah, atau akun belum tersedia.",
-        true
+      window.location.replace("index.html");
+
+    } catch (error) {
+
+      console.error(
+        "Login gagal:",
+        error
       );
 
-    } else if (errorText.includes("email not confirmed")) {
+      const errorText =
+        String(error.message || "").toLowerCase();
 
-      showMessage(
-        "Silakan konfirmasi alamat email melalui pesan dari Supabase.",
-        true
-      );
+      if (
+        errorText.includes(
+          "invalid login credentials"
+        )
+      ) {
 
-    } else {
+        showMessage(
+          "Email atau password salah, atau akun belum tersedia.",
+          true
+        );
 
-      showMessage(
-        "Login belum berhasil. Periksa koneksi internet atau coba lagi.",
-        true
-      );
+      } else if (
+        errorText.includes(
+          "email not confirmed"
+        )
+      ) {
 
-    }
+        showMessage(
+          "Silakan konfirmasi alamat email melalui pesan dari Supabase.",
+          true
+        );
 
-  } finally {
+      } else if (
+        error.message === "SESSION_NOT_FOUND"
+      ) {
 
-    if (!redirecting) {
-      loginButton.disabled = false;
-      loginButton.textContent = "Masuk";
+        showMessage(
+          "Login belum menghasilkan sesi. Silakan coba lagi.",
+          true
+        );
+
+      } else {
+
+        showMessage(
+          "Login belum berhasil. Periksa koneksi internet atau coba lagi.",
+          true
+        );
+
+      }
+
+    } finally {
+
+      if (!redirecting) {
+
+        loginButton.disabled = false;
+
+        loginButton.textContent =
+          "Masuk";
+
+      }
+
     }
 
   }
+);
 
-});
 </script>
 
 </body>
