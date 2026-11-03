@@ -1012,8 +1012,11 @@
       show("formpage");
     }
 
-    /* ========================================= PEMETAAN ROLE ========================================= */
+    /* ========================================= PEMETAAN ROLE (TERMASUK ADMIN) ========================================= */
     function getRoleInfo(role, verified) {
+      if (role === "admin") {
+        return { label: "Admin AntarDesa 👑", page: "admin.html", dashboard: "Panel Admin Verifikasi" };
+      }
       if (role === "pelanggan") {
         return { label: "Pelanggan", page: "pelanggan.html", dashboard: "Dashboard Pelanggan" };
       }
@@ -1980,9 +1983,11 @@
           topLink.classList.remove("hidden");
           profileLink.classList.remove("hidden");
           setAccountMessage(
-            data.role === "mitra" 
-              ? "Status Mitra terverifikasi. Kamu bisa menjelajahi katalog dan mengelola produk tokomu sendiri."
-              : "Status akun berhasil diperiksa. Kamu tetap berada di dashboard utama dan dapat menjelajahi katalog.", 
+            data.role === "admin"
+              ? "Status Admin terdeteksi. Kamu dapat mengakses Panel Admin Verifikasi."
+              : data.role === "mitra" 
+                ? "Status Mitra terverifikasi. Kamu bisa menjelajahi katalog dan mengelola produk tokomu sendiri."
+                : "Status akun berhasil diperiksa. Kamu tetap berada di dashboard utama dan dapat menjelajahi katalog.", 
             false
           );
         } else {
@@ -2109,7 +2114,6 @@
       setText("modalProductStock", Number.isFinite(stockValue) && stockValue > 0 ? "Stok tersedia: " + stockValue + " unit" : "Stok saat ini habis");
       setText("modalProductDesc", product.description || "Belum ada deskripsi lengkap untuk produk ini.");
 
-      // Seller Info
       setText("modalSellerName", product.seller_name || product.store_name || "Mitra AntarDesa");
       setText("modalSellerLocation", product.seller_location || "Wilayah Operasional AntarDesa");
 
@@ -2125,12 +2129,12 @@
       }
 
       modal.classList.remove("hidden");
-      document.body.style.overflow = "hidden"; // Kunci scroll background
+      document.body.style.overflow = "hidden";
     }
 
     function closeProductDetailModal() {
       byId("productDetailModal").classList.add("hidden");
-      document.body.style.overflow = ""; // Pulihkan scroll
+      document.body.style.overflow = "";
     }
 
     byId("btnCloseModal").addEventListener("click", closeProductDetailModal);
@@ -2176,7 +2180,6 @@
       content.append(category, name, price, stock);
       card.append(imageContainer, content);
 
-      // KLIK KARTU -> BUKA DETAIL MODAL
       card.addEventListener("click", function() {
         openProductDetailModal(product);
       });
@@ -2248,7 +2251,7 @@
       }
     }
 
-    /* ========================================= MEMUAT PRODUK PUBLIK (DENGAN TIMEOUT 4 DETIK) ========================================= */
+    /* ========================================= MEMUAT PRODUK PUBLIK ========================================= */
     async function loadPublicProducts() {
       const refreshButton = byId("refreshCatalogButton");
       refreshButton.disabled = true;
