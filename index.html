@@ -177,11 +177,24 @@
       font: inherit; 
       font-size: 0.8em; 
       color: var(--muted-color); 
-      min-width: 72px; 
+      min-width: 60px; 
       padding: 4px; 
       cursor: pointer;
+      position: relative;
     }
     nav button.active { color: var(--accent-color); font-weight: bold; }
+
+    .nav-badge {
+      position: absolute;
+      top: 2px;
+      right: 12px;
+      background: #b42318;
+      color: white;
+      font-size: 0.65em;
+      font-weight: bold;
+      padding: 1px 5px;
+      border-radius: 10px;
+    }
 
     .order { 
       padding: 12px; 
@@ -238,7 +251,7 @@
     .catalog-refresh { width: auto; min-width: 86px; padding: 9px 12px; font-size: 0.8em; }
     .catalog-footer { margin-top: 13px; font-size: 0.75em; line-height: 1.5; color: var(--muted-color); }
 
-    /* MODAL DETAIL PRODUK (MODUL K1) */
+    /* MODAL DETAIL PRODUK (MODUL K1 & T1) */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -291,24 +304,63 @@
     }
     .modal-product-img {
       width: 100%;
-      max-height: 260px;
+      max-height: 220px;
       object-fit: cover;
       border-radius: 12px;
       background: var(--card-sub-bg);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .modal-seller-box {
       background: var(--card-sub-bg);
       border: 1px solid var(--panel-border);
       border-radius: 10px;
       padding: 10px 12px;
-      margin: 12px 0;
+      margin: 10px 0;
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    /* PROFIL & ALAMAT STYLES (MODUL L2 UPDATED) */
+    /* KONTROL KUANTITAS (MODUL T1) */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+      background: var(--card-sub-bg);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+    }
+    .qty-btn {
+      background: var(--panel-bg);
+      color: var(--text-color);
+      border: 1px solid var(--input-border);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+    .qty-value { font-weight: bold; font-size: 1.05em; min-width: 24px; text-align: center; }
+
+    /* KERANJANG ITEM STYLES (MODUL T1) */
+    .cart-item-card {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-title { font-weight: bold; font-size: 0.9em; margin-bottom: 3px; overflow-wrap: anywhere; }
+    .cart-item-price { color: var(--accent-color); font-weight: bold; font-size: 0.85em; }
+
+    /* PROFIL & ALAMAT STYLES */
     .profile-card { border: 1px solid var(--panel-border); background: var(--card-sub-bg); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
     .profile-avatar { width: 86px; height: 86px; min-width: 86px; border-radius: 50%; background: var(--panel-bg); border: 2px solid var(--panel-border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 30px; font-weight: bold; }
@@ -378,7 +430,6 @@
       font-weight: bold;
     }
 
-    /* GPS BADGE & BOX (MODUL L2) */
     .gps-box {
       background: var(--card-sub-bg);
       border: 1px dashed var(--accent-color);
@@ -461,7 +512,7 @@
           <div class="account-actions-main">
             <a id="roleDashboardLink" class="primary hidden" href="#">Buka Dashboard</a>
             <button id="retryRoleButton" class="secondary hidden" type="button">Coba periksa peran lagi</button>
-            <button id="logoutButton" class="secondary" type="button">Keluar dari akun</button>
+            <button id="logoutButton" class="secondary" type="button">Keluar dari akaun</button>
           </div>
           <p id="accountMessage" class="account-message" role="status" aria-live="polite">Memeriksa status akun...</p>
         </div>
@@ -525,7 +576,7 @@
       </div>
     </section>
 
-    <!-- MODAL DETAIL PRODUK (MODUL K1) -->
+    <!-- MODAL DETAIL PRODUK (MODUL K1 & T1) -->
     <div id="productDetailModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalProductName">
       <div class="modal-card">
         <div class="modal-header">
@@ -540,7 +591,7 @@
 
         <h3 id="modalProductName" style="margin:0 0 6px; font-size:1.2em;">Nama Produk</h3>
         <div id="modalProductPrice" class="product-price" style="font-size:1.2em; margin-bottom:4px;">Rp0</div>
-        <div id="modalProductStock" class="product-stock" style="margin-bottom:12px;">Stok tersedia: 0</div>
+        <div id="modalProductStock" class="product-stock" style="margin-bottom:8px;">Stok tersedia: 0</div>
 
         <!-- INFO SELLER / MITRA -->
         <div class="modal-seller-box">
@@ -551,16 +602,70 @@
           </div>
         </div>
 
-        <label style="margin-top:12px; margin-bottom:4px;">Deskripsi Produk:</label>
-        <div id="modalProductDesc" class="muted" style="font-size:0.85em; line-height:1.6; white-space:pre-line; margin-bottom:18px;">
+        <label style="margin-top:10px; margin-bottom:2px;">Deskripsi Produk:</label>
+        <div id="modalProductDesc" class="muted" style="font-size:0.85em; line-height:1.5; white-space:pre-line; margin-bottom:12px;">
           Belum ada deskripsi.
         </div>
 
-        <button class="primary" type="button" onclick="alert('Fitur pemesanan dan checkout saat ini masih dikunci (simulasi).')">
-          🛒 Pesan via Titip Belanja
+        <!-- KUANTITAS PEMBELIAN (MODUL T1) -->
+        <label style="margin-top:0; margin-bottom:2px;">Jumlah Unit:</label>
+        <div class="qty-control">
+          <button id="btnQtyMinus" class="qty-btn" type="button">-</button>
+          <span id="modalProductQty" class="qty-value">1</span>
+          <button id="btnQtyPlus" class="qty-btn" type="button">+</button>
+        </div>
+
+        <button id="btnAddToCart" class="primary" type="button" style="margin-top:10px;">
+          🛒 Masukkan ke Keranjang Belanja
         </button>
       </div>
     </div>
+
+    <!-- HALAMAN KERANJANG BELANJA (MODUL T1) -->
+    <section id="cart" class="page hidden">
+      <div class="panel">
+        <h2>Keranjang Belanja 🛒</h2>
+        <p class="muted">
+          Periksa kembali rincian produk dan alamat pengantaran sebelum melanjutkan pesanan.
+        </p>
+
+        <!-- ALAMAT PENGANTARAN UTAMA -->
+        <div class="card-sub" style="background:var(--card-sub-bg); border:1px solid var(--panel-border); border-radius:12px; padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="font-size:0.9em;">📍 Alamat Pengantaran Utama:</strong>
+            <a href="#profile" onclick="show('profile'); return false;" style="font-size:0.8em; color:var(--accent-color); font-weight:bold; text-decoration:underline;">Ubah Alamat</a>
+          </div>
+          <div id="cartPrimaryAddress" class="muted" style="font-size:0.85em; line-height:1.4;">
+            Memuat alamat utama...
+          </div>
+        </div>
+
+        <!-- DAFTAR ITEM KERANJANG -->
+        <div id="cartItemList">
+          <p class="muted" style="text-align:center; padding:20px;">Keranjang belanja masih kosong.</p>
+        </div>
+
+        <!-- RINGKASAN PEMBAYARAN -->
+        <div id="cartSummaryBox" class="hidden" style="margin-top:14px; border-top:1px solid var(--panel-border); padding-top:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.9em; margin-bottom:6px;">
+            <span>Subtotal Produk:</span>
+            <strong id="cartSubtotalText">Rp0</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9em; margin-bottom:10px;">
+            <span>Estimasi Ongkir:</span>
+            <strong id="cartShippingText">Rp5.000</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:1.1em; font-weight:bold; color:var(--accent-color); margin-bottom:14px;">
+            <span>Total Pembayaran:</span>
+            <span id="cartTotalText">Rp0</span>
+          </div>
+
+          <button id="btnCheckout" class="primary" type="button">
+            🚀 Lanjutkan ke Checkout Pesanan
+          </button>
+        </div>
+      </div>
+    </section>
 
     <!-- HALAMAN FORM SIMULASI -->
     <section id="formpage" class="page hidden">
@@ -872,13 +977,17 @@
 
   </main>
 
-  <!-- NAVIGASI BAWAH -->
+  <!-- NAVIGASI BAWAH (DITAMBAH TOMBOL KERANJANG - MODUL T1) -->
   <nav aria-label="Navigasi Utama">
     <button id="navhome" class="active" type="button" onclick="show('home')">
       <span>⌂</span><br>Beranda
     </button>
     <button id="navservices" type="button" onclick="show('services')">
       <span>▤</span><br>Simulasi
+    </button>
+    <button id="navcart" type="button" onclick="show('cart')">
+      <span>🛒</span><br>Keranjang
+      <span id="cartBadge" class="nav-badge hidden">0</span>
     </button>
     <button id="navprofile" type="button" onclick="show('profile')">
       <span>♙</span><br>Akun
@@ -906,10 +1015,15 @@
     let currentVerificationRequest = null;
     let currentUserAddresses = [];
     let editingAddressId = null;
-    let currentTempCoords = null; // MODUL L2: Menyimpan { lat, lng } sementara
+    let currentTempCoords = null;
     let selectedService = "";
     let targetVerificationRole = "mitra";
     const simulatedOrders = [];
+
+    /* ========================================= STATE KERANJANG (MODUL T1) ========================================= */
+    let cartItems = []; // Array objek: { product, quantity }
+    let activeModalProduct = null;
+    let currentModalQty = 1;
 
     /* ========================================= DATA KATALOG ========================================= */
     let publicProducts = [];
@@ -952,19 +1066,23 @@
       });
       window.scrollTo(0, 0);
 
-      if (["home", "services", "profile"].includes(pageId)) {
+      if (["home", "services", "cart", "profile"].includes(pageId)) {
         try {
           localStorage.setItem("antardesa_last_tab", pageId);
         } catch(e) {
           console.warn("Gagal menyimpan tab terakhir:", e);
         }
       }
+
+      if (pageId === "cart") {
+        renderCartPage();
+      }
     }
 
     function restoreLastTab() {
       try {
         const lastTab = localStorage.getItem("antardesa_last_tab");
-        if (lastTab && ["home", "services", "profile"].includes(lastTab)) {
+        if (lastTab && ["home", "services", "cart", "profile"].includes(lastTab)) {
           show(lastTab);
         } else {
           show("home");
@@ -1578,7 +1696,6 @@
           body.append(note);
         }
 
-        // TAMPILAN GPS MODUL L2
         if (addr.latitude && addr.longitude) {
           const gpsRow = document.createElement("div");
           gpsRow.style.cssText = "margin-top:6px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;";
@@ -1652,7 +1769,6 @@
       byId("addrNote").value = addr ? (addr.area_note || "") : "";
       byId("addrIsPrimary").checked = addr ? addr.is_primary : (currentUserAddresses.length === 0);
 
-      // GPS Form Display Reset
       const coordsText = byId("gpsCoordsText");
       const gpsStatus = byId("gpsStatus");
       if (currentTempCoords) {
@@ -1668,7 +1784,6 @@
       setAddressMessage("", "");
     }
 
-    /* MODUL L2: AMBIL LOKASI GPS PERANGKAT HP */
     byId("btnGetGPS").addEventListener("click", function() {
       const btn = this;
       const status = byId("gpsStatus");
@@ -2223,8 +2338,11 @@
       state.style.color = isError ? "#b42318" : "#61746b";
     }
 
-    /* ========================================= MODUL K1: MODAL DETAIL PRODUK ========================================= */
+    /* ========================================= MODUL K1 & T1: MODAL DETAIL PRODUK & KERANJANG ========================================= */
     function openProductDetailModal(product) {
+      activeModalProduct = product;
+      currentModalQty = 1;
+
       const modal = byId("productDetailModal");
       const img = byId("modalProductImg");
       const imgPlaceholder = byId("modalProductImgPlaceholder");
@@ -2239,6 +2357,7 @@
 
       setText("modalSellerName", product.seller_name || product.store_name || "Mitra AntarDesa");
       setText("modalSellerLocation", product.seller_location || "Wilayah Operasional AntarDesa");
+      setText("modalProductQty", currentModalQty);
 
       const imageUrl = safeImageUrl(product.image_url);
       if (imageUrl) {
@@ -2258,6 +2377,7 @@
     function closeProductDetailModal() {
       byId("productDetailModal").classList.add("hidden");
       document.body.style.overflow = "";
+      activeModalProduct = null;
     }
 
     byId("btnCloseModal").addEventListener("click", closeProductDetailModal);
@@ -2265,6 +2385,174 @@
       if (event.target === this) {
         closeProductDetailModal();
       }
+    });
+
+    /* KONTROL KUANTITAS DI MODAL */
+    byId("btnQtyMinus").addEventListener("click", function() {
+      if (currentModalQty > 1) {
+        currentModalQty--;
+        setText("modalProductQty", currentModalQty);
+      }
+    });
+
+    byId("btnQtyPlus").addEventListener("click", function() {
+      if (activeModalProduct) {
+        const maxStock = Number(activeModalProduct.stock) || 999;
+        if (currentModalQty < maxStock) {
+          currentModalQty++;
+          setText("modalProductQty", currentModalQty);
+        }
+      }
+    });
+
+    /* TAMBAH KE KERANJANG */
+    byId("btnAddToCart").addEventListener("click", function() {
+      if (!activeModalProduct) return;
+
+      const existingIndex = cartItems.findIndex(item => item.product.id === activeModalProduct.id);
+      if (existingIndex > -1) {
+        cartItems[existingIndex].quantity += currentModalQty;
+      } else {
+        cartItems.push({ product: activeModalProduct, quantity: currentModalQty });
+      }
+
+      updateCartBadge();
+      closeProductDetailModal();
+      alert("Produk berhasil ditambahkan ke keranjang belanja!");
+    });
+
+    function updateCartBadge() {
+      const badge = byId("cartBadge");
+      const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      if (totalCount > 0) {
+        badge.textContent = totalCount;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+    }
+
+    /* RENDER HALAMAN KERANJANG (MODUL T1) */
+    function renderCartPage() {
+      const listContainer = byId("cartItemList");
+      const summaryBox = byId("cartSummaryBox");
+      const addrContainer = byId("cartPrimaryAddress");
+
+      // 1. Tampilkan Alamat Utama
+      const primaryAddr = currentUserAddresses.find(a => a.is_primary) || currentUserAddresses[0];
+      if (primaryAddr) {
+        addrContainer.innerHTML = `<strong>${primaryAddr.label} - ${primaryAddr.recipient_name} (${primaryAddr.phone_number})</strong><br>${primaryAddr.full_address}` + (primaryAddr.latitude ? `<br><span style="color:var(--accent-color);">📍 GPS Terkunci</span>` : ``);
+      } else {
+        addrContainer.innerHTML = `<span style="color:#b42318;">Belum ada alamat tersimpan. Silakan atur alamat di menu Akun.</span>`;
+      }
+
+      // 2. Render Item Keranjang
+      listContainer.replaceChildren();
+
+      if (cartItems.length === 0) {
+        listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:24px;">Keranjang belanja Anda masih kosong. Silakan pilih produk dari katalog Pasar Desa.</p>';
+        summaryBox.classList.add("hidden");
+        return;
+      }
+
+      let subtotal = 0;
+
+      cartItems.forEach(function(cartItem, index) {
+        const prod = cartItem.product;
+        const itemTotal = prod.price * cartItem.quantity;
+        subtotal += itemTotal;
+
+        const card = document.createElement("div");
+        card.className = "cart-item-card";
+
+        const info = document.createElement("div");
+        info.className = "cart-item-info";
+
+        const title = document.createElement("div");
+        title.className = "cart-item-title";
+        title.textContent = prod.name;
+
+        const price = document.createElement("div");
+        price.className = "cart-item-price";
+        price.textContent = formatPrice(prod.price) + " x " + cartItem.quantity + " = " + formatPrice(itemTotal);
+
+        info.append(title, price);
+
+        // Aksi Qty & Hapus
+        const actions = document.createElement("div");
+        actions.style.cssText = "display:flex; align-items:center; gap:6px;";
+
+        const btnMinus = document.createElement("button");
+        btnMinus.className = "secondary";
+        btnMinus.style.cssText = "width:28px; height:28px; padding:0; font-size:0.9em;";
+        btnMinus.textContent = "-";
+        btnMinus.addEventListener("click", function() {
+          if (cartItem.quantity > 1) {
+            cartItem.quantity--;
+          } else {
+            cartItems.splice(index, 1);
+          }
+          updateCartBadge();
+          renderCartPage();
+        });
+
+        const qtySpan = document.createElement("span");
+        qtySpan.style.cssText = "font-weight:bold; font-size:0.9em; min-width:20px; text-align:center;";
+        qtySpan.textContent = cartItem.quantity;
+
+        const btnPlus = document.createElement("button");
+        btnPlus.className = "secondary";
+        btnPlus.style.cssText = "width:28px; height:28px; padding:0; font-size:0.9em;";
+        btnPlus.textContent = "+";
+        btnPlus.addEventListener("click", function() {
+          if (cartItem.quantity < (prod.stock || 99)) {
+            cartItem.quantity++;
+            updateCartBadge();
+            renderCartPage();
+          } else {
+            alert("Stok produk tidak mencukupi.");
+          }
+        });
+
+        const btnDel = document.createElement("button");
+        btnDel.className = "danger-button";
+        btnDel.style.cssText = "padding:4px 8px; font-size:0.75em; margin-left:6px;";
+        btnDel.textContent = "🗑️";
+        btnDel.addEventListener("click", function() {
+          cartItems.splice(index, 1);
+          updateCartBadge();
+          renderCartPage();
+        });
+
+        actions.append(btnMinus, qtySpan, btnPlus, btnDel);
+        card.append(info, actions);
+        listContainer.append(card);
+      });
+
+      // 3. Kalkulasi Ringkasan Biaya
+      const shippingFee = 5000;
+      const totalPayment = subtotal + shippingFee;
+
+      setText("cartSubtotalText", formatPrice(subtotal));
+      setText("cartShippingText", formatPrice(shippingFee));
+      setText("cartTotalText", formatPrice(totalPayment));
+
+      summaryBox.classList.remove("hidden");
+    }
+
+    byId("btnCheckout").addEventListener("click", function() {
+      if (!currentUser) {
+        alert("Silakan masuk ke akun terlebih dahulu untuk melanjutkan pesanan.");
+        show("profile");
+        return;
+      }
+      const primaryAddr = currentUserAddresses.find(a => a.is_primary) || currentUserAddresses[0];
+      if (!primaryAddr) {
+        alert("Silakan tambahkan alamat pengantaran terlebih dahulu pada menu Akun.");
+        show("profile");
+        return;
+      }
+      alert("Simulasi Pre-Checkout berhasil! Integrasi penuh ke Modul O1 (Sistem Pesanan Real-Time) akan menyusul.");
     });
 
     /* ========================================= KARTU PRODUK ========================================= */
@@ -2457,7 +2745,7 @@
       });
 
       this.reset();
-      show("orders");
+      show("services");
     });
 
     /* ========================================= PESAN KOSONG RIWAYAT SIMULASI ========================================= */
