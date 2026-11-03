@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id" class="dark-theme">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin Verifikasi - AntarDesa</title>
+  <link rel="stylesheet" href="ui-components.css">
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg-color: #121e19;
+      --text-color: #e2ebe6;
+      --panel-bg: #1a2923;
+      --panel-border: #283d34;
+      --muted-color: #9cb3a8;
+      --input-bg: #22342c;
+      --input-border: #354e42;
+      --header-bg: #0f5c43;
+      --card-sub-bg: #16241e;
+      --accent-color: #24a177;
+      --nav-bg: #1a2923;
+      --nav-border: #283d34;
+      --font-scale: 15px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font: var(--font-scale) Arial, sans-serif;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: white;
+      padding: 22px 18px 26px;
+      border-radius: 0 0 24px 24px;
+    }
+    .header-inner { max-width: 650px; margin: auto; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { margin: 0; font-size: 1.6em; }
+    header p { margin: 5px 0 0; font-size: 0.85em; opacity: 0.9; }
+
+    main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .panel h2 { margin: 0 0 8px; font-size: 1.2em; }
+    .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .stat-card {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .stat-num { font-size: 1.4em; font-weight: bold; color: var(--accent-color); }
+    .stat-label { font-size: 0.75em; color: var(--muted-color); margin-top: 2px; }
+
+    .request-card {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .role-badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+    .badge-mitra { background: #065f46; color: #a7f3d0; }
+    .badge-kurir { background: #1e3a8a; color: #bfdbfe; }
+
+    .info-row { font-size: 0.85em; margin-bottom: 6px; line-height: 1.4; overflow-wrap: anywhere; }
+    .info-row strong { color: var(--muted-color); }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-approve {
+      background: var(--accent-color);
+      color: white;
+      border: 0;
+      border-radius: 9px;
+      padding: 9px;
+      font-weight: bold;
+      font-size: 0.8em;
+      cursor: pointer;
+    }
+    .btn-reject {
+      background: var(--panel-bg);
+      color: #f8a59d;
+      border: 1px solid #b42318;
+      border-radius: 9px;
+      padding: 9px;
+      font-weight: bold;
+      font-size: 0.8em;
+      cursor: pointer;
+    }
+
+    button:disabled { opacity: 0.5; cursor: wait; }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--nav-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+      z-index: 5;
+    }
+    nav a {
+      color: var(--muted-color);
+      text-decoration: none;
+      font-size: 0.8em;
+      text-align: center;
+    }
+    nav a.active { color: var(--accent-color); font-weight: bold; }
+
+    .status-msg { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); }
+    .status-msg.error { color: #f8a59d; font-weight: bold; }
+    .status-msg.success { color: var(--accent-color); font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Panel Admin</h1>
+        <p>Verifikasi Mitra & Kurir AntarDesa 👑</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- UTAMA -->
+  <main>
+
+    <!-- RINGKASAN STATISTIK -->
+    <div class="panel">
+      <h2>Ringkasan Verifikasi</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div id="countPending" class="stat-num">0</div>
+          <div class="stat-label">Menunggu</div>
+        </div>
+        <div class="stat-card">
+          <div id="countApproved" class="stat-num">0</div>
+          <div class="stat-label">Disetujui</div>
+        </div>
+        <div class="stat-card">
+          <div id="countRejected" class="stat-num">0</div>
+          <div class="stat-label">Ditolak</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAFTAR PENGAJUAN VERIFIKASI -->
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Daftar Pengajuan</h2>
+        <button id="btnRefresh" class="btn-approve" type="button" style="padding:6px 12px;">Muat Ulang</button>
+      </div>
+      
+      <p id="adminMsg" class="status-msg" role="status" aria-live="polite"></p>
+
+      <div id="requestList">
+        <p class="muted" style="text-align:center; padding:16px;">Memuat data pengajuan...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- NAVIGASI BAWAH -->
+  <nav aria-label="Navigasi Admin">
+    <a href="index.html">
+      <span>⌂</span><br>Beranda
+    </a>
+    <a href="admin.html" class="active">
+      <span>👑</span><br>Verifikasi
+    </a>
+  </nav>
+
+  <!-- EXTERNAL SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    "use strict";
+
+    const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let verificationRequests = [];
+
+    function byId(id) { return document.getElementById(id); }
+
+    function setMsg(text, type) {
+      const el = byId("adminMsg");
+      el.textContent = text;
+      el.className = "status-msg";
+      if (type === "error") el.classList.add("error");
+      if (type === "success") el.classList.add("success");
+    }
+
+    async function loadRequests() {
+      if (!supabaseClient || !currentUser) return;
+
+      const listContainer = byId("requestList");
+      listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Memuat pengajuan...</p>';
+      setMsg("", "");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("verification_requests")
+          .select("id,user_id,requested_role,full_name,phone,business_name,address_detail,notes,status,created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        verificationRequests = Array.isArray(data) ? data : [];
+        updateStats();
+        renderRequests();
+      } catch (err) {
+        console.error("Gagal memuat pengajuan:", err);
+        setMsg("Gagal mengambil data pengajuan. Pastikan akun Anda memiliki peran 'admin'.", "error");
+        listContainer.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Akses ditolak atau koneksi gagal.</p>';
+      }
+    }
+
+    function updateStats() {
+      let pending = 0, approved = 0, rejected = 0;
+      verificationRequests.forEach(r => {
+        if (r.status === "pending") pending++;
+        if (r.status === "approved") approved++;
+        if (r.status === "rejected") rejected++;
+      });
+
+      byId("countPending").textContent = pending;
+      byId("countApproved").textContent = approved;
+      byId("countRejected").textContent = rejected;
+    }
+
+    function renderRequests() {
+      const container = byId("requestList");
+      container.replaceChildren();
+
+      if (verificationRequests.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Belum ada pengajuan verifikasi.</p>';
+        return;
+      }
+
+      verificationRequests.forEach(req => {
+        const card = document.createElement("div");
+        card.className = "request-card";
+
+        const header = document.createElement("div");
+        header.className = "request-header";
+
+        const title = document.createElement("strong");
+        title.style.fontSize = "0.95em";
+        title.textContent = req.full_name;
+
+        const badge = document.createElement("span");
+        badge.className = "role-badge " + (req.requested_role === "mitra" ? "badge-mitra" : "badge-kurir");
+        badge.textContent = req.requested_role.toUpperCase() + " (" + req.status.toUpperCase() + ")";
+
+        header.append(title, badge);
+
+        const phone = document.createElement("div");
+        phone.className = "info-row";
+        phone.innerHTML = "<strong>WhatsApp:</strong> " + req.phone;
+
+        const business = document.createElement("div");
+        business.className = "info-row";
+        business.innerHTML = "<strong>Toko/Wilayah:</strong> " + (req.business_name || "-");
+
+        const address = document.createElement("div");
+        address.className = "info-row";
+        address.innerHTML = "<strong>Alamat:</strong> " + req.address_detail;
+
+        card.append(header, phone, business, address);
+
+        if (req.notes) {
+          const notes = document.createElement("div");
+          notes.className = "info-row";
+          notes.innerHTML = "<strong>Catatan:</strong> " + req.notes;
+          card.append(notes);
+        }
+
+        // Tombol Aksi jika status masih Pending
+        if (req.status === "pending") {
+          const actions = document.createElement("div");
+          actions.className = "actions-grid";
+
+          const btnApprove = document.createElement("button");
+          btnApprove.className = "btn-approve";
+          btnApprove.textContent = "✅ Setujui";
+          btnApprove.addEventListener("click", () => processVerification(req, "approved"));
+
+          const btnReject = document.createElement("button");
+          btnReject.className = "btn-reject";
+          btnReject.textContent = "❌ Tolak";
+          btnReject.addEventListener("click", () => processVerification(req, "rejected"));
+
+          actions.append(btnApprove, btnReject);
+          card.append(actions);
+        }
+
+        container.append(card);
+      });
+    }
+
+    async function processVerification(req, targetStatus) {
+      if (!confirm(`Konfirmasi perubahan status pengajuan ${req.full_name} menjadi '${targetStatus}'?`)) return;
+
+      setMsg("Memproses perubahan status...", "");
+
+      try {
+        // 1. Update status pada verification_requests
+        const { error: verifErr } = await supabaseClient
+          .from("verification_requests")
+          .update({ status: targetStatus, updated_at: new Date().toISOString() })
+          .eq("id", req.id);
+
+        if (verifErr) throw verifErr;
+
+        // 2. Jika disetujui, update/upsert user_roles
+        if (targetStatus === "approved") {
+          const { error: roleErr } = await supabaseClient
+            .from("user_roles")
+            .upsert({
+              user_id: req.user_id,
+              role: req.requested_role,
+              is_verified: true,
+              updated_at: new Date().toISOString()
+            });
+
+          if (roleErr) throw roleErr;
+        }
+
+        setMsg(`Pengajuan ${req.full_name} telah diperbarui menjadi '${targetStatus}'.`, "success");
+        await loadRequests();
+      } catch (err) {
+        console.error("Gagal memproses verifikasi:", err);
+        setMsg(err.message || "Gagal memproses pengajuan. Coba lagi.", "error");
+      }
+    }
+
+    byId("btnRefresh").addEventListener("click", loadRequests);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.supabase && window.supabase.createClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
+        });
+
+        const { data } = await supabaseClient.auth.getSession();
+        if (data && data.session) {
+          currentUser = data.session.user;
+          loadRequests();
+        } else {
+          window.location.href = "login.html";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
