@@ -1,86 +1,597 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark-theme">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dashboard Mitra | AntarDesa</title><link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="ui-components.css">
-<style>
-:root{--green:#16805d;--green-dark:#106747;--red:#dc2626;--border:#e2e9e4;--muted:#61746b}*{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:#20352a;font-family:Arial,sans-serif}header{background:var(--green);color:white;padding:24px 20px;border-radius:0 0 22px 22px}header h1{margin:0}header p{font-size:13px;margin-bottom:0}main{max-width:650px;margin:auto;padding:20px 16px 110px}.card{background:white;border:1px solid var(--border);border-radius:15px;padding:18px;margin-bottom:18px}.muted{font-size:13px;color:var(--muted);line-height:1.6}label{display:block;font-size:13px;font-weight:bold;margin:13px 0 6px}input,select,textarea{display:block;width:100%;padding:12px;border:1px solid #ccd9d0;border-radius:9px;font:inherit;background:white}textarea{min-height:85px;resize:vertical}button{border:0;border-radius:10px;padding:12px;cursor:pointer;font-weight:bold;font-size:14px}button:disabled{opacity:.6;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #85c9a8;outline-offset:2px}.primary{background:var(--green);color:white;width:100%;margin-top:15px}.primary:hover{background:var(--green-dark)}.secondary{background:#e8f4ee;color:var(--green)}.delete-button{background:var(--red);color:white;width:100%}.product,.order{border:1px solid var(--border);border-radius:11px;padding:14px;margin-top:10px;background:white;overflow-wrap:anywhere}.product strong,.order strong{display:block;margin-bottom:6px;overflow-wrap:anywhere}.product small,.order small{display:block;color:var(--muted);line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}.product img{width:100%;max-height:220px;object-fit:cover;border-radius:9px;margin-bottom:10px}.product-actions{display:flex;gap:8px;margin-top:12px}.order-item{border-top:1px solid var(--border);margin-top:10px;padding-top:10px;font-size:13px;line-height:1.6;white-space:pre-wrap}.status{display:inline-block;border-radius:20px;padding:5px 9px;background:#e8f4ee;color:var(--green);font-size:12px;font-weight:bold;margin-bottom:10px}.status.pending{background:#fff4d6;color:#805900}.status.rejected,.status.cancelled{background:#fee2e2;color:#991b1b}.status.preparing{background:#e0f2fe;color:#075985}.status.ready{background:#dcfce7;color:#166534}.order-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.order-actions.single{grid-template-columns:1fr}.accept-button,.prepare-button{background:var(--green);color:white}.reject-button{background:var(--red);color:white}.ready-button{background:#075985;color:white}.empty{padding:14px 0;color:var(--muted);font-size:14px}.notice{background:#fff8e6;border:1px solid #f2dfad;color:#755b19;padding:11px;border-radius:9px;font-size:12px;line-height:1.5}.message{font-size:13px;line-height:1.5;margin-top:12px;overflow-wrap:anywhere}.message.error{color:#b91c1c}.message.success{color:#106747}nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;gap:8px;background:white;border-top:1px solid #ddd;padding:14px 8px;padding-bottom:max(14px,env(safe-area-inset-bottom));z-index:10}nav a,nav button{text-decoration:none;color:var(--green);font-size:13px;font-weight:normal;background:transparent;padding:0}.merchant-delivery-detail{margin-top:12px;padding:14px;border:1px solid #cde5d5;border-radius:10px;background:#f4faf6;overflow-wrap:anywhere}.merchant-delivery-detail h4{margin:0 0 12px;color:var(--green-dark)}.merchant-delivery-line{margin:10px 0;font-size:13px;line-height:1.6;white-space:pre-wrap}.merchant-delivery-line strong{display:block;margin-bottom:3px}.merchant-detail-button{width:100%;margin-top:12px;background:#e8f4ee;color:var(--green-dark)}.merchant-delivery-error{color:#b91c1c;font-size:13px;line-height:1.6}.gps-box{border:1px solid #cde5d5;border-radius:10px;background:#f4faf6;padding:13px;margin-top:12px}.gps-box p{margin:7px 0;overflow-wrap:anywhere}.gps-actions{display:grid;gap:8px}.gps-actions .secondary{width:100%}#dashboard{display:none}#accessScreen{max-width:460px;margin:55px auto;padding:24px;text-align:center}#accessScreen a{display:inline-block;margin-top:12px;color:var(--green)}#accessScreen p{line-height:1.6}.g3-profile{background:#f4faf6;border:1px solid #cde5d5;border-radius:10px;padding:13px;margin-top:12px}.g3-profile p{margin:7px 0;line-height:1.5;overflow-wrap:anywhere}.g3-profile strong{color:var(--green-dark)}.g3-tag{display:inline-block;padding:5px 9px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px;font-weight:bold}.g3-product-meta{white-space:pre-wrap}.g3-product-description{white-space:pre-wrap;overflow-wrap:anywhere}.g3-image-fallback{background:#f4faf6;border:1px dashed #cde5d5;border-radius:9px;padding:14px;color:var(--muted);font-size:13px;margin-bottom:10px}[hidden]{display:none!important}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Mitra Usaha - AntarDesa</title>
+  <link rel="stylesheet" href="ui-components.css">
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg-color: #121e19;
+      --text-color: #e2ebe6;
+      --panel-bg: #1a2923;
+      --panel-border: #283d34;
+      --muted-color: #9cb3a8;
+      --input-bg: #22342c;
+      --input-border: #354e42;
+      --header-bg: #0f5c43;
+      --card-sub-bg: #16241e;
+      --accent-color: #24a177;
+      --nav-bg: #1a2923;
+      --nav-border: #283d34;
+      --font-scale: 15px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font: var(--font-scale) Arial, sans-serif;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: white;
+      padding: 22px 18px 26px;
+      border-radius: 0 0 24px 24px;
+    }
+    .header-inner { max-width: 650px; margin: auto; }
+    header h1 { margin: 0; font-size: 1.8em; }
+    header p { margin: 7px 0 0; font-size: 0.85em; }
+
+    main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .panel h2 { margin: 0 0 8px; font-size: 1.25em; }
+    .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
+
+    .card-sub {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .primary {
+      background: var(--accent-color);
+      color: white;
+      border: 0;
+      border-radius: 11px;
+      padding: 12px 16px;
+      font-weight: bold;
+      width: 100%;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .secondary {
+      background: var(--panel-bg);
+      color: var(--accent-color);
+      border: 1px solid var(--accent-color);
+      border-radius: 11px;
+      padding: 10px 14px;
+      width: 100%;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .danger-button {
+      background: var(--panel-bg);
+      color: #f8a59d;
+      border: 1px solid #b42318;
+      border-radius: 11px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    button:disabled { opacity: .6; cursor: wait; }
+
+    label { display: block; font-weight: bold; font-size: 0.85em; margin: 12px 0 6px; }
+    input, textarea, select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font: inherit;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+    textarea { min-height: 80px; }
+
+    .hidden { display: none !important; }
+
+    /* PRODUK LIST STYLES */
+    .product-item {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .product-item-img {
+      width: 68px;
+      height: 68px;
+      min-width: 68px;
+      border-radius: 10px;
+      background: var(--panel-bg);
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--accent-color);
+      border: 1px solid var(--panel-border);
+    }
+    .product-item-info { flex: 1; min-width: 0; }
+    .product-item-title { font-weight: bold; font-size: 0.95em; margin-bottom: 3px; overflow-wrap: anywhere; }
+    .product-item-price { color: var(--accent-color); font-weight: bold; font-size: 0.9em; }
+    .product-item-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7em;
+      font-weight: bold;
+      margin-left: 6px;
+    }
+    .badge-active { background: #065f46; color: #a7f3d0; }
+    .badge-inactive { background: #451a1a; color: #fca5a5; }
+
+    .actions-grid { display: flex; gap: 6px; margin-top: 8px; }
+
+    /* NAVIGASI BAWAH */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--nav-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+      z-index: 5;
+    }
+    nav a, nav button {
+      background: none;
+      border: 0;
+      font: inherit;
+      font-size: 0.75em;
+      color: var(--muted-color);
+      text-decoration: none;
+      text-align: center;
+      min-width: 60px;
+      padding: 4px;
+      cursor: pointer;
+    }
+    nav a.active, nav button.active { color: var(--accent-color); font-weight: bold; }
+
+    .status-msg { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); overflow-wrap: anywhere; }
+    .status-msg.error { color: #f8a59d; font-weight: bold; }
+    .status-msg.success { color: var(--accent-color); font-weight: bold; }
+  </style>
 </head>
 <body>
-<section id="accessScreen" role="status" aria-live="polite"><h2>AntarDesa 🏪</h2><p id="accessMessage">Sedang memeriksa hak akses Mitra...</p><a id="accessLink" href="login.html" hidden>Kembali ke Login</a><button id="retryLogout" class="primary" type="button" hidden>Coba Keluar Lagi</button></section>
-<div id="dashboard">
-<header><h1>AntarDesa.</h1><p>Dashboard Mitra Usaha 🏪</p></header>
-<main>
-<section class="card" id="profilMitra"><h2>Profil dan Verifikasi Mitra</h2><p class="muted">Informasi berikut dibaca dari sesi dan pemeriksaan peran yang sudah digunakan dashboard. Tidak mengubah status verifikasi.</p><div class="g3-profile"><p><strong>Akun:</strong> <span id="merchantAccount">Belum tersedia</span></p><p><strong>Peran:</strong> <span id="merchantRole">Sedang diverifikasi…</span></p><p><strong>Verifikasi:</strong> <span id="merchantVerification">Sedang diperiksa…</span></p><p><span class="g3-tag">Hanya Mitra terverifikasi</span></p></div><p class="muted">Nama usaha dan informasi profil tambahan belum tersedia pada data yang dibaca halaman ini. Tidak ditampilkan sebagai informasi rekaan.</p></section>
-<section class="card"><h2>Kelola Toko</h2><p class="muted">Kelola produk yang tersimpan di database AntarDesa.</p><p><strong>Status toko:</strong> <span id="storeStatus">Buka (Demo)</span></p><button class="secondary" id="toggleStore" type="button">Tutup Toko</button><p class="muted">Status buka/tutup masih simulasi dan belum memengaruhi katalog pelanggan.</p></section>
-<section class="card" id="lokasiToko"><h3>📍 Lokasi GPS Toko</h3><p class="muted">Datang ke titik pengambilan pesanan di toko, aktifkan lokasi HP, kemudian tekan tombol di bawah. Lokasi hanya diambil setelah Anda menekan tombol. Pastikan posisi yang diperoleh benar sebelum menyimpan.</p><div class="gps-actions"><button class="secondary" id="getStoreGps" type="button">◎ Ambil Lokasi GPS Sekarang</button></div><div class="gps-box" id="gpsResult" hidden><p><strong>Latitude:</strong> <span id="gpsLatitude">-</span></p><p><strong>Longitude:</strong> <span id="gpsLongitude">-</span></p><p><strong>Perkiraan akurasi:</strong> <span id="gpsAccuracy">-</span></p><p class="muted">GPS menunjukkan lokasi perangkat, bukan otomatis posisi toko. Jangan simpan jika Anda sedang berada jauh dari toko.</p><a id="gpsMapLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Lihat titik di peta</a></div><div class="gps-box" id="savedGpsBox" hidden><strong>📍 Lokasi Toko Tersimpan</strong><p><strong>Latitude:</strong> <span id="savedGpsLatitude">-</span></p><p><strong>Longitude:</strong> <span id="savedGpsLongitude">-</span></p><p><strong>Petunjuk:</strong> <span id="savedGpsNote">-</span></p><p><strong>Terakhir disimpan:</strong> <span id="savedGpsUpdated">-</span></p><a id="savedGpsMapLink" href="#" target="_blank" rel="noopener noreferrer">Lihat lokasi tersimpan di peta</a></div><button class="secondary" id="refreshSavedGps" type="button" style="width:100%;margin-top:12px">↻ Muat Ulang Lokasi Tersimpan</button><p id="savedGpsMessage" class="message" role="status" aria-live="polite">Lokasi tersimpan belum diperiksa.</p><label for="storeLocationNote">Petunjuk lokasi toko (opsional)</label><textarea id="storeLocationNote" maxlength="500" placeholder="Contoh: Sebelah balai desa, pagar hijau"></textarea><button class="primary" id="saveStoreGps" type="button" disabled>Simpan Lokasi Toko</button><p id="gpsMessage" class="message" role="status" aria-live="polite">Belum mengambil GPS baru. Lokasi lama diperiksa secara otomatis tanpa meminta izin lokasi HP.</p></section>
-<section class="card"><h3>Tambah Produk</h3><form id="productForm"><label for="productName">Nama produk</label><input id="productName" maxlength="80" placeholder="Contoh: Beras 5 kg" required><label for="description">Deskripsi</label><textarea id="description" maxlength="1000" placeholder="Keterangan produk (opsional)"></textarea><label for="category">Kategori</label><select id="category" required><option value="">Pilih kategori</option><option value="Sembako">Sembako</option><option value="Makanan dan Minuman">Makanan dan Minuman</option><option value="Sayur dan Buah">Sayur dan Buah</option><option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option><option value="Lainnya">Lainnya</option></select><label for="price">Harga (Rp)</label><input id="price" type="number" min="1" max="100000000" step="1" placeholder="Contoh: 65000" required><label for="stock">Stok tersedia</label><input id="stock" type="number" min="0" max="100000" step="1" placeholder="Contoh: 20" required><label for="imageUrl">URL gambar (opsional)</label><input id="imageUrl" type="url" maxlength="2000" placeholder="https://contoh.com/foto.jpg"><button class="primary" id="saveProduct" type="submit">+ Simpan Produk</button></form><p id="formMessage" class="message" role="status" aria-live="polite"></p><p class="muted">Produk baru disimpan sebagai produk aktif. Gunakan URL gambar HTTPS jika tersedia.</p></section>
-<section class="card"><h3>Daftar Produk Saya</h3><p class="muted" id="productCount">Memuat produk...</p><button id="refreshProducts" class="secondary" type="button">↻ Muat Ulang Produk</button><p id="listMessage" class="message" role="status" aria-live="polite"></p><div id="productList" aria-live="polite"></div></section>
-<section class="card" id="pesananMasuk"><h3>📋 Pesanan Masuk</h3><p class="muted">Menampilkan maksimal 20 pesanan terbaru untuk toko Anda. Pesanan pending dapat diterima atau ditolak. Pesanan accepted dapat mulai disiapkan. Pesanan preparing dapat ditandai siap dikirim. Detail pengantaran dapat dilihat melalui tombol khusus pada pesanan yang didukung.</p><button id="refreshIncomingOrders" class="secondary" type="button">↻ Muat Ulang Pesanan</button><p id="incomingStatus" class="message" role="status" aria-live="polite">Belum dimuat.</p><div id="incomingOrders" aria-live="polite"></div><p class="muted">Perubahan status terhubung ke database. Penugasan Kurir dan penyelesaian pengiriman diproses melalui alur Kurir. Pembayaran belum diaktifkan.</p></section>
-<section class="card"><p class="muted">AntarDesa v0.2.10 · Baca dan Simpan GPS Mitra</p><div class="notice">Penolakan pesanan pending mengembalikan stok melalui database. Detail penerima dibaca melalui RPC khusus Mitra. Lokasi GPS disimpan melalui RPC khusus Mitra terverifikasi. Checkout V3 belum menghitung ongkir GPS. Status toko masih demo.</div></section>
-</main><nav aria-label="Navigasi Mitra"><a href="mitra.html">⌂ Toko</a><a href="#lokasiToko">📍 GPS</a><a href="#pesananMasuk">▤ Pesanan</a><a href="pelanggan.html">▦ Pelanggan</a><button id="logoutButton" type="button">♙ Keluar</button></nav></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="ui-messages.js"></script>
-<script>
-"use strict";
-/* ANTARDESA v0.2.10: GPS tersimpan dibaca via RPC milik Mitra. Publishable key saja. */
-const SUPABASE_URL="https://gswlkajcizcvrhcfabtg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
-const $=id=>document.getElementById(id);
-const accessScreen=$("accessScreen"),accessMessage=$("accessMessage"),accessLink=$("accessLink"),retryLogout=$("retryLogout"),dashboard=$("dashboard"),logoutButton=$("logoutButton");
-let supabaseClient=null,merchantId=null,dashboardInitialized=false,busy=false,productsLoading=false,incomingLoading=false,respondingOrderId=null,products=[];
-let gpsPosition=null,gpsBusy=false;
-const rupiah=value=>"Rp "+Number(value).toLocaleString("id-ID");
-function denyAccess(message){dashboard.style.display="none";accessScreen.style.display="block";accessMessage.textContent=message;accessLink.hidden=false;retryLogout.hidden=true}
-function allowAccess(){accessScreen.style.display="none";dashboard.style.display="block"}
-function setMessage(id,message,type=""){const element=$(id);element.textContent=message;element.className="message "+type}
-function getG1Message(id,fallback){try{const ui=window.AntarDesaUI;const message=ui&&typeof ui.get==="function"?ui.get(id):null;return typeof message==="string"&&message?message:fallback}catch(error){console.warn("Pesan G1 tidak tersedia:",id,error);return fallback}}
-async function verifyMerchantAccess(){if(!window.supabase||!SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")){denyAccess("Konfigurasi Supabase belum siap.");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);try{const {data:authData,error:authError}=await supabaseClient.auth.getUser();if(authError||!authData?.user){window.location.replace("login.html");return}const userId=authData.user.id;const {data:userRole,error:roleError}=await supabaseClient.from("user_roles").select("role,is_verified").eq("user_id",userId).single();if(roleError||!userRole){denyAccess("Hak akses belum dapat diverifikasi. Periksa koneksi.");return}if(userRole.role!=="mitra"||userRole.is_verified!==true){denyAccess(getG1Message("UI-08","Anda tidak memiliki akses ke halaman ini.")+" Halaman ini hanya untuk Mitra terverifikasi.");return}merchantId=userId;$("merchantAccount").textContent=authData.user.email||"Belum tersedia";$("merchantRole").textContent="Mitra";$("merchantVerification").textContent="Terverifikasi";allowAccess();initializeDashboard()}catch(error){console.error("Verifikasi gagal:",error);denyAccess("Terjadi kendala saat memeriksa hak akses.")}}
-async function logout(){if(!supabaseClient||logoutButton.disabled)return;logoutButton.disabled=true;logoutButton.textContent="Memproses...";dashboard.style.display="none";accessScreen.style.display="block";accessMessage.textContent="Sedang keluar dari akun...";accessLink.hidden=true;retryLogout.hidden=true;try{const {error}=await supabaseClient.auth.signOut();if(error)throw error;window.location.replace("login.html")}catch(error){console.error("Logout gagal:",error);accessMessage.textContent="Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.";retryLogout.hidden=false;logoutButton.disabled=false;logoutButton.textContent="♙ Keluar"}}
-logoutButton.addEventListener("click",logout);retryLogout.addEventListener("click",logout);
-function initializeDashboard(){if(dashboardInitialized)return;dashboardInitialized=true;let storeOpen=true;$("toggleStore").addEventListener("click",function(){storeOpen=!storeOpen;$("storeStatus").textContent=storeOpen?"Buka (Demo)":"Tutup (Demo)";this.textContent=storeOpen?"Tutup Toko":"Buka Toko"});$("productForm").addEventListener("submit",saveProduct);$("refreshProducts").addEventListener("click",loadProducts);$("refreshIncomingOrders").addEventListener("click",loadIncomingOrders);$("getStoreGps").addEventListener("click",getStoreGps);$("saveStoreGps").addEventListener("click",saveStoreGps);$("refreshSavedGps").addEventListener("click",loadSavedStoreGps);loadSavedStoreGps();loadProducts();loadIncomingOrders()}
-/* Baca GPS tersimpan milik akun aktif. Tidak meminta izin geolocation perangkat. */
-let savedGpsLoading=false;
-async function loadSavedStoreGps(){
- if(savedGpsLoading||!merchantId||!supabaseClient)return;
- savedGpsLoading=true;$("refreshSavedGps").disabled=true;
- setMessage("savedGpsMessage","Sedang membaca lokasi toko tersimpan...");
- try{
-  const {data,error}=await supabaseClient.rpc("get_my_antardesa_merchant_location");
-  if(error)throw error;
-  if(!Array.isArray(data))throw new Error("Format respons lokasi tidak sesuai.");
-  if(data.length===0){$("savedGpsBox").hidden=true;setMessage("savedGpsMessage","Belum ada lokasi GPS tersimpan untuk akun Mitra ini.");return}
-  if(data.length!==1||data[0].merchant_id!==merchantId)throw new Error("Identitas lokasi tidak sesuai dengan akun yang login.");
-  const item=data[0],lat=Number(item.latitude),lon=Number(item.longitude);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat < -90||lat > 90||lon < -180||lon > 180)throw new Error("Koordinat tersimpan tidak valid.");
-  $("savedGpsLatitude").textContent=lat.toFixed(7);$("savedGpsLongitude").textContent=lon.toFixed(7);
-  $("savedGpsNote").textContent=item.location_note||"Tidak ada";
-  $("savedGpsUpdated").textContent=item.updated_at?new Date(item.updated_at).toLocaleString("id-ID"):"Tidak tersedia";
-  $("savedGpsMapLink").href="https://www.openstreetmap.org/?mlat="+encodeURIComponent(lat)+"&mlon="+encodeURIComponent(lon)+"#map=17/"+encodeURIComponent(lat)+"/"+encodeURIComponent(lon);
-  $("savedGpsBox").hidden=false;setMessage("savedGpsMessage","Lokasi GPS toko berhasil dibaca dari database.","success");
- }catch(error){console.error("Gagal membaca GPS tersimpan:",error);$("savedGpsBox").hidden=true;setMessage("savedGpsMessage","Gagal membaca lokasi tersimpan: "+(error.message||"Silakan coba lagi."),"error")}
- finally{savedGpsLoading=false;$("refreshSavedGps").disabled=false}
-}
-/* GPS: tidak menyimpan tanpa konfirmasi tombol kedua. */
-function getStoreGps(){if(gpsBusy||!merchantId)return;if(!window.isSecureContext||!navigator.geolocation){setMessage("gpsMessage","GPS memerlukan browser yang mendukung lokasi dan halaman HTTPS. Buka situs AntarDesa melalui HTTPS.","error");return}gpsBusy=true;gpsPosition=null;$("getStoreGps").disabled=true;$("saveStoreGps").disabled=true;$("gpsResult").hidden=true;$("gpsMapLink").hidden=true;setMessage("gpsMessage","Sedang mencari lokasi perangkat. Pastikan GPS HP aktif...");navigator.geolocation.getCurrentPosition(position=>{gpsBusy=false;$("getStoreGps").disabled=false;const {latitude,longitude,accuracy}=position.coords;if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude >90||longitude < -180||longitude >180){setMessage("gpsMessage","Koordinat yang diterima tidak valid. Coba lagi.","error");return}gpsPosition={latitude:Number(latitude.toFixed(7)),longitude:Number(longitude.toFixed(7)),accuracy};$("gpsLatitude").textContent=gpsPosition.latitude.toFixed(7);$("gpsLongitude").textContent=gpsPosition.longitude.toFixed(7);$("gpsAccuracy").textContent=Number.isFinite(accuracy)?Math.round(accuracy)+" meter":"Tidak tersedia";const link=$("gpsMapLink");link.href="https://www.openstreetmap.org/?mlat="+encodeURIComponent(gpsPosition.latitude)+"&mlon="+encodeURIComponent(gpsPosition.longitude)+"#map=17/"+encodeURIComponent(gpsPosition.latitude)+"/"+encodeURIComponent(gpsPosition.longitude);link.hidden=false;$("gpsResult").hidden=false;$("saveStoreGps").disabled=false;setMessage("gpsMessage",accuracy>100?"Lokasi ditemukan, tetapi akurasi masih rendah. Sebaiknya coba lagi di area terbuka sebelum menyimpan.":"Lokasi ditemukan. Periksa titik pada peta, lalu tekan Simpan Lokasi Toko.",accuracy>100?"error":"success")},error=>{gpsBusy=false;$("getStoreGps").disabled=false;const messages={1:"Izin lokasi ditolak. Izinkan lokasi untuk situs AntarDesa melalui pengaturan browser.",2:"Lokasi tidak tersedia. Aktifkan GPS dan coba di tempat terbuka.",3:"Pencarian lokasi terlalu lama. Coba lagi."};setMessage("gpsMessage",messages[error.code]||"Gagal mengambil lokasi. Silakan coba lagi.","error")},{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
-async function saveStoreGps(){if(gpsBusy||!gpsPosition||!merchantId||!supabaseClient)return;const note=$("storeLocationNote").value.trim();if(note.length>500){setMessage("gpsMessage","Catatan lokasi maksimal 500 karakter.","error");return}if(!window.confirm("Simpan titik GPS yang ditampilkan sebagai lokasi pengambilan pesanan toko Anda? Pastikan Anda sedang berada di toko."))return;gpsBusy=true;$("getStoreGps").disabled=true;$("saveStoreGps").disabled=true;setMessage("gpsMessage","Sedang menyimpan lokasi toko...");try{const {data,error}=await supabaseClient.rpc("save_antardesa_merchant_location",{p_latitude:gpsPosition.latitude,p_longitude:gpsPosition.longitude,p_location_note:note});if(error)throw error;if(data!==true)throw new Error("Database belum mengonfirmasi penyimpanan.");setMessage("gpsMessage","Lokasi toko berhasil disimpan ke database. Untuk mengubahnya, ambil GPS kembali dan simpan ulang.","success");await loadSavedStoreGps()}catch(error){console.error("Simpan GPS gagal:",error);setMessage("gpsMessage","Gagal menyimpan lokasi: "+(error.message||"Coba lagi."),"error")}finally{gpsBusy=false;$("getStoreGps").disabled=false;$("saveStoreGps").disabled=!gpsPosition}}
-/* KELOLA PRODUK */
-function renderProducts(){const list=$("productList");list.replaceChildren();$("productCount").textContent="Jumlah produk: "+products.length;if(!products.length){const empty=document.createElement("p");empty.className="empty";empty.textContent=getG1Message("UI-02","Belum ada produk yang tersedia.");list.appendChild(empty);return}products.forEach(product=>{const card=document.createElement("div");card.className="product";if(product.image_url&&/^https:\/\//i.test(product.image_url)){const img=document.createElement("img");img.src=product.image_url;img.alt="Foto "+product.name;img.loading="lazy";img.referrerPolicy="no-referrer";img.onerror=()=>{img.remove();const placeholder=document.createElement("p");placeholder.className="g3-image-fallback";placeholder.textContent="Gambar produk belum tersedia.";card.prepend(placeholder)};card.appendChild(img)}if(!product.image_url||!/^https:\/\//i.test(product.image_url)){const placeholder=document.createElement("p");placeholder.className="g3-image-fallback";placeholder.textContent="Gambar produk belum tersedia.";card.appendChild(placeholder)}const title=document.createElement("strong");title.textContent=product.name||"Nama belum tersedia";const info=document.createElement("small");info.className="g3-product-meta";info.textContent="Kategori: "+(product.category||"Belum tersedia")+"\nHarga: "+(product.price==null?"Belum tersedia":rupiah(product.price))+"\nStok: "+(product.stock==null?"Belum tersedia":product.stock)+"\nStatus: "+(product.is_active?"Aktif":"Nonaktif");const description=document.createElement("p");description.className="muted g3-product-description";description.textContent="Deskripsi: "+(product.description?.trim()||"Belum tersedia");const actions=document.createElement("div");actions.className="product-actions";const button=document.createElement("button");button.type="button";button.className="delete-button";button.textContent="🗑️ Hapus Produk";button.disabled=busy;button.addEventListener("click",()=>deleteProduct(product,button));actions.appendChild(button);card.append(title,info,description,actions);list.appendChild(card)})}
-async function loadProducts(){if(!merchantId||busy||productsLoading)return;productsLoading=true;$("refreshProducts").disabled=true;try{setMessage("listMessage",getG1Message("UI-01","Sedang memuat data…"));$("productCount").textContent="Memuat produk...";const {data,error}=await supabaseClient.from("products").select("id,merchant_id,name,description,category,price,stock,image_url,is_active,created_at").eq("merchant_id",merchantId).order("created_at",{ascending:false});if(error)throw error;products=data||[];renderProducts();setMessage("listMessage",products.length?"Daftar produk berhasil dimuat.":"")}catch(error){console.error("Gagal memuat produk:",error);setMessage("listMessage",getG1Message("UI-06","Data belum dapat dimuat. Silakan coba lagi."),"error");$("productCount").textContent="Daftar produk belum berhasil dimuat."}finally{productsLoading=false;$("refreshProducts").disabled=false}}
-async function saveProduct(event){event.preventDefault();if(busy||!merchantId)return;const name=$("productName").value.trim(),description=$("description").value.trim(),category=$("category").value,priceText=$("price").value,stockText=$("stock").value,imageText=$("imageUrl").value.trim(),price=Number(priceText),stock=Number(stockText);if(!name||name.length>80||description.length>1000||!category||priceText===""||stockText===""||!Number.isSafeInteger(price)||price<1||price>100000000||!Number.isSafeInteger(stock)||stock<0||stock>100000){setMessage("formMessage","Periksa nama, kategori, harga, dan stok produk.","error");return}let imageUrl=null;if(imageText){try{const parsed=new URL(imageText);if(parsed.protocol!=="https:"||parsed.username||parsed.password||imageText.length>2000)throw new Error("URL tidak valid");imageUrl=parsed.href}catch{setMessage("formMessage","URL gambar harus menggunakan HTTPS yang valid.","error");return}}busy=true;$("saveProduct").disabled=true;$("saveProduct").textContent="Menyimpan...";setMessage("formMessage","Sedang menyimpan produk...");try{const {error}=await supabaseClient.from("products").insert({merchant_id:merchantId,name,description,category,price,stock,image_url:imageUrl,is_active:true});if(error)throw error;$("productForm").reset();setMessage("formMessage","Produk berhasil disimpan ke Supabase.","success")}catch(error){console.error("Gagal menyimpan produk:",error);setMessage("formMessage","Gagal menyimpan produk: "+error.message,"error");return}finally{busy=false;$("saveProduct").disabled=false;$("saveProduct").textContent="+ Simpan Produk"}await loadProducts()}
-async function deleteProduct(product,button){if(busy||!merchantId)return;if(!window.confirm('Hapus produk "'+product.name+'" secara permanen dari database?'))return;busy=true;button.disabled=true;button.textContent="Menghapus...";setMessage("listMessage","Sedang menghapus produk...");try{const {data,error}=await supabaseClient.from("products").delete().eq("id",product.id).eq("merchant_id",merchantId).select("id");if(error){if(error.code==="23503")throw new Error("Produk sudah tercatat dalam riwayat pesanan dan tidak boleh dihapus permanen.");throw error}if(!data||data.length!==1)throw new Error("Produk tidak terhapus. Periksa izin atau muat ulang.");products=products.filter(item=>item.id!==product.id);renderProducts();setMessage("listMessage","Produk berhasil dihapus dari database.","success")}catch(error){console.error("Gagal menghapus produk:",error);setMessage("listMessage","Gagal menghapus produk: "+error.message,"error");button.disabled=false;button.textContent="🗑️ Hapus Produk"}finally{busy=false}}
-/* DETAIL PENGANTARAN KHUSUS MITRA */
-function addMerchantDeliveryButton(card,order){if(!["pending","accepted","preparing","ready","delivering","completed"].includes(order.status))return;const button=document.createElement("button");button.type="button";button.className="merchant-detail-button";button.textContent="📍 Lihat Detail Pengantaran";const panel=document.createElement("div");panel.className="merchant-delivery-detail";panel.hidden=true;let loading=false,opened=false;button.addEventListener("click",async()=>{if(loading)return;if(opened){panel.replaceChildren();panel.hidden=true;opened=false;button.textContent="📍 Lihat Detail Pengantaran";return}if(!merchantId||!supabaseClient)return;loading=true;button.disabled=true;button.textContent="Mengambil detail...";panel.replaceChildren();panel.hidden=false;try{const {data,error}=await supabaseClient.rpc("get_antardesa_merchant_delivery_details",{p_order_id:order.id});if(error)throw error;if(!Array.isArray(data)||data.length!==1)throw new Error("Detail pengantaran tidak tersedia atau akun ini tidak memiliki akses.");const detail=data[0];if(detail.order_id!==order.id)throw new Error("Identitas pesanan tidak sesuai.");const heading=document.createElement("h4");heading.textContent="📍 Detail Pengantaran";panel.appendChild(heading);const fields=[["Nama penerima",detail.recipient_name],["Nomor telepon",detail.recipient_phone],["Alamat lengkap",detail.delivery_address],["Catatan pengantaran",detail.delivery_note||"-"]];for(const [label,value] of fields){const line=document.createElement("div");line.className="merchant-delivery-line";const title=document.createElement("strong");title.textContent=label;const content=document.createElement("span");content.textContent=String(value??"-");line.append(title,content);panel.appendChild(line)}opened=true;button.textContent="Sembunyikan Detail Pengantaran"}catch(error){console.error("Gagal membaca detail pengantaran Mitra:",error);panel.replaceChildren();const message=document.createElement("p");message.className="merchant-delivery-error";message.textContent="Detail tidak dapat ditampilkan. "+(error.message||"Silakan coba lagi.");panel.appendChild(message);button.textContent="Coba Lagi Lihat Detail"}finally{loading=false;button.disabled=false}});card.append(button,panel)}
-/* PESANAN MASUK */
-const statusLabels={pending:"Menunggu Konfirmasi",accepted:"Diterima",rejected:"Ditolak",preparing:"Sedang Disiapkan",ready:"Siap Dikirim",delivering:"Dalam Pengiriman",completed:"Selesai",cancelled:"Dibatalkan"};
-function makeActionButton(label,className,handler){const button=document.createElement("button");button.type="button";button.className=className;button.textContent=label;button.addEventListener("click",handler);return button}
-async function loadIncomingOrders(){if(!merchantId||incomingLoading||respondingOrderId)return;incomingLoading=true;$("refreshIncomingOrders").disabled=true;try{setMessage("incomingStatus",getG1Message("UI-01","Sedang memuat data…"));const {data:orders,error}=await supabaseClient.from("orders").select("id,customer_id,merchant_id,status,total_amount,customer_note,created_at").eq("merchant_id",merchantId).order("created_at",{ascending:false}).limit(20);if(error)throw error;const list=$("incomingOrders");if(!orders?.length){list.replaceChildren();setMessage("incomingStatus","Belum ada pesanan masuk untuk toko Anda.");return}const orderIds=orders.map(order=>order.id);const {data:items,error:itemsError}=await supabaseClient.from("order_items").select("order_id,product_name,quantity,unit_price,subtotal").in("order_id",orderIds);if(itemsError)throw itemsError;const groupedItems=new Map();for(const item of items||[]){if(!groupedItems.has(item.order_id))groupedItems.set(item.order_id,[]);groupedItems.get(item.order_id).push(item)}const fragment=document.createDocumentFragment();for(const order of orders){const card=document.createElement("article");card.className="order";const title=document.createElement("strong");title.textContent="Pesanan #"+order.id.slice(0,8);const status=document.createElement("span");status.className="status "+order.status;status.textContent=statusLabels[order.status]||order.status;const info=document.createElement("small");const date=new Date(order.created_at).toLocaleString("id-ID");info.textContent="Tanggal: "+date+"\nTotal: "+rupiah(order.total_amount)+"\nID Pesanan: "+order.id;card.append(title,status,info);const orderItems=groupedItems.get(order.id)||[];if(!orderItems.length){const missing=document.createElement("p");missing.className="muted";missing.textContent="Rincian produk belum dapat ditampilkan.";card.appendChild(missing)}for(const item of orderItems){const row=document.createElement("div");row.className="order-item";row.textContent=item.product_name+"\nJumlah: "+item.quantity+"\nHarga satuan: "+rupiah(item.unit_price)+"\nSubtotal: "+rupiah(item.subtotal);card.appendChild(row)}if(order.customer_note){const note=document.createElement("p");note.className="muted";note.textContent="Catatan pelanggan: "+order.customer_note;card.appendChild(note)}if(orderItems.length>0){const actions=document.createElement("div");actions.className="order-actions";if(order.status==="pending")actions.append(makeActionButton("✓ Terima","accept-button",()=>respondToOrder(order,"accepted")),makeActionButton("✕ Tolak","reject-button",()=>respondToOrder(order,"rejected")));if(order.status==="accepted"){actions.classList.add("single");actions.append(makeActionButton("🍳 Mulai Siapkan","prepare-button",()=>advanceOrder(order,"preparing")))}if(order.status==="preparing"){actions.classList.add("single");actions.append(makeActionButton("📦 Siap Dikirim","ready-button",()=>advanceOrder(order,"ready")))}if(actions.children.length)card.appendChild(actions)}addMerchantDeliveryButton(card,order);fragment.appendChild(card)}list.replaceChildren(fragment);setMessage("incomingStatus","Berhasil memuat "+orders.length+" pesanan terbaru untuk toko Anda.","success")}catch(error){console.error("Gagal memuat pesanan masuk:",error);setMessage("incomingStatus",getG1Message("UI-06","Data belum dapat dimuat. Silakan coba lagi."),"error")}finally{incomingLoading=false;$("refreshIncomingOrders").disabled=false}}
-function disableOrderActions(){$("refreshIncomingOrders").disabled=true;$("incomingOrders").querySelectorAll(".order-actions button").forEach(button=>button.disabled=true)}
-async function respondToOrder(order,decision){if(!merchantId||incomingLoading||respondingOrderId||order.status!=="pending"||!["accepted","rejected"].includes(decision))return;const isReject=decision==="rejected";const question=isReject?"TOLAK pesanan #"+order.id.slice(0,8)+"?\n\nStok produk akan dikembalikan. Keputusan ini tidak dapat dibatalkan.":"TERIMA pesanan #"+order.id.slice(0,8)+"?\n\nStatus akan menjadi Diterima. Stok tidak dikurangi lagi.";if(!window.confirm(question))return;respondingOrderId=order.id;disableOrderActions();setMessage("incomingStatus",isReject?"Sedang memproses penolakan pesanan...":"Sedang menerima pesanan...");let responseError=null;try{const {data,error}=await supabaseClient.rpc("respond_antardesa_order",{p_order_id:order.id,p_decision:decision});if(error)throw error;if(data!==decision)throw new Error("Respons database tidak sesuai. Muat ulang pesanan.")}catch(error){responseError=error;console.error("Respons pesanan:",error)}finally{respondingOrderId=null}await loadIncomingOrders();await loadProducts();if(responseError){setMessage("incomingStatus","Respons belum dapat dipastikan: "+responseError.message+". Periksa status terbaru sebelum mencoba lagi.","error");return}setMessage("incomingStatus",isReject?"Pesanan berhasil ditolak. Stok telah dikembalikan oleh database.":"Pesanan berhasil diterima. Tombol Mulai Siapkan sekarang tersedia.","success")}
-async function advanceOrder(order,nextStatus){if(!merchantId||incomingLoading||respondingOrderId)return;const allowed=(order.status==="accepted"&&nextStatus==="preparing")||(order.status==="preparing"&&nextStatus==="ready");if(!allowed)return;const isPreparing=nextStatus==="preparing";const question=isPreparing?"Mulai siapkan pesanan #"+order.id.slice(0,8)+"?\n\nStatus akan menjadi Sedang Disiapkan.":"Tandai pesanan #"+order.id.slice(0,8)+" sebagai Siap Dikirim?\n\nPastikan produk sudah benar-benar disiapkan.";if(!window.confirm(question))return;respondingOrderId=order.id;disableOrderActions();setMessage("incomingStatus",isPreparing?"Sedang mengubah status menjadi Sedang Disiapkan...":"Sedang mengubah status menjadi Siap Dikirim...");let responseError=null;try{const {data,error}=await supabaseClient.rpc("advance_antardesa_order",{p_order_id:order.id,p_next_status:nextStatus});if(error)throw error;if(data!==nextStatus)throw new Error("Respons status database tidak sesuai. Periksa pesanan.")}catch(error){responseError=error;console.error("Persiapan pesanan:",error)}finally{respondingOrderId=null}await loadIncomingOrders();if(responseError){setMessage("incomingStatus","Perubahan status belum dapat dipastikan: "+responseError.message+". Periksa status terbaru sebelum mencoba lagi.","error");return}setMessage("incomingStatus",isPreparing?"Pesanan sekarang Sedang Disiapkan. Tombol Siap Dikirim tersedia.":"Pesanan berhasil ditandai Siap Dikirim. Menunggu tahap penugasan Kurir.","success")}
-verifyMerchantAccess();
-</script>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <h1>AntarDesa</h1>
+      <p>Dashboard Mitra Usaha 🏪</p>
+    </div>
+  </header>
+
+  <!-- UTAMA -->
+  <main>
+
+    <!-- PROFIL MITRA -->
+    <div class="panel">
+      <h2>Profil & Verifikasi Mitra</h2>
+      <p class="muted">
+        Informasi berikut dibaca dari sesi aktif akun Anda.
+      </p>
+
+      <div class="card-sub">
+        <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
+        <div style="margin-top:4px;"><strong>Status Usaha:</strong> <span id="mitraStatus" style="color:var(--accent-color); font-weight:bold;">Terverifikasi</span></div>
+      </div>
+    </div>
+
+    <!-- KELOLA PRODUK (MODUL K2) -->
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h2>Kelola Produk Toko 📦</h2>
+        <button id="btnOpenAddForm" class="secondary" type="button" style="width:auto; padding:7px 12px;">+ Tambah Produk</button>
+      </div>
+      <p class="muted">
+        Atur barang dagangan atau hasil kebun yang ingin ditampilkan pada katalog Pasar Desa.
+      </p>
+
+      <!-- FORM TAMBAH / EDIT PRODUK -->
+      <div id="productFormBox" class="card-sub hidden" style="border: 1px solid var(--accent-color);">
+        <h3 id="formProductTitle" style="margin:0 0 10px; font-size:1em;">Tambah Produk Baru</h3>
+
+        <label for="prodName" style="margin-top:0;">Nama Produk:</label>
+        <input id="prodName" type="text" maxlength="100" placeholder="Contoh: Kopi Robusta Pagar Alam 250g">
+
+        <label for="prodCategory">Kategori:</label>
+        <select id="prodCategory">
+          <option value="Hasil Kebun">Hasil Kebun</option>
+          <option value="Makanan & Minuman">Makanan & Minuman</option>
+          <option value="Sembako & Kebutuhan">Sembako & Kebutuhan</option>
+          <option value="Kerajinan Desa">Kerajinan Desa</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+
+        <label for="prodPrice">Harga (Rp):</label>
+        <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
+
+        <label for="prodStock">Stok Barang:</label>
+        <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
+
+        <label for="prodImage">Foto Produk (JPG/PNG/WebP, Maks 5MB):</label>
+        <input id="prodImage" type="file" accept="image/jpeg,image/png,image/webp">
+
+        <label for="prodDesc">Deskripsi Produk:</label>
+        <textarea id="prodDesc" maxlength="500" placeholder="Jelaskan kualitas, rasa, atau keunggulan produk Anda"></textarea>
+
+        <div class="actions-grid" style="margin-top:12px;">
+          <button id="btnSaveProduct" class="primary" type="button">Simpan Produk</button>
+          <button id="btnCancelProduct" class="secondary" type="button">Batal</button>
+        </div>
+      </div>
+
+      <p id="productMsg" class="status-msg" role="status" aria-live="polite"></p>
+
+      <!-- DAFTAR PRODUK MITRA -->
+      <div id="mitraProductList">
+        <p class="muted" style="text-align:center; padding:12px;">Memuat daftar produk...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- NAVIGASI BAWAH -->
+  <nav aria-label="Navigasi Mitra">
+    <a href="index.html">
+      <span>⌂</span><br>Beranda
+    </a>
+    <a href="#" class="active">
+      <span>🏪</span><br>Toko
+    </a>
+    <a href="#" onclick="alert('Modul GPS lokasi toko akan datang'); return false;">
+      <span>📍</span><br>GPS
+    </a>
+    <a href="#" onclick="alert('Modul Pesanan Masuk akan datang'); return false;">
+      <span>📋</span><br>Pesanan
+    </a>
+    <a href="#" onclick="logoutFromMitra(); return false;">
+      <span>🚪</span><br>Keluar
+    </a>
+  </nav>
+
+  <!-- EXTERNAL SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    "use strict";
+
+    const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+    const BUCKET_NAME = "product-images";
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let mitraProducts = [];
+    let editingProductId = null;
+
+    const rupiahFormatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    });
+
+    function byId(id) { return document.getElementById(id); }
+
+    function setMsg(text, type) {
+      const el = byId("productMsg");
+      el.textContent = text;
+      el.className = "status-msg";
+      if (type === "error") el.classList.add("error");
+      if (type === "success") el.classList.add("success");
+    }
+
+    /* LOAD PRODUCTS */
+    async function loadMitraProducts() {
+      if (!supabaseClient || !currentUser) return;
+
+      const container = byId("mitraProductList");
+      container.innerHTML = '<p class="muted" style="text-align:center; padding:12px;">Memuat produk Anda...</p>';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("products")
+          .select("id,name,description,category,price,stock,image_url,is_active,created_at")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        mitraProducts = Array.isArray(data) ? data : [];
+        renderMitraProducts();
+      } catch (err) {
+        console.error("Gagal memuat produk:", err);
+        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal memuat daftar produk.</p>';
+      }
+    }
+
+    /* RENDER PRODUCTS */
+    function renderMitraProducts() {
+      const container = byId("mitraProductList");
+      container.replaceChildren();
+
+      if (mitraProducts.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:14px;">Belum ada produk. Klik "+ Tambah Produk" di atas.</p>';
+        return;
+      }
+
+      mitraProducts.forEach(function(prod) {
+        const item = document.createElement("div");
+        item.className = "product-item";
+
+        // Image
+        const imgBox = document.createElement("div");
+        imgBox.className = "product-item-img";
+        if (prod.image_url) {
+          const img = document.createElement("img");
+          img.src = prod.image_url;
+          img.alt = prod.name;
+          img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:10px;";
+          imgBox.append(img);
+        } else {
+          imgBox.textContent = "📦";
+        }
+
+        // Info
+        const info = document.createElement("div");
+        info.className = "product-item-info";
+
+        const title = document.createElement("div");
+        title.className = "product-item-title";
+        title.textContent = prod.name;
+
+        const badge = document.createElement("span");
+        badge.className = "product-item-badge " + (prod.is_active ? "badge-active" : "badge-inactive");
+        badge.textContent = prod.is_active ? "Aktif" : "Nonaktif";
+        title.append(badge);
+
+        const price = document.createElement("div");
+        price.className = "product-item-price";
+        price.textContent = rupiahFormatter.format(prod.price) + " | Stok: " + prod.stock;
+
+        const actions = document.createElement("div");
+        actions.className = "actions-grid";
+
+        const btnToggle = document.createElement("button");
+        btnToggle.className = "secondary";
+        btnToggle.style.padding = "5px 8px";
+        btnToggle.style.fontSize = "0.75em";
+        btnToggle.textContent = prod.is_active ? "Sembunyikan" : "Tampilkan";
+        btnToggle.addEventListener("click", function() { toggleProductStatus(prod); });
+
+        const btnEdit = document.createElement("button");
+        btnEdit.className = "secondary";
+        btnEdit.style.padding = "5px 8px";
+        btnEdit.style.fontSize = "0.75em";
+        btnEdit.textContent = "Edit";
+        btnEdit.addEventListener("click", function() { openProductForm(prod); });
+
+        const btnDelete = document.createElement("button");
+        btnDelete.className = "danger-button";
+        btnDelete.style.padding = "5px 8px";
+        btnDelete.style.fontSize = "0.75em";
+        btnDelete.textContent = "Hapus";
+        btnDelete.addEventListener("click", function() { deleteProduct(prod.id); });
+
+        actions.append(btnToggle, btnEdit, btnDelete);
+        info.append(title, price, actions);
+        item.append(imgBox, info);
+        container.append(item);
+      });
+    }
+
+    /* FORM HANDLERS */
+    function openProductForm(prod = null) {
+      editingProductId = prod ? prod.id : null;
+      byId("formProductTitle").textContent = prod ? "Edit Produk" : "Tambah Produk Baru";
+
+      byId("prodName").value = prod ? prod.name : "";
+      byId("prodCategory").value = prod ? prod.category : "Hasil Kebun";
+      byId("prodPrice").value = prod ? prod.price : "";
+      byId("prodStock").value = prod ? prod.stock : "";
+      byId("prodDesc").value = prod ? (prod.description || "") : "";
+      byId("prodImage").value = "";
+
+      byId("productFormBox").classList.remove("hidden");
+      setMsg("", "");
+    }
+
+    byId("btnOpenAddForm").addEventListener("click", function() { openProductForm(null); });
+    byId("btnCancelProduct").addEventListener("click", function() {
+      byId("productFormBox").classList.add("hidden");
+      editingProductId = null;
+    });
+
+    /* SAVE PRODUCT (WITH FILE UPLOAD) */
+    byId("btnSaveProduct").addEventListener("click", async function() {
+      if (!supabaseClient || !currentUser) return;
+
+      const name = byId("prodName").value.trim();
+      const category = byId("prodCategory").value;
+      const price = parseFloat(byId("prodPrice").value);
+      const stock = parseInt(byId("prodStock").value, 10);
+      const desc = byId("prodDesc").value.trim();
+      const imageFile = byId("prodImage").files[0];
+
+      if (!name) { setMsg("Nama produk wajib diisi.", "error"); return; }
+      if (isNaN(price) || price < 0) { setMsg("Harga tidak valid.", "error"); return; }
+      if (isNaN(stock) || stock < 0) { setMsg("Jumlah stok tidak valid.", "error"); return; }
+
+      this.disabled = true;
+      this.textContent = "Menyimpan...";
+      setMsg("Menyimpan data produk...", "");
+
+      try {
+        let imageUrl = null;
+
+        // Process Image Upload
+        if (imageFile) {
+          setMsg("Mengunggah foto produk...", "");
+          const fileExt = imageFile.name.split('.').pop();
+          const filePath = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+          const { error: uploadErr } = await supabaseClient
+            .storage
+            .from(BUCKET_NAME)
+            .upload(filePath, imageFile, { upsert: true });
+
+          if (uploadErr) throw uploadErr;
+
+          const { data: pubUrlData } = supabaseClient
+            .storage
+            .from(BUCKET_NAME)
+            .getPublicUrl(filePath);
+
+          imageUrl = pubUrlData?.publicUrl || null;
+        }
+
+        const payload = {
+          user_id: currentUser.id,
+          name: name,
+          category: category,
+          price: price,
+          stock: stock,
+          description: desc,
+          updated_at: new Date().toISOString()
+        };
+
+        if (imageUrl) {
+          payload.image_url = imageUrl;
+        }
+
+        let resError = null;
+
+        if (editingProductId) {
+          const { error } = await supabaseClient
+            .from("products")
+            .update(payload)
+            .eq("id", editingProductId)
+            .eq("user_id", currentUser.id);
+          resError = error;
+        } else {
+          payload.is_active = true;
+          const { error } = await supabaseClient
+            .from("products")
+            .insert([payload]);
+          resError = error;
+        }
+
+        if (resError) throw resError;
+
+        setMsg("Produk berhasil disimpan!", "success");
+        byId("productFormBox").classList.add("hidden");
+        editingProductId = null;
+        await loadMitraProducts();
+      } catch (err) {
+        console.error("Gagal menyimpan produk:", err);
+        setMsg(err.message || "Gagal menyimpan produk. Coba lagi.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Simpan Produk";
+      }
+    });
+
+    /* TOGGLE ACTIVE STATUS */
+    async function toggleProductStatus(prod) {
+      if (!supabaseClient || !currentUser) return;
+      try {
+        const { error } = await supabaseClient
+          .from("products")
+          .update({ is_active: !prod.is_active, updated_at: new Date().toISOString() })
+          .eq("id", prod.id)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+        await loadMitraProducts();
+      } catch (err) {
+        alert("Gagal memperbarui status produk.");
+      }
+    }
+
+    /* DELETE PRODUCT */
+    async function deleteProduct(productId) {
+      if (!supabaseClient || !currentUser) return;
+      if (!confirm("Hapus produk ini dari toko Anda?")) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from("products")
+          .delete()
+          .eq("id", productId)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+        setMsg("Produk berhasil dihapus.", "success");
+        await loadMitraProducts();
+      } catch (err) {
+        setMsg("Gagal menghapus produk.", "error");
+      }
+    }
+
+    /* LOGOUT */
+    async function logoutFromMitra() {
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+      }
+      window.location.href = "index.html";
+    }
+
+    /* INIT */
+    document.addEventListener("DOMContentLoaded", async function() {
+      if (window.supabase && window.supabase.createClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
+        });
+
+        const { data } = await supabaseClient.auth.getSession();
+        if (data && data.session) {
+          currentUser = data.session.user;
+          byId("mitraEmail").textContent = currentUser.email;
+          loadMitraProducts();
+        } else {
+          window.location.href = "login.html";
+        }
+      }
+    });
+  </script>
 </body>
 </html>
