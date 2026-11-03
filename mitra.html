@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark-theme">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +9,18 @@
     * { box-sizing: border-box; }
     
     :root {
-      --bg-color: #f4f7f5;
-      --text-color: #1c3028;
-      --panel-bg: #ffffff;
-      --panel-border: #e3ebe6;
-      --muted-color: #61746b;
-      --input-bg: #ffffff;
-      --input-border: #cbd9d0;
-      --header-bg: #16805d;
-      --card-sub-bg: #f8fbf9;
-      --accent-color: #16805d;
-      --nav-bg: #ffffff;
-      --nav-border: #dde7df;
+      --bg-color: #121e19;
+      --text-color: #e2ebe6;
+      --panel-bg: #1a2923;
+      --panel-border: #283d34;
+      --muted-color: #9cb3a8;
+      --input-bg: #22342c;
+      --input-border: #354e42;
+      --header-bg: #0f5c43;
+      --card-sub-bg: #16241e;
+      --accent-color: #24a177;
+      --nav-bg: #1a2923;
+      --nav-border: #283d34;
       --font-scale: 15px;
     }
 
@@ -77,28 +77,39 @@
       font-size: 0.9em;
     }
     .danger-btn {
-      background: #fef2f2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
+      background: #2a1f1f;
+      color: #f8a59d;
+      border: 1px solid #5c3232;
       border-radius: 10px;
       padding: 10px 14px;
       font-weight: bold;
-      cursor: pointer;
+      cursor: pointer; 
       font-size: 0.9em;
     }
 
     button:disabled { opacity: 0.6; cursor: wait; }
     .hidden { display: none !important; }
 
+    label { display: block; font-weight: bold; font-size: 0.85em; margin: 12px 0 4px; }
+    input, textarea, select { 
+      width: 100%; 
+      padding: 10px; 
+      border: 1px solid var(--input-border); 
+      border-radius: 8px; 
+      font: inherit; 
+      background: var(--input-bg); 
+      color: var(--text-color); 
+    }
+
     /* BADGE & STATUS */
-    .badge-green { background: #d1fae5; color: #065f46; padding: 4px 9px; border-radius: 6px; font-size: 0.75em; font-weight: bold; display: inline-block; }
+    .badge-green { background: #133827; color: #4ade80; border: 1px solid #1f573d; padding: 4px 9px; border-radius: 6px; font-size: 0.75em; font-weight: bold; display: inline-block; }
     
-    .merchant-order-card {
+    .merchant-order-card, .merchant-product-card {
       background: var(--card-sub-bg);
       border: 1px solid var(--panel-border);
       border-radius: 14px;
       padding: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .order-status-badge {
       display: inline-block;
@@ -107,21 +118,21 @@
       font-size: 0.75em;
       font-weight: bold;
     }
-    .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-    .status-processing { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .status-delivering { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-    .status-completed { background: #e5e7eb; color: #374151; border: 1px solid #d1d5db; }
+    .status-pending { background: #3b2e16; color: #f6e05e; border: 1px solid #6c521a; }
+    .status-processing { background: #133827; color: #4ade80; border: 1px solid #1f573d; }
+    .status-delivering { background: #1e3a8a; color: #93c5fd; border: 1px solid #1d4ed8; }
+    .status-completed { background: #262626; color: #d4d4d4; border: 1px solid #404040; }
 
     .action-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 12px;
-      padding-top: 10px;
+      margin-top: 10px;
+      padding-top: 8px;
       border-top: 1px solid var(--panel-border);
     }
 
-    /* NAVIGASI BAWAH ASLI */
+    /* NAVIGASI BAWAH */
     nav { 
       position: fixed; 
       bottom: 0; 
@@ -157,27 +168,57 @@
   </header>
 
   <main>
-    <!-- TAB 1: TOKO & PROFIL -->
+    <!-- TAB 1: TOKO & PRODUK -->
     <section id="tab-toko" class="mitra-page">
       <div class="panel">
         <h2 style="font-size:1.1em; margin-bottom:6px;">Profil dan Verifikasi Mitra</h2>
-        <p class="muted" style="margin-bottom:12px;">Informasi berikut dibaca dari sesi dan pemeriksaan peran aktif Anda.</p>
-        
         <div style="background:var(--card-sub-bg); border:1px solid var(--panel-border); border-radius:12px; padding:14px; line-height:1.6; font-size:0.9em;">
           <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
           <div><strong>Peran:</strong> Mitra</div>
-          <div><strong>Verifikasi:</strong> Terverifikasi</div>
-          <div style="margin-top:6px;"><span class="badge-green">Hanya Mitra terverifikasi</span></div>
+          <div><strong>Verifikasi:</strong> Terverifikasi <span class="badge-green">Aktif</span></div>
         </div>
       </div>
 
+      <!-- KELOLA PRODUK TOKO -->
       <div class="panel">
-        <h2 style="font-size:1.1em; margin-bottom:6px;">Kelola Toko</h2>
-        <p class="muted" style="margin-bottom:12px;">Kelola produk dan status operasional toko Anda di database AntarDesa.</p>
-        
-        <div style="margin-bottom:12px;"><strong>Status toko:</strong> Buka (Demo)</div>
-        <button class="secondary" type="button" style="width:auto; padding:8px 14px;">Tutup Toko</button>
-        <p class="muted" style="font-size:0.75em; margin-top:8px;">Status buka/tutup masih simulasi.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h2 style="font-size:1.1em; margin:0;">Kelola Produk Toko 🛒</h2>
+          <button class="primary" type="button" style="width:auto; padding:7px 12px; font-size:0.8em;" onclick="openProductForm(null)">+ Tambah Produk</button>
+        </div>
+        <p class="muted" style="margin-bottom:12px;">Tambah, edit, atau hapus produk yang tampil di katalog Pasar Desa secara real-time.</p>
+
+        <!-- FORM TAMBAH / EDIT PRODUK -->
+        <div id="productFormBox" class="panel hidden" style="background:var(--card-sub-bg); margin-bottom:14px;">
+          <h3 id="formProductTitle" style="margin-top:0; font-size:1em;">Tambah Produk Baru</h3>
+          <input type="hidden" id="editProductId">
+
+          <label for="prodName">Nama Produk:</label>
+          <input id="prodName" type="text" maxlength="120" placeholder="Contoh: Kopi Robusta 250g">
+
+          <label for="prodCategory">Kategori:</label>
+          <input id="prodCategory" type="text" maxlength="50" placeholder="Contoh: Hasil Kebun / Makanan">
+
+          <label for="prodPrice">Harga (Rp):</label>
+          <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
+
+          <label for="prodStock">Stok:</label>
+          <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
+
+          <label for="prodImage">URL Gambar Produk (Opsional):</label>
+          <input id="prodImage" type="url" placeholder="https://example.com/image.jpg">
+
+          <label for="prodDesc">Deskripsi:</label>
+          <textarea id="prodDesc" rows="3" placeholder="Jelaskan detail produk Anda"></textarea>
+
+          <div class="action-row" style="margin-top:14px;">
+            <button class="primary" type="button" style="flex:1;" onclick="saveProduct()">Simpan Produk</button>
+            <button class="secondary" type="button" style="flex:1;" onclick="closeProductForm()">Batal</button>
+          </div>
+        </div>
+
+        <div id="merchantProductList">
+          <p class="muted" style="text-align:center; padding:16px;">Memuat produk Anda...</p>
+        </div>
       </div>
     </section>
 
@@ -185,46 +226,44 @@
     <section id="tab-gps" class="mitra-page hidden">
       <div class="panel">
         <h2>Lokasi Toko & GPS 📍</h2>
-        <p class="muted">Titik koordinat usaha Anda untuk memudahkan kurir melakukan penjemputan barang pesanan.</p>
+        <p class="muted">Titik koordinat usaha Anda untuk memudahkan kurir melakukan penjemputan.</p>
         <div style="background:var(--card-sub-bg); border:1px dashed var(--accent-color); border-radius:10px; padding:14px; text-align:center; margin-top:12px;">
-          <p class="muted" style="margin:0 0 10px;">Koordinat Toko Aktif</p>
-          <strong style="color:var(--accent-color); font-family:monospace;">Terverifikasi di Wilayah Operasional</strong>
+          <strong style="color:var(--accent-color); font-family:monospace;">GPS Toko Aktif & Terverifikasi</strong>
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: PESANAN MASUK (MODUL O2 NYATA) -->
+    <!-- TAB 3: PESANAN MASUK -->
     <section id="tab-pesanan" class="mitra-page hidden">
       <div class="panel">
         <h2>Pesanan Masuk (Real-Time) 📦</h2>
-        <p class="muted">Daftar pesanan nyata dari pelanggan yang masuk ke toko Anda.</p>
-        
+        <p class="muted">Daftar pesanan nyata dari pelanggan.</p>
         <div id="merchantOrdersList" style="margin-top:14px;">
-          <p class="muted" style="text-align:center; padding:20px;">Memuat pesanan masuk...</p>
+          <p class="muted" style="text-align:center; padding:20px;">Memuat pesanan...</p>
         </div>
       </div>
     </section>
 
-    <!-- TAB 4: PELANGGAN -->
-    <section id="tab-pelanggan" class="mitra-page hidden">
+    <!-- TAB 4: AKUN -->
+    <section id="tab-akun" class="mitra-page hidden">
       <div class="panel">
-        <h2>Daftar Pelanggan 👥</h2>
-        <p class="muted">Pelanggan yang pernah bertransaksi dengan toko Anda.</p>
-        <div style="text-align:center; padding:24px;" class="muted">Belum ada data pelanggan tercatat.</div>
+        <h2>Pengaturan Akun Mitra 👤</h2>
+        <p class="muted">Kelola sesi masuk dan informasi akun Anda.</p>
+        <div style="margin-top:16px;">
+          <button class="danger-btn" type="button" onclick="logoutMitra()">🚪 Keluar dari Akun</button>
+        </div>
       </div>
     </section>
   </main>
 
-  <!-- NAVIGASI BAWAH ASLI -->
+  <!-- NAVIGASI BAWAH -->
   <nav aria-label="Navigasi Mitra">
     <button id="nav-toko" class="active" type="button" onclick="switchTab('toko')"><span>🏪</span><br>Toko</button>
     <button id="nav-gps" type="button" onclick="switchTab('gps')"><span>📍</span><br>GPS</button>
     <button id="nav-pesanan" type="button" onclick="switchTab('pesanan')"><span>📦</span><br>Pesanan</button>
-    <button id="nav-pelanggan" type="button" onclick="switchTab('pelanggan')"><span>👥</span><br>Pelanggan</button>
-    <button type="button" onclick="logoutMitra()"><span>🚪</span><br>Keluar</button>
+    <button id="nav-akun" type="button" onclick="switchTab('akun')"><span>👤</span><br>Akun</button>
   </nav>
 
-  <!-- SUPABASE & SKRIP -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     "use strict";
@@ -235,6 +274,7 @@
     let supabaseClient = null;
     let currentUser = null;
     let merchantOrders = [];
+    let merchantProducts = [];
     let realtimeChannel = null;
 
     const rupiahFormatter = new Intl.NumberFormat("id-ID", {
@@ -259,9 +299,8 @@
       if (targetNav) targetNav.classList.add("active");
       window.scrollTo(0, 0);
 
-      if (tabName === "pesanan") {
-        loadMerchantOrders();
-      }
+      if (tabName === "pesanan") loadMerchantOrders();
+      if (tabName === "toko") loadMerchantProducts();
     }
 
     async function initSupabase() {
@@ -281,36 +320,178 @@
       currentUser = sessionData.session.user;
       document.getElementById("mitraEmail").textContent = currentUser.email;
 
+      loadMerchantProducts();
       loadMerchantOrders();
       initRealtime();
     }
 
+    /* ==================== KELOLA PRODUK ==================== */
+    async function loadMerchantProducts() {
+      if (!supabaseClient || !currentUser) return;
+      const container = document.getElementById("merchantProductList");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("products")
+          .select("id,name,category,price,stock,image_url,description,is_active")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        merchantProducts = Array.isArray(data) ? data : [];
+        renderMerchantProducts();
+      } catch (err) {
+        console.error("Gagal memuat produk:", err);
+        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal memuat produk dari server.</p>';
+      }
+    }
+
+    function renderMerchantProducts() {
+      const container = document.getElementById("merchantProductList");
+      container.replaceChildren();
+
+      if (merchantProducts.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Belum ada produk. Klik "+ Tambah Produk" di atas.</p>';
+        return;
+      }
+
+      merchantProducts.forEach(prod => {
+        const card = document.createElement("div");
+        card.className = "merchant-product-card";
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <strong style="font-size:0.95em;">${prod.name}</strong>
+              <div class="muted" style="font-size:0.8em; margin-top:2px;">Kategori: ${prod.category || "-"} | Stok: ${prod.stock}</div>
+              <div style="color:var(--accent-color); font-weight:bold; font-size:0.9em; margin-top:4px;">${formatPrice(prod.price)}</div>
+            </div>
+            <span class="badge-green">${prod.is_active !== false ? "Aktif" : "Nonaktif"}</span>
+          </div>
+          <div class="action-row">
+            <button class="secondary" style="padding:6px 10px; font-size:0.8em;" onclick='openProductForm(${JSON.stringify(prod)})'>Edit</button>
+            <button class="danger-btn" style="padding:6px 10px; font-size:0.8em;" onclick="deleteProduct('${prod.id}')">Hapus</button>
+          </div>
+        `;
+        container.append(card);
+      });
+    }
+
+    function openProductForm(prod) {
+      document.getElementById("productFormBox").classList.remove("hidden");
+      if (prod) {
+        document.getElementById("formProductTitle").textContent = "Edit Produk";
+        document.getElementById("editProductId").value = prod.id;
+        document.getElementById("prodName").value = prod.name || "";
+        document.getElementById("prodCategory").value = prod.category || "";
+        document.getElementById("prodPrice").value = prod.price || "";
+        document.getElementById("prodStock").value = prod.stock || "";
+        document.getElementById("prodImage").value = prod.image_url || "";
+        document.getElementById("prodDesc").value = prod.description || "";
+      } else {
+        document.getElementById("formProductTitle").textContent = "Tambah Produk Baru";
+        document.getElementById("editProductId").value = "";
+        document.getElementById("prodName").value = "";
+        document.getElementById("prodCategory").value = "";
+        document.getElementById("prodPrice").value = "";
+        document.getElementById("prodStock").value = "";
+        document.getElementById("prodImage").value = "";
+        document.getElementById("prodDesc").value = "";
+      }
+    }
+
+    function closeProductForm() {
+      document.getElementById("productFormBox").classList.add("hidden");
+    }
+
+    async function saveProduct() {
+      if (!supabaseClient || !currentUser) return;
+
+      const id = document.getElementById("editProductId").value;
+      const name = document.getElementById("prodName").value.trim();
+      const category = document.getElementById("prodCategory").value.trim();
+      const price = Number(document.getElementById("prodPrice").value);
+      const stock = Number(document.getElementById("prodStock").value);
+      const imageUrl = document.getElementById("prodImage").value.trim();
+      const description = document.getElementById("prodDesc").value.trim();
+
+      if (!name || isNaN(price) || isNaN(stock)) {
+        alert("Nama produk, harga, dan stok wajib diisi dengan benar.");
+        return;
+      }
+
+      const payload = {
+        user_id: currentUser.id,
+        name: name,
+        category: category || "Umum",
+        price: price,
+        stock: stock,
+        image_url: imageUrl || null,
+        description: description || null,
+        is_active: true,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        let err = null;
+        if (id) {
+          const res = await supabaseClient.from("products").update(payload).eq("id", id).eq("user_id", currentUser.id);
+          err = res.error;
+        } else {
+          const res = await supabaseClient.from("products").insert([payload]);
+          err = res.error;
+        }
+
+        if (err) throw err;
+
+        alert("Produk berhasil disimpan!");
+        closeProductForm();
+        loadMerchantProducts();
+      } catch (err) {
+        console.error("Gagal menyimpan produk:", err);
+        alert("Gagal menyimpan produk: " + (err.message || "Kesalahan server"));
+      }
+    }
+
+    async function deleteProduct(productId) {
+      if (!supabaseClient || !currentUser) return;
+      if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from("products")
+          .delete()
+          .eq("id", productId)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+        alert("Produk berhasil dihapus.");
+        loadMerchantProducts();
+      } catch (err) {
+        console.error("Gagal menghapus produk:", err);
+        alert("Gagal menghapus produk.");
+      }
+    }
+
+    /* ==================== KELOLA PESANAN ==================== */
     async function loadMerchantOrders() {
       if (!supabaseClient || !currentUser) return;
-      
       const container = document.getElementById("merchantOrdersList");
 
       try {
-        // Menggunakan kueri fleksibel untuk mengambil pesanan yang ditujukan ke mitra_id, merchant_id, atau memuat semua pesanan aktif demo
         const { data, error } = await supabaseClient
           .from("orders")
-          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,customer_id,mitra_id,merchant_id")
+          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,mitra_id,merchant_id")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
-        // Filter khusus untuk akun yang login atau tampilkan semua jika dalam mode pengujian toko tunggal
         merchantOrders = Array.isArray(data) ? data.filter(o => o.mitra_id === currentUser.id || o.merchant_id === currentUser.id || !o.mitra_id) : [];
-        
-        // Jika filter kosong tapi ada data pesanan (untuk kemudahan uji coba), ambil semua pesanan
-        if (merchantOrders.length === 0 && Array.isArray(data) && data.length > 0) {
-          merchantOrders = data;
-        }
+        if (merchantOrders.length === 0 && Array.isArray(data) && data.length > 0) merchantOrders = data;
 
         renderMerchantOrders();
       } catch (err) {
-        console.error("Gagal memuat pesanan mitra:", err);
-        container.innerHTML = '<p class="muted" style="color:#991b1b; text-align:center;">Gagal mengambil data pesanan dari server.</p>';
+        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal mengambil pesanan.</p>';
       }
     }
 
@@ -319,7 +500,7 @@
       container.replaceChildren();
 
       if (merchantOrders.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada pesanan masuk. Coba lakukan checkout dari akun pelanggan.</p>';
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada pesanan masuk.</p>';
         return;
       }
 
@@ -327,84 +508,34 @@
         const card = document.createElement("div");
         card.className = "merchant-order-card";
 
-        const topRow = document.createElement("div");
-        topRow.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;";
-
-        const title = document.createElement("strong");
-        title.style.fontSize = "0.9em";
-        title.textContent = "Pesanan #" + ord.id.substring(0, 8).toUpperCase();
-
-        const badge = document.createElement("span");
-        badge.className = "order-status-badge ";
-        if (ord.status === "pending_confirmation") { badge.classList.add("status-pending"); badge.textContent = "Menunggu Konfirmasi"; }
-        else if (ord.status === "processing") { badge.classList.add("status-processing"); badge.textContent = "Diproses Mitra"; }
-        else if (ord.status === "finding_courier") { badge.classList.add("status-pending"); badge.textContent = "Mencari Kurir"; }
-        else if (ord.status === "delivering") { badge.classList.add("status-delivering"); badge.textContent = "Dalam Pengantaran"; }
-        else if (ord.status === "completed") { badge.classList.add("status-completed"); badge.textContent = "Selesai"; }
-        else { badge.classList.add("status-pending"); badge.textContent = ord.status; }
-
-        topRow.append(title, badge);
-
-        const info = document.createElement("div");
-        info.style.cssText = "font-size:0.85em; line-height:1.5; color:var(--text-color); margin-bottom:8px;";
-        info.innerHTML = `<strong>Total Pembayaran:</strong> ${formatPrice(ord.total_amount)}<br><strong>Alamat Pengantaran:</strong> ${ord.address_snapshot}`;
-
-        card.append(topRow, info);
-
-        const actionRow = document.createElement("div");
-        actionRow.className = "action-row";
-
-        if (ord.status === "pending_confirmation" || ord.status === "pending") {
-          const btnProcess = document.createElement("button");
-          btnProcess.className = "primary";
-          btnProcess.style.width = "auto";
-          btnProcess.textContent = "✔ Terima & Proses Pesanan";
-          btnProcess.addEventListener("click", () => updateOrderStatus(ord.id, "processing"));
-          actionRow.append(btnProcess);
-        }
-
-        if (ord.status === "processing") {
-          const btnCourier = document.createElement("button");
-          btnCourier.className = "primary";
-          btnCourier.style.width = "auto";
-          btnCourier.textContent = "🛵 Cari Kurir Pengantaran";
-          btnCourier.addEventListener("click", () => updateOrderStatus(ord.id, "finding_courier"));
-          actionRow.append(btnCourier);
-        }
-
-        if (ord.status !== "completed" && ord.status !== "cancelled") {
-          const btnCancel = document.createElement("button");
-          btnCancel.className = "danger-btn";
-          btnCancel.textContent = "Batalkan";
-          btnCancel.addEventListener("click", () => updateOrderStatus(ord.id, "cancelled"));
-          actionRow.append(btnCancel);
-        }
-
-        if (actionRow.children.length > 0) {
-          card.append(actionRow);
-        }
-
+        const badgeClass = ord.status === "processing" ? "status-processing" : ord.status === "completed" ? "status-completed" : "status-pending";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong>Pesanan #${ord.id.substring(0, 8).toUpperCase()}</strong>
+            <span class="order-status-badge ${badgeClass}">${ord.status}</span>
+          </div>
+          <div style="font-size:0.85em; line-height:1.4; margin-bottom:8px;">
+            <strong>Total:</strong> ${formatPrice(ord.total_amount)}<br><strong>Alamat:</strong> ${ord.address_snapshot}
+          </div>
+          <div class="action-row">
+            ${ord.status === "pending_confirmation" || ord.status === "pending" ? `<button class="primary" style="width:auto; padding:6px 12px; font-size:0.8em;" onclick="updateOrderStatus('${ord.id}', 'processing')">✔ Proses</button>` : ""}
+            ${ord.status === "processing" ? `<button class="primary" style="width:auto; padding:6px 12px; font-size:0.8em;" onclick="updateOrderStatus('${ord.id}', 'finding_courier')">🛵 Cari Kurir</button>` : ""}
+            <button class="danger-btn" style="padding:6px 12px; font-size:0.8em;" onclick="updateOrderStatus('${ord.id}', 'cancelled')">Batalkan</button>
+          </div>
+        `;
         container.append(card);
       });
     }
 
     async function updateOrderStatus(orderId, newStatus) {
       if (!supabaseClient) return;
-      if (!confirm("Ubah status pesanan menjadi: " + newStatus + "?")) return;
-
       try {
-        const { error } = await supabaseClient
-          .from("orders")
-          .update({ status: newStatus, updated_at: new Date().toISOString() })
-          .eq("id", orderId);
-
+        const { error } = await supabaseClient.from("orders").update({ status: newStatus, updated_at: new Date().toISOString() }).eq("id", orderId);
         if (error) throw error;
-
-        alert("Status pesanan berhasil diperbarui!");
+        alert("Status pesanan diperbarui!");
         loadMerchantOrders();
-      } href="javascript:void(0)" catch (err) {
-        console.error("Gagal memperbarui status:", err);
-        alert("Gagal memperbarui status pesanan.");
+      } catch (err) {
+        alert("Gagal memperbarui status.");
       }
     }
 
@@ -416,12 +547,7 @@
 
     function initRealtime() {
       if (!supabaseClient || realtimeChannel) return;
-      realtimeChannel = supabaseClient
-        .channel("merchant_orders_realtime")
-        .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
-          loadMerchantOrders();
-        })
-        .subscribe();
+      realtimeChannel = supabaseClient.channel("merchant_realtime").on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => loadMerchantOrders()).subscribe();
     }
 
     document.addEventListener("DOMContentLoaded", initSupabase);
