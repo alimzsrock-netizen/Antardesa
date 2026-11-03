@@ -230,7 +230,7 @@
     .catalog-refresh { width: auto; min-width: 86px; padding: 9px 12px; font-size: 0.8em; }
     .catalog-footer { margin-top: 13px; font-size: 0.75em; line-height: 1.5; color: var(--muted-color); }
 
-    /* PROFIL P1 */
+    /* PROFIL & VERIFIKASI P2 */
     .profile-card { border: 1px solid var(--panel-border); background: var(--card-sub-bg); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
     .profile-avatar { width: 86px; height: 86px; min-width: 86px; border-radius: 50%; background: var(--panel-bg); border: 2px solid var(--panel-border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 30px; font-weight: bold; }
@@ -255,6 +255,19 @@
     .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; }
     .checkbox-group input[type="checkbox"] { width: auto; margin-top: 3px; }
     .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.85em; }
+
+    /* VERIFIKASI P2 STYLES */
+    .verification-status-badge {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 0.75em;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .status-approved { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .status-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
     @media (max-width: 380px) {
       .header-top { align-items: flex-start; flex-direction: column; }
@@ -514,6 +527,54 @@
             </div>
           </div>
 
+          <!-- KARTU MODUL P2: STATUS & FORM PENGAJUAN VERIFIKASI PERAN -->
+          <div class="profile-card" id="verificationCard">
+            <h3 style="margin:0 0 6px; font-size:1em;">Verifikasi Mitra Usaha & Kurir</h3>
+            <p class="muted" style="font-size:0.8em; margin-bottom:12px;">
+              Kembangkan usaha dagangmu atau jadilah pengantar lokal di desa dengan mendaftar sebagai Mitra atau Kurir.
+            </p>
+
+            <!-- TAMPILAN STATUS PENGAJUAN SAAT INI -->
+            <div id="verificationStatusBox" class="hidden" style="margin-bottom:12px; padding:10px; border-radius:10px; background:var(--panel-bg); border:1px solid var(--panel-border);">
+              <span class="profile-detail-label">Status Pengajuan Verifikasi:</span>
+              <div id="verificationStatusBadge" class="verification-status-badge status-pending">Memeriksa status...</div>
+              <div id="verificationStatusDetail" class="muted" style="font-size:0.8em; margin-top:6px; line-height:1.4;"></div>
+            </div>
+
+            <!-- TOMBOL PILIH PERAN BAGI PELANGGAN -->
+            <div id="verificationActionBtns" class="profile-edit-actions" style="grid-template-columns: 1fr 1fr; display:grid;">
+              <button id="btnApplyMitra" class="secondary" type="button">🏪 Daftar Mitra</button>
+              <button id="btnApplyKurir" class="secondary" type="button">🛵 Daftar Kurir</button>
+            </div>
+
+            <!-- FORMULIR PENGAJUAN VERIFIKASI -->
+            <div id="verificationFormBox" class="profile-edit-box hidden" style="margin-top:12px;">
+              <h4 id="verificationFormTitle" style="margin:0 0 10px; font-size:0.95em;">Formulir Pengajuan</h4>
+              
+              <label for="verifFullName" style="margin-top:0;">Nama Lengkap (Sesuai KTP):</label>
+              <input id="verifFullName" type="text" maxlength="120" placeholder="Contoh: Ahmad Subagyo">
+
+              <label for="verifPhone">Nomor WhatsApp / HP Aktif:</label>
+              <input id="verifPhone" type="tel" maxlength="20" placeholder="Contoh: 081234567890">
+
+              <label id="lblVerifBusinessName" for="verifBusinessName">Nama Toko / Usaha:</label>
+              <input id="verifBusinessName" type="text" maxlength="120" placeholder="Contoh: Warung Berkah / Kebun Kopi Mandiri">
+
+              <label for="verifAddress">Alamat Lengkap / Wilayah Operasional:</label>
+              <textarea id="verifAddress" maxlength="300" placeholder="Jelaskan alamat usaha atau jangkauan wilayah antar"></textarea>
+
+              <label for="verifNotes">Catatan / Keterangan Tambahan (Opsional):</label>
+              <input id="verifNotes" type="text" maxlength="200" placeholder="Contoh: Menyediakan produk sayur segar harian">
+
+              <div class="profile-edit-actions" style="margin-top:12px;">
+                <button id="btnSubmitVerification" class="primary" type="button">Kirim Pengajuan</button>
+                <button id="btnCancelVerification" class="secondary" type="button">Batal</button>
+              </div>
+            </div>
+
+            <p id="verificationMessage" class="profile-message" role="status" aria-live="polite"></p>
+          </div>
+
           <!-- KARTU 3: UBAH PASSWORD -->
           <div class="profile-card">
             <h3 style="margin:0 0 10px; font-size:1em;">Ubah Password</h3>
@@ -576,7 +637,7 @@
         </div>
 
         <div class="profile-status-note">
-          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Pengaturan akun telah diperbarui pada rilis v0.3.0-RC Modul P1.
+          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Pengaturan akun & alur pengajuan verifikasi Mitra/Kurir telah diintegrasikan pada rilis Modul P2.
         </div>
       </div>
     </section>
@@ -614,7 +675,9 @@
     let currentUser = null;
     let currentRole = null;
     let currentProfile = null;
+    let currentVerificationRequest = null;
     let selectedService = "";
+    let targetVerificationRole = "mitra";
     const simulatedOrders = [];
 
     /* ========================================= DATA KATALOG ========================================= */
@@ -658,7 +721,6 @@
       });
       window.scrollTo(0, 0);
 
-      /* Mengingat tab yang boleh diingat: home, services, profile */
       if (["home", "services", "profile"].includes(pageId)) {
         try {
           localStorage.setItem("antardesa_last_tab", pageId);
@@ -789,6 +851,14 @@
 
     function setProfileMessage(message, type) {
       const element = byId("profileMessage");
+      element.textContent = message;
+      element.className = "profile-message";
+      if (type === "error") { element.classList.add("error"); }
+      if (type === "success") { element.classList.add("success"); }
+    }
+
+    function setVerificationMessage(message, type) {
+      const element = byId("verificationMessage");
       element.textContent = message;
       element.className = "profile-message";
       if (type === "error") { element.classList.add("error"); }
@@ -1191,11 +1261,169 @@
       }
     });
 
+    /* ========================================= MODUL P2: LOGIKA VERIFIKASI MITRA & KURIR ========================================= */
+    async function loadVerificationStatus() {
+      if (!supabaseClient || !currentUser) return;
+      
+      const statusBox = byId("verificationStatusBox");
+      const badge = byId("verificationStatusBadge");
+      const detail = byId("verificationStatusDetail");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("verification_requests")
+          .select("id,requested_role,full_name,phone,business_name,address_detail,notes,status,created_at")
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if (error && error.code !== "PGRST116") {
+          throw error;
+        }
+
+        currentVerificationRequest = data || null;
+
+        if (!currentVerificationRequest) {
+          statusBox.classList.add("hidden");
+          byId("verificationActionBtns").classList.remove("hidden");
+          return;
+        }
+
+        statusBox.classList.remove("hidden");
+        const roleLabel = currentVerificationRequest.requested_role === "mitra" ? "Mitra Usaha" : "Kurir AntarDesa";
+
+        if (currentVerificationRequest.status === "pending") {
+          badge.className = "verification-status-badge status-pending";
+          badge.textContent = "Menunggu Verifikasi (" + roleLabel + ")";
+          detail.textContent = "Pengajuan verifikasi kamu telah diterima tim AntarDesa dan sedang dalam proses peninjauan. Kamu dapat memperbarui data jika diperlukan.";
+          byId("verificationActionBtns").classList.remove("hidden");
+          byId("btnApplyMitra").textContent = "✏️ Edit Pengajuan Mitra";
+          byId("btnApplyKurir").textContent = "✏️ Edit Pengajuan Kurir";
+        } else if (currentVerificationRequest.status === "approved") {
+          badge.className = "verification-status-badge status-approved";
+          badge.textContent = "Verifikasi Disetujui (" + roleLabel + ")";
+          detail.textContent = "Selamat! Pengajuan kamu telah disetujui. Silakan akses tombol 'Buka Dashboard' di atas untuk mengelola layanan kamu.";
+          byId("verificationActionBtns").classList.add("hidden");
+          byId("verificationFormBox").classList.add("hidden");
+        } else if (currentVerificationRequest.status === "rejected") {
+          badge.className = "verification-status-badge status-rejected";
+          badge.textContent = "Pengajuan Perlu Perbaikan";
+          detail.textContent = "Pengajuan verifikasi kamu belum menyetujui kriteria. Silakan ajukan ulang dengan melengkapi data yang benar.";
+          byId("verificationActionBtns").classList.remove("hidden");
+          byId("btnApplyMitra").textContent = "🏪 Ajukan Ulang Mitra";
+          byId("btnApplyKurir").textContent = "🛵 Ajukan Ulang Kurir";
+        }
+      } catch (err) {
+        console.warn("Gagal membaca status verifikasi:", err);
+      }
+    }
+
+    function openVerificationForm(role) {
+      targetVerificationRole = role;
+      const formBox = byId("verificationFormBox");
+      const formTitle = byId("verificationFormTitle");
+      const lblBusiness = byId("lblVerifBusinessName");
+      const txtBusiness = byId("verifBusinessName");
+
+      formTitle.textContent = role === "mitra" ? "Formulir Pengajuan Mitra Usaha" : "Formulir Pengajuan Kurir AntarDesa";
+      lblBusiness.textContent = role === "mitra" ? "Nama Toko / Hasil Kebun / Usaha:" : "Jangkauan Wilayah Operasional Kurir:";
+      txtBusiness.placeholder = role === "mitra" ? "Contoh: Warung Berkah / Kebun Kopi Mandiri" : "Contoh: Kecamatan Pagar Alam Selatan & Desa Sekitar";
+
+      // Isi data awal dari profil atau pengajuan lama jika ada
+      const metadata = currentUser ? currentUser.user_metadata || {} : {};
+      byId("verifFullName").value = currentVerificationRequest?.full_name || currentProfile?.full_name || metadata.full_name || "";
+      byId("verifPhone").value = currentVerificationRequest?.phone || metadata.phone || currentUser?.phone || "";
+      byId("verifBusinessName").value = currentVerificationRequest?.business_name || "";
+      byId("verifAddress").value = currentVerificationRequest?.address_detail || "";
+      byId("verifNotes").value = currentVerificationRequest?.notes || "";
+
+      formBox.classList.remove("hidden");
+      setVerificationMessage("", "");
+    }
+
+    byId("btnApplyMitra").addEventListener("click", function() { openVerificationForm("mitra"); });
+    byId("btnApplyKurir").addEventListener("click", function() { openVerificationForm("kurir"); });
+    byId("btnCancelVerification").addEventListener("click", function() {
+      byId("verificationFormBox").classList.add("hidden");
+    });
+
+    byId("btnSubmitVerification").addEventListener("click", async function() {
+      if (!supabaseClient || !currentUser) return;
+
+      const fullName = byId("verifFullName").value.trim();
+      const phone = byId("verifPhone").value.trim();
+      const businessName = byId("verifBusinessName").value.trim();
+      const addressDetail = byId("verifAddress").value.trim();
+      const notes = byId("verifNotes").value.trim();
+
+      if (fullName.length < 2) {
+        setVerificationMessage("Nama lengkap harus diisi sesuai KTP.", "error");
+        return;
+      }
+      if (phone.length < 8) {
+        setVerificationMessage("Masukkan nomor HP/WhatsApp yang aktif.", "error");
+        return;
+      }
+      if (businessName.length < 2) {
+        setVerificationMessage(targetVerificationRole === "mitra" ? "Masukkan nama toko/usaha kamu." : "Masukkan jangkauan wilayah operasional.", "error");
+        return;
+      }
+      if (addressDetail.length < 5) {
+        setVerificationMessage("Alamat lengkap harus diisi jelas.", "error");
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = "Mengirim...";
+      setVerificationMessage("Mengirim data pengajuan verifikasi...", "");
+
+      const payload = {
+        user_id: currentUser.id,
+        requested_role: targetVerificationRole,
+        full_name: fullName,
+        phone: phone,
+        business_name: businessName,
+        address_detail: addressDetail,
+        notes: notes,
+        status: "pending",
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        let responseError = null;
+
+        if (currentVerificationRequest && currentVerificationRequest.id) {
+          const { error } = await supabaseClient
+            .from("verification_requests")
+            .update(payload)
+            .eq("user_id", currentUser.id);
+          responseError = error;
+        } else {
+          const { error } = await supabaseClient
+            .from("verification_requests")
+            .insert([payload]);
+          responseError = error;
+        }
+
+        if (responseError) throw responseError;
+
+        setVerificationMessage("Pengajuan verifikasi berhasil dikirim. Tim AntarDesa akan meninjau pengajuan kamu.", "success");
+        byId("verificationFormBox").classList.add("hidden");
+        await loadVerificationStatus();
+      } catch (err) {
+        console.error("Gagal mengirim pengajuan:", err);
+        setVerificationMessage(err.message || "Gagal mengirim pengajuan. Periksa koneksi lalu coba lagi.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Kirim Pengajuan";
+      }
+    });
+
     /* ========================================= TAMPILAN PENGGUNA TAMU ========================================= */
     function showGuestState() {
       currentUser = null;
       currentRole = null;
       currentProfile = null;
+      currentVerificationRequest = null;
       byId("headerAccountActions").innerHTML = `
         <a class="account-login" href="login.html">Masuk</a>
         <a class="account-register" href="register.html">Daftar</a>
@@ -1208,6 +1436,7 @@
       setHidden("profileAccountActions", true);
       setText("profileDescription", "Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan dan katalog produk tanpa login.");
       setProfileMessage("", "");
+      setVerificationMessage("", "");
       byId("profileAvatarImage").removeAttribute("src");
       byId("profileAvatarImage").classList.add("hidden");
       byId("profileAvatarFallback").classList.remove("hidden");
@@ -1219,6 +1448,7 @@
       currentUser = user;
       currentRole = null;
       currentProfile = null;
+      currentVerificationRequest = null;
       byId("headerAccountActions").innerHTML = `
         <a class="account-login" href="#profile" onclick="show('profile'); return false;">Akun saya</a>
       `;
@@ -1317,8 +1547,8 @@
 
         showSignedInState(data.session.user);
         
-        Promise.all([loadUserRole(), loadUserProfile()]).catch(function(err) {
-          console.warn("Gagal memuat peran/profil pengguna:", err);
+        Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus()]).catch(function(err) {
+          console.warn("Gagal memuat peran/profil/verifikasi pengguna:", err);
         });
 
       } catch (error) {
@@ -1617,7 +1847,7 @@
             showSignedInState(session.user);
             window.setTimeout(function() {
               if (currentUser && currentUser.id === session.user.id) {
-                Promise.all([loadUserRole(), loadUserProfile()]);
+                Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus()]);
               }
             }, 0);
           }
@@ -1628,7 +1858,7 @@
       }
     });
 
-    /* ========================================= SERVICE WORKER (PAKSA CHECK KE SERVER) ========================================= */
+    /* ========================================= SERVICE WORKER ========================================= */
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
         navigator.serviceWorker.register("./service-worker.js?v=rc2", { scope: "./", updateViaCache: "none" })
