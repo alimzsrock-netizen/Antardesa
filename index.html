@@ -631,6 +631,23 @@
     function setText(id, value) { byId(id).textContent = value === null || value === undefined ? "" : String(value); }
     function setHidden(id, hidden) { byId(id).classList.toggle("hidden", hidden); }
 
+    /* ========================================= UTILITAS TIMEOUT JARINGAN ========================================= */
+    function withTimeout(promise, ms = 4000) {
+      return new Promise(function(resolve, reject) {
+        const timer = setTimeout(function() {
+          reject(new Error("NETWORK_TIMEOUT"));
+        }, ms);
+
+        promise.then(function(res) {
+          clearTimeout(timer);
+          resolve(res);
+        }).catch(function(err) {
+          clearTimeout(timer);
+          reject(err);
+        });
+      });
+    }
+
     /* ========================================= NAVIGASI & TAB TERAKHIR ========================================= */
     function show(pageId) {
       document.querySelectorAll(".page").forEach(function(page) {
@@ -945,7 +962,6 @@
       }
 
       const oldPath = currentProfile.avatar_path;
-      /* Memastikan path berada di folder UUID pengguna sendiri */
       if (!oldPath.startsWith(currentUser.id + "/")) {
         setProfileMessage("Akses lokasi penyimpanan foto tidak valid.", "error");
         return;
@@ -959,7 +975,6 @@
       setProfileMessage("Menghapus foto profil...", "");
 
       try {
-        /* 1. Update database profiles */
         const { data: updatedProfile, error: updateError } = await supabaseClient
           .from("profiles")
           .update({ avatar_path: null, updated_at: new Date().toISOString() })
@@ -970,11 +985,9 @@
         if (updateError) { throw updateError; }
         currentProfile = updatedProfile;
 
-        /* 2. Tampilkan fallback avatar */
         const name = currentProfile.full_name || currentUser.user_metadata?.full_name || "";
         displayAvatar(name, null);
 
-        /* 3. Hapus dari Supabase Storage */
         const { error: storageRemoveError } = await supabaseClient
           .storage
           .from(AVATAR_BUCKET)
@@ -1042,7 +1055,6 @@
 
         currentProfile = updatedProfile;
 
-        /* Sinkronkan ke user_metadata auth */
         await supabaseClient.auth.updateUser({ data: { full_name: newName } });
 
         showProfileIdentity(newName, currentUser.email, currentUser.user_metadata?.phone || currentUser.phone || "");
@@ -1147,7 +1159,6 @@
       setProfileMessage("Memverifikasi password saat ini...", "");
 
       try {
-        /* Re-otentikasi password lama terlebih dahulu */
         const { error: reauthError } = await supabaseClient.auth.signInWithPassword({
           email: currentUser.email,
           password: currentPassword
@@ -1162,13 +1173,11 @@
 
         setProfileMessage("Memperbarui password baru...", "");
 
-        /* Perbarui password */
         const { error: updateError } = await supabaseClient.auth.updateUser({ password: newPassword });
         if (updateError) { throw updateError; }
 
         setProfileMessage("Password berhasil diperbarui.", "success");
 
-        /* Bersihkan input password */
         byId("inputCurrentPassword").value = "";
         byId("inputNewPassword").value = "";
         byId("inputConfirmPassword").value = "";
@@ -1289,26 +1298,38 @@
       }
     }
 
-    /* ========================================= PEMULIHAN SESI ========================================= */
+    /* ========================================= PEMULIHAN SESI (DENGAN TIMEOUT 4 DETIK) ========================================= */
     async function refreshSession() {
       if (!supabaseClient) {
         showGuestState();
         setText("welcomeDescription", "Dashboard utama tetap dapat digunakan. Koneksi akun belum tersedia.");
         return;
       }
+
       try {
-        const { data, error } = await supabaseClient.auth.getSession();
+        /* Batasi penantian getSession maksimal 4 detik */
+        const { data, error } = await withTimeout(supabaseClient.auth.getSession(), 4000);
+        
         if (error) { throw error; }
-        if (!data.session || !data.session.user) {
+        if (!data || !data.session || !data.session.user) {
           showGuestState();
           return;
         }
+
         showSignedInState(data.session.user);
-        await Promise.all([loadUserRole(), loadUserProfile()]);
+        
+        /* Panggil data peran dan profil secara asinkron tanpa memblokir antarmuka */
+        Promise.all([loadUserRole(), loadUserProfile()]).catch(function(err) {
+          console.warn("Gagal memuat peran/profil pengguna:", err);
+        });
+
       } catch (error) {
-        console.error("Pemulihan sesi gagal:", error);
+        console.warn("Pemulihan sesi dibatalkan karena timeout/koneksi lambat:", error.message);
         showGuestState();
-        setText("welcomeDescription", "Dashboard utama tetap dapat digunakan. Status akun belum dapat diperiksa karena koneksi atau pemulihan sesi mengalami kendala. Silakan muat ulang halaman saat koneksi stabil.");
+        setText(
+          "welcomeDescription", 
+          "Koneksi internet lambat atau tidak stabil. Tampilan dimuat dalam mode offline/publik. Silakan muat ulang jika ingin masuk ke akun."
+        );
       }
     }
 
@@ -1473,7 +1494,7 @@
       }
     }
 
-    /* ========================================= MEMUAT PRODUK PUBLIK ========================================= */
+    /* ========================================= MEMUAT PRODUK PUBLIK (DENGAN TIMEOUT 4 DETIK) ========================================= */
     async function loadPublicProducts() {
       const refreshButton = byId("refreshCatalogButton");
       refreshButton.disabled = true;
@@ -1482,12 +1503,16 @@
 
       try {
         if (!supabaseClient) { throw new Error("SUPABASE_NOT_AVAILABLE"); }
-        const { data, error } = await supabaseClient
+
+        const queryPromise = supabaseClient
           .from("products")
           .select("id,name,description,category,price,stock,image_url,created_at")
           .eq("is_active", true)
           .order("created_at", { ascending: false })
           .limit(PRODUCT_LIMIT);
+
+        /* Batasi query produk maksimal 4 detik */
+        const { data, error } = await withTimeout(queryPromise, 4000);
 
         if (error) { throw error; }
 
@@ -1495,9 +1520,15 @@
         populateProductCategories();
         renderProductCatalog();
       } catch (error) {
-        console.error("Gagal memuat katalog produk:", error);
+        console.warn("Gagal memuat produk:", error.message);
         publicProducts = [];
-        setCatalogState("Katalog belum dapat dimuat. Periksa koneksi internet atau akses Data API Supabase, lalu tekan Muat ulang.", true);
+        
+        const isTimeout = error.message === "NETWORK_TIMEOUT";
+        const errorMessage = isTimeout 
+          ? "Koneksi lambat. Katalog belum dapat dimuat tepat waktu. Tekan 'Muat ulang' untuk mencoba kembali."
+          : "Katalog belum dapat dimuat. Periksa koneksi internet lalu tekan 'Muat ulang'.";
+
+        setCatalogState(errorMessage, true);
       } finally {
         refreshButton.disabled = false;
         refreshButton.textContent = "Muat ulang";
@@ -1560,12 +1591,15 @@
       }
     }
 
-    /* ========================================= INISIALISASI UTAMA ========================================= */
+    /* ========================================= INISIALISASI UTAMA (OPTIMISTIC & INSTAN) ========================================= */
     document.addEventListener("DOMContentLoaded", function() {
+      /* 1. Render UI dasar & lokal secara langsung (0 ms) */
       renderEmptyOrders();
       loadAppSettings();
       restoreLastTab();
+      showGuestState();
 
+      /* 2. Inisialisasi Supabase SDK */
       if (window.supabase && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           auth: {
@@ -1576,6 +1610,7 @@
           }
         });
 
+        /* 3. Panggil data jaringan (dilindungi timeout 4 detik) */
         loadPublicProducts();
         refreshSession();
 
@@ -1594,7 +1629,6 @@
           }
         });
       } else {
-        showGuestState();
         setCatalogState("Katalog belum dapat dimuat karena Supabase SDK gagal dimuat.", true);
         setText("welcomeDescription", "Dashboard utama tetap dapat digunakan. Layanan pemeriksaan akun belum tersedia karena Supabase SDK gagal dimuat.");
       }
