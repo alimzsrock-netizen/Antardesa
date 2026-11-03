@@ -1,14 +1,28 @@
 <!DOCTYPE html>
-<html lang="id" class="dark-theme">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Mitra Usaha - AntarDesa</title>
+  <title>Dashboard Mitra - AntarDesa</title>
   <link rel="stylesheet" href="ui-components.css">
   <style>
     * { box-sizing: border-box; }
-
+    
     :root {
+      --bg-color: #f4f7f5;
+      --text-color: #1c3028;
+      --panel-bg: #ffffff;
+      --panel-border: #e3ebe6;
+      --muted-color: #61746b;
+      --input-bg: #ffffff;
+      --input-border: #cbd9d0;
+      --header-bg: #16805d;
+      --card-sub-bg: #f8fbf9;
+      --accent-color: #16805d;
+      --font-scale: 15px;
+    }
+
+    html.dark-theme {
       --bg-color: #121e19;
       --text-color: #e2ebe6;
       --panel-bg: #1a2923;
@@ -19,290 +33,135 @@
       --header-bg: #0f5c43;
       --card-sub-bg: #16241e;
       --accent-color: #24a177;
-      --nav-bg: #1a2923;
-      --nav-border: #283d34;
-      --font-scale: 15px;
     }
 
-    body {
-      margin: 0;
-      background: var(--bg-color);
-      color: var(--text-color);
-      font: var(--font-scale) Arial, sans-serif;
+    body { 
+      margin: 0; 
+      background: var(--bg-color); 
+      color: var(--text-color); 
+      font: var(--font-scale) Arial, sans-serif; 
     }
 
-    header {
-      background: var(--header-bg);
-      color: white;
-      padding: 22px 18px 26px;
-      border-radius: 0 0 24px 24px;
+    header { 
+      background: var(--header-bg); 
+      color: white; 
+      padding: 20px 18px; 
+      border-radius: 0 0 20px 20px; 
     }
-    .header-inner { max-width: 650px; margin: auto; }
-    header h1 { margin: 0; font-size: 1.8em; }
-    header p { margin: 7px 0 0; font-size: 0.85em; }
+    .header-inner { max-width: 650px; margin: auto; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { margin: 0; font-size: 1.5em; }
+    header p { margin: 4px 0 0; font-size: 0.8em; opacity: 0.9; }
 
-    main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
+    main { max-width: 650px; margin: auto; padding: 18px 16px 40px; }
 
-    .panel {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 18px;
+    .panel { 
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-radius: 16px; 
+      padding: 18px; 
+      margin-bottom: 18px; 
     }
-    .panel h2 { margin: 0 0 8px; font-size: 1.25em; }
-    .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
+    .panel h2 { margin: 0 0 8px; font-size: 1.2em; }
+    .muted { color: var(--muted-color); font-size: 0.85em; line-height: 1.5; }
 
-    .card-sub {
-      background: var(--card-sub-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 12px;
+    .primary { 
+      background: var(--accent-color); 
+      color: white; 
+      border: 0; 
+      border-radius: 10px; 
+      padding: 10px 14px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      font-size: 0.9em;
     }
-
-    .primary {
-      background: var(--accent-color);
-      color: white;
-      border: 0;
-      border-radius: 11px;
-      padding: 12px 16px;
+    .secondary { 
+      background: var(--panel-bg); 
+      color: var(--accent-color); 
+      border: 1px solid var(--accent-color); 
+      border-radius: 10px; 
+      padding: 10px 14px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      font-size: 0.9em;
+    }
+    .danger-btn {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 10px 14px;
       font-weight: bold;
-      width: 100%;
-      display: block;
-      text-align: center;
-      text-decoration: none;
       cursor: pointer;
       font-size: 0.9em;
     }
-    .secondary {
-      background: var(--panel-bg);
-      color: var(--accent-color);
-      border: 1px solid var(--accent-color);
-      border-radius: 11px;
-      padding: 10px 14px;
-      width: 100%;
-      display: block;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      font-size: 0.85em;
-      font-weight: bold;
-    }
-    .danger-button {
-      background: var(--panel-bg);
-      color: #f8a59d;
-      border: 1px solid #b42318;
-      border-radius: 11px;
-      padding: 10px;
-      width: 100%;
-      cursor: pointer;
-      font-size: 0.85em;
-      font-weight: bold;
-    }
 
-    button:disabled { opacity: .6; cursor: wait; }
-
-    label { display: block; font-weight: bold; font-size: 0.85em; margin: 12px 0 6px; }
-    input, textarea, select {
-      width: 100%;
-      padding: 11px;
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      font: inherit;
-      background: var(--input-bg);
-      color: var(--text-color);
-    }
-    textarea { min-height: 80px; }
-
+    button:disabled { opacity: 0.6; cursor: wait; }
     .hidden { display: none !important; }
 
-    /* PRODUK LIST STYLES */
-    .product-item {
+    /* KARTU PESANAN MITRA */
+    .merchant-order-card {
       background: var(--card-sub-bg);
       border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 10px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
     }
-    .product-item-img {
-      width: 68px;
-      height: 68px;
-      min-width: 68px;
-      border-radius: 10px;
-      background: var(--panel-bg);
-      object-fit: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: var(--accent-color);
-      border: 1px solid var(--panel-border);
-    }
-    .product-item-info { flex: 1; min-width: 0; }
-    .product-item-title { font-weight: bold; font-size: 0.95em; margin-bottom: 3px; overflow-wrap: anywhere; }
-    .product-item-price { color: var(--accent-color); font-weight: bold; font-size: 0.9em; }
-    .product-item-badge {
+    .order-status-badge {
       display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7em;
-      font-weight: bold;
-      margin-left: 6px;
-    }
-    .badge-active { background: #065f46; color: #a7f3d0; }
-    .badge-inactive { background: #451a1a; color: #fca5a5; }
-
-    .actions-grid { display: flex; gap: 6px; margin-top: 8px; }
-
-    /* NAVIGASI BAWAH */
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--nav-bg);
-      border-top: 1px solid var(--nav-border);
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
-      z-index: 5;
-    }
-    nav a, nav button {
-      background: none;
-      border: 0;
-      font: inherit;
+      padding: 3px 8px;
+      border-radius: 6px;
       font-size: 0.75em;
-      color: var(--muted-color);
-      text-decoration: none;
-      text-align: center;
-      min-width: 60px;
-      padding: 4px;
-      cursor: pointer;
+      font-weight: bold;
     }
-    nav a.active, nav button.active { color: var(--accent-color); font-weight: bold; }
+    .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .status-processing { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .status-delivering { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .status-completed { background: #e5e7eb; color: #374151; border: 1px solid #d1d5db; }
 
-    .status-msg { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); overflow-wrap: anywhere; }
-    .status-msg.error { color: #f8a59d; font-weight: bold; }
-    .status-msg.success { color: var(--accent-color); font-weight: bold; }
+    .action-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--panel-border);
+    }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="header-inner">
-      <h1>AntarDesa</h1>
-      <p>Dashboard Mitra Usaha 🏪</p>
+      <div>
+        <h1>Dashboard Mitra 🏪</h1>
+        <p>Kelola pesanan masuk dan produk usaha desa</p>
+      </div>
+      <a href="index.html" style="color:white; text-decoration:none; font-size:0.85em; font-weight:bold; background:rgba(255,255,255,0.2); padding:6px 10px; border-radius:8px;">← Beranda</a>
     </div>
   </header>
 
-  <!-- UTAMA -->
   <main>
-
-    <!-- PROFIL MITRA -->
     <div class="panel">
-      <h2>Profil & Verifikasi Mitra</h2>
-      <p class="muted">
-        Informasi berikut dibaca dari sesi aktif akun Anda.
-      </p>
-
-      <div class="card-sub">
-        <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
-        <div style="margin-top:4px;"><strong>Status Usaha:</strong> <span id="mitraStatus" style="color:var(--accent-color); font-weight:bold;">Terverifikasi</span></div>
+      <h2>Pesanan Masuk (Real-Time) 📦</h2>
+      <p class="muted">Daftar pesanan dari pelanggan yang ditujukan ke toko/usaha Anda.</p>
+      
+      <div id="merchantOrdersList">
+        <p class="muted" style="text-align:center; padding:20px;">Memuat daftar pesanan masuk...</p>
       </div>
     </div>
-
-    <!-- KELOLA PRODUK (MODUL K2) -->
-    <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <h2>Kelola Produk Toko 📦</h2>
-        <button id="btnOpenAddForm" class="secondary" type="button" style="width:auto; padding:7px 12px;">+ Tambah Produk</button>
-      </div>
-      <p class="muted">
-        Atur barang dagangan atau hasil kebun yang ingin ditampilkan pada katalog Pasar Desa.
-      </p>
-
-      <!-- FORM TAMBAH / EDIT PRODUK -->
-      <div id="productFormBox" class="card-sub hidden" style="border: 1px solid var(--accent-color);">
-        <h3 id="formProductTitle" style="margin:0 0 10px; font-size:1em;">Tambah Produk Baru</h3>
-
-        <label for="prodName" style="margin-top:0;">Nama Produk:</label>
-        <input id="prodName" type="text" maxlength="100" placeholder="Contoh: Kopi Robusta Pagar Alam 250g">
-
-        <label for="prodCategory">Kategori:</label>
-        <select id="prodCategory">
-          <option value="Hasil Kebun">Hasil Kebun</option>
-          <option value="Makanan & Minuman">Makanan & Minuman</option>
-          <option value="Sembako & Kebutuhan">Sembako & Kebutuhan</option>
-          <option value="Kerajinan Desa">Kerajinan Desa</option>
-          <option value="Lainnya">Lainnya</option>
-        </select>
-
-        <label for="prodPrice">Harga (Rp):</label>
-        <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
-
-        <label for="prodStock">Stok Barang:</label>
-        <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
-
-        <label for="prodImage">Foto Produk (JPG/PNG/WebP, Maks 5MB):</label>
-        <input id="prodImage" type="file" accept="image/jpeg,image/png,image/webp">
-
-        <label for="prodDesc">Deskripsi Produk:</label>
-        <textarea id="prodDesc" maxlength="500" placeholder="Jelaskan kualitas, rasa, atau keunggulan produk Anda"></textarea>
-
-        <div class="actions-grid" style="margin-top:12px;">
-          <button id="btnSaveProduct" class="primary" type="button">Simpan Produk</button>
-          <button id="btnCancelProduct" class="secondary" type="button">Batal</button>
-        </div>
-      </div>
-
-      <p id="productMsg" class="status-msg" role="status" aria-live="polite"></p>
-
-      <!-- DAFTAR PRODUK MITRA -->
-      <div id="mitraProductList">
-        <p class="muted" style="text-align:center; padding:12px;">Memuat daftar produk...</p>
-      </div>
-    </div>
-
   </main>
 
-  <!-- NAVIGASI BAWAH -->
-  <nav aria-label="Navigasi Mitra">
-    <a href="index.html">
-      <span>⌂</span><br>Beranda
-    </a>
-    <a href="#" class="active">
-      <span>🏪</span><br>Toko
-    </a>
-    <a href="#" onclick="alert('Modul GPS lokasi toko akan datang'); return false;">
-      <span>📍</span><br>GPS
-    </a>
-    <a href="#" onclick="alert('Modul Pesanan Masuk akan datang'); return false;">
-      <span>📋</span><br>Pesanan
-    </a>
-    <a href="#" onclick="logoutFromMitra(); return false;">
-      <span>🚪</span><br>Keluar
-    </a>
-  </nav>
-
-  <!-- EXTERNAL SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
     "use strict";
 
     const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
-    const BUCKET_NAME = "product-images";
 
     let supabaseClient = null;
     let currentUser = null;
-    let mitraProducts = [];
-    let editingProductId = null;
+    let merchantOrders = [];
+    let realtimeChannel = null;
 
     const rupiahFormatter = new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -310,341 +169,162 @@
       maximumFractionDigits: 0
     });
 
-    function byId(id) { return document.getElementById(id); }
-
-    function setMsg(text, type) {
-      const el = byId("productMsg");
-      el.textContent = text;
-      el.className = "status-msg";
-      if (type === "error") el.classList.add("error");
-      if (type === "success") el.classList.add("success");
+    function formatPrice(val) {
+      const num = Number(val);
+      return Number.isFinite(num) ? rupiahFormatter.format(num) : "Rp0";
     }
 
-    /* KOMPRESI FOTO HP OTOMATIS (RESIZE MAX 800PX, JPEG 0.75) */
-    function compressImage(file, maxWidth = 800, quality = 0.75) {
-      return new Promise(function(resolve) {
-        if (!file || !file.type.startsWith("image/")) {
-          resolve(file);
-          return;
-        }
+    async function initSupabase() {
+      if (!window.supabase || !window.supabase.createClient) {
+        document.getElementById("merchantOrdersList").innerHTML = '<p class="muted" style="color:#991b1b; text-align:center;">Gagal memuat pustaka Supabase.</p>';
+        return;
+      }
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function(event) {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = function() {
-            const canvas = document.createElement("canvas");
-            let width = img.width;
-            let height = img.height;
-
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
-
-            canvas.toBlob(
-              function(blob) {
-                if (blob) {
-                  const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
-                    type: "image/jpeg",
-                    lastModified: Date.now()
-                  });
-                  resolve(compressedFile);
-                } else {
-                  resolve(file);
-                }
-              },
-              "image/jpeg",
-              quality
-            );
-          };
-          img.onerror = function() { resolve(file); };
-        };
-        reader.onerror = function() { resolve(file); };
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
       });
+
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+      if (!sessionData || !sessionData.session || !sessionData.session.user) {
+        alert("Silakan masuk terlebih dahulu dengan akun Mitra.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = sessionData.session.user;
+      loadMerchantOrders();
+      initRealtime();
     }
 
-    /* LOAD PRODUCTS */
-    async function loadMitraProducts() {
+    async function loadMerchantOrders() {
       if (!supabaseClient || !currentUser) return;
-
-      const container = byId("mitraProductList");
-      container.innerHTML = '<p class="muted" style="text-align:center; padding:12px;">Memuat produk Anda...</p>';
+      
+      const container = document.getElementById("merchantOrdersList");
 
       try {
+        // Ambil pesanan di mana mitra_id atau merchant_id adalah user yang sedang login
         const { data, error } = await supabaseClient
-          .from("products")
-          .select("id,name,description,category,price,stock,image_url,is_active,created_at")
-          .eq("user_id", currentUser.id)
+          .from("orders")
+          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,customer_id")
+          .or(`mitra_id.eq.${currentUser.id},merchant_id.eq.${currentUser.id}`)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
-        mitraProducts = Array.isArray(data) ? data : [];
-        renderMitraProducts();
+        merchantOrders = Array.isArray(data) ? data : [];
+        renderMerchantOrders();
       } catch (err) {
-        console.error("Gagal memuat produk:", err);
-        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal memuat daftar produk.</p>';
+        console.error("Gagal memuat pesanan mitra:", err);
+        container.innerHTML = '<p class="muted" style="color:#991b1b; text-align:center;">Gagal mengambil data pesanan dari server.</p>';
       }
     }
 
-    /* RENDER PRODUCTS */
-    function renderMitraProducts() {
-      const container = byId("mitraProductList");
+    function renderMerchantOrders() {
+      const container = document.getElementById("merchantOrdersList");
       container.replaceChildren();
 
-      if (mitraProducts.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:14px;">Belum ada produk. Klik "+ Tambah Produk" di atas.</p>';
+      if (merchantOrders.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada pesanan masuk untuk usaha Anda.</p>';
         return;
       }
 
-      mitraProducts.forEach(function(prod) {
-        const item = document.createElement("div");
-        item.className = "product-item";
+      merchantOrders.forEach(ord => {
+        const card = document.createElement("div");
+        card.className = "merchant-order-card";
 
-        // Image
-        const imgBox = document.createElement("div");
-        imgBox.className = "product-item-img";
-        if (prod.image_url) {
-          const img = document.createElement("img");
-          img.src = prod.image_url;
-          img.alt = prod.name;
-          img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:10px;";
-          imgBox.append(img);
-        } else {
-          imgBox.textContent = "📦";
-        }
+        const topRow = document.createElement("div");
+        topRow.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;";
 
-        // Info
-        const info = document.createElement("div");
-        info.className = "product-item-info";
-
-        const title = document.createElement("div");
-        title.className = "product-item-title";
-        title.textContent = prod.name;
+        const title = document.createElement("strong");
+        title.style.fontSize = "0.9em";
+        title.textContent = "Pesanan #" + ord.id.substring(0, 8).toUpperCase();
 
         const badge = document.createElement("span");
-        badge.className = "product-item-badge " + (prod.is_active ? "badge-active" : "badge-inactive");
-        badge.textContent = prod.is_active ? "Aktif" : "Nonaktif";
-        title.append(badge);
+        badge.className = "order-status-badge ";
+        if (ord.status === "pending_confirmation") { badge.classList.add("status-pending"); badge.textContent = "Menunggu Konfirmasi"; }
+        else if (ord.status === "processing") { badge.classList.add("status-processing"); badge.textContent = "Diproses Mitra"; }
+        else if (ord.status === "finding_courier") { badge.classList.add("status-pending"); badge.textContent = "Mencari Kurir"; }
+        else if (ord.status === "delivering") { badge.classList.add("status-delivering"); badge.textContent = "Dalam Pengantaran"; }
+        else if (ord.status === "completed") { badge.classList.add("status-completed"); badge.textContent = "Selesai"; }
+        else { badge.classList.add("status-pending"); badge.textContent = ord.status; }
 
-        const price = document.createElement("div");
-        price.className = "product-item-price";
-        price.textContent = rupiahFormatter.format(prod.price) + " | Stok: " + prod.stock;
+        topRow.append(title, badge);
 
-        const actions = document.createElement("div");
-        actions.className = "actions-grid";
+        const info = document.createElement("div");
+        info.style.cssText = "font-size:0.85em; line-height:1.5; color:var(--text-color); margin-bottom:8px;";
+        info.innerHTML = `<strong>Total Pembayaran:</strong> ${formatPrice(ord.total_amount)}<br><strong>Alamat Pengantaran:</strong> ${ord.address_snapshot}`;
 
-        const btnToggle = document.createElement("button");
-        btnToggle.className = "secondary";
-        btnToggle.style.padding = "5px 8px";
-        btnToggle.style.fontSize = "0.75em";
-        btnToggle.textContent = prod.is_active ? "Sembunyikan" : "Tampilkan";
-        btnToggle.addEventListener("click", function() { toggleProductStatus(prod); });
+        card.append(topRow, info);
 
-        const btnEdit = document.createElement("button");
-        btnEdit.className = "secondary";
-        btnEdit.style.padding = "5px 8px";
-        btnEdit.style.fontSize = "0.75em";
-        btnEdit.textContent = "Edit";
-        btnEdit.addEventListener("click", function() { openProductForm(prod); });
+        // TOMBOL AKSI MITRA
+        const actionRow = document.createElement("div");
+        actionRow.className = "action-row";
 
-        const btnDelete = document.createElement("button");
-        btnDelete.className = "danger-button";
-        btnDelete.style.padding = "5px 8px";
-        btnDelete.style.fontSize = "0.75em";
-        btnDelete.textContent = "Hapus";
-        btnDelete.addEventListener("click", function() { deleteProduct(prod.id); });
+        if (ord.status === "pending_confirmation") {
+          const btnProcess = document.createElement("button");
+          btnProcess.className = "primary";
+          btnProcess.textContent = "✔ Terima & Proses Pesanan";
+          btnProcess.addEventListener("click", () => updateOrderStatus(ord.id, "processing"));
+          actionRow.append(btnProcess);
+        }
 
-        actions.append(btnToggle, btnEdit, btnDelete);
-        info.append(title, price, actions);
-        item.append(imgBox, info);
-        container.append(item);
+        if (ord.status === "processing") {
+          const btnCourier = document.createElement("button");
+          btnCourier.className = "primary";
+          btnCourier.textContent = "🛵 Cari Kurir Pengantaran";
+          btnCourier.addEventListener("click", () => updateOrderStatus(ord.id, "finding_courier"));
+          actionRow.append(btnCourier);
+        }
+
+        if (ord.status !== "completed" && ord.status !== "cancelled") {
+          const btnCancel = document.createElement("button");
+          btnCancel.className = "danger-btn";
+          btnCancel.textContent = "Batalkan";
+          btnCancel.addEventListener("click", () => updateOrderStatus(ord.id, "cancelled"));
+          actionRow.append(btnCancel);
+        }
+
+        if (actionRow.children.length > 0) {
+          card.append(actionRow);
+        }
+
+        container.append(card);
       });
     }
 
-    /* FORM HANDLERS */
-    function openProductForm(prod = null) {
-      editingProductId = prod ? prod.id : null;
-      byId("formProductTitle").textContent = prod ? "Edit Produk" : "Tambah Produk Baru";
-
-      byId("prodName").value = prod ? prod.name : "";
-      byId("prodCategory").value = prod ? prod.category : "Hasil Kebun";
-      byId("prodPrice").value = prod ? prod.price : "";
-      byId("prodStock").value = prod ? prod.stock : "";
-      byId("prodDesc").value = prod ? (prod.description || "") : "";
-      byId("prodImage").value = "";
-
-      byId("productFormBox").classList.remove("hidden");
-      setMsg("", "");
-    }
-
-    byId("btnOpenAddForm").addEventListener("click", function() { openProductForm(null); });
-    byId("btnCancelProduct").addEventListener("click", function() {
-      byId("productFormBox").classList.add("hidden");
-      editingProductId = null;
-    });
-
-    /* SAVE PRODUCT (DENGAN KOMPRESI OTOMATIS) */
-    byId("btnSaveProduct").addEventListener("click", async function() {
-      if (!supabaseClient || !currentUser) return;
-
-      const name = byId("prodName").value.trim();
-      const category = byId("prodCategory").value;
-      const price = parseFloat(byId("prodPrice").value);
-      const stock = parseInt(byId("prodStock").value, 10);
-      const desc = byId("prodDesc").value.trim();
-      const imageFile = byId("prodImage").files[0];
-
-      if (!name) { setMsg("Nama produk wajib diisi.", "error"); return; }
-      if (isNaN(price) || price < 0) { setMsg("Harga tidak valid.", "error"); return; }
-      if (isNaN(stock) || stock < 0) { setMsg("Jumlah stok tidak valid.", "error"); return; }
-
-      this.disabled = true;
-      this.textContent = "Memproses...";
-      setMsg("Menyiapkan data produk...", "");
-
-      try {
-        let imageUrl = null;
-
-        if (imageFile) {
-          setMsg("Mengompresi foto produk...", "");
-          const compressedFile = await compressImage(imageFile, 800, 0.75);
-
-          setMsg("Mengunggah foto...", "");
-          const filePath = `${currentUser.id}/${Date.now()}.jpg`;
-
-          const { error: uploadErr } = await supabaseClient
-            .storage
-            .from(BUCKET_NAME)
-            .upload(filePath, compressedFile, { upsert: true, contentType: "image/jpeg" });
-
-          if (uploadErr) throw uploadErr;
-
-          const { data: pubUrlData } = supabaseClient
-            .storage
-            .from(BUCKET_NAME)
-            .getPublicUrl(filePath);
-
-          imageUrl = pubUrlData?.publicUrl || null;
-        }
-
-        setMsg("Menyimpan ke database...", "");
-        const payload = {
-          user_id: currentUser.id,
-          name: name,
-          category: category,
-          price: price,
-          stock: stock,
-          description: desc,
-          updated_at: new Date().toISOString()
-        };
-
-        if (imageUrl) {
-          payload.image_url = imageUrl;
-        }
-
-        let resError = null;
-
-        if (editingProductId) {
-          const { error } = await supabaseClient
-            .from("products")
-            .update(payload)
-            .eq("id", editingProductId)
-            .eq("user_id", currentUser.id);
-          resError = error;
-        } else {
-          payload.is_active = true;
-          const { error } = await supabaseClient
-            .from("products")
-            .insert([payload]);
-          resError = error;
-        }
-
-        if (resError) throw resError;
-
-        setMsg("Produk berhasil disimpan!", "success");
-        byId("productFormBox").classList.add("hidden");
-        editingProductId = null;
-        await loadMitraProducts();
-      } catch (err) {
-        console.error("Gagal menyimpan produk:", err);
-        setMsg(err.message || "Gagal menyimpan produk. Coba lagi.", "error");
-      } finally {
-        this.disabled = false;
-        this.textContent = "Simpan Produk";
-      }
-    });
-
-    /* TOGGLE ACTIVE STATUS */
-    async function toggleProductStatus(prod) {
-      if (!supabaseClient || !currentUser) return;
-      try {
-        const { error } = await supabaseClient
-          .from("products")
-          .update({ is_active: !prod.is_active, updated_at: new Date().toISOString() })
-          .eq("id", prod.id)
-          .eq("user_id", currentUser.id);
-
-        if (error) throw error;
-        await loadMitraProducts();
-      } catch (err) {
-        alert("Gagal memperbarui status produk.");
-      }
-    }
-
-    /* DELETE PRODUCT */
-    async function deleteProduct(productId) {
-      if (!supabaseClient || !currentUser) return;
-      if (!confirm("Hapus produk ini dari toko Anda?")) return;
+    async function updateOrderStatus(orderId, newStatus) {
+      if (!supabaseClient) return;
+      if (!confirm("Apakah Anda yakin ingin mengubah status pesanan ini menjadi: " + newStatus + "?")) return;
 
       try {
         const { error } = await supabaseClient
-          .from("products")
-          .delete()
-          .eq("id", productId)
-          .eq("user_id", currentUser.id);
+          .from("orders")
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq("id", orderId);
 
         if (error) throw error;
-        setMsg("Produk berhasil dihapus.", "success");
-        await loadMitraProducts();
+
+        alert("Status pesanan berhasil diperbarui!");
+        loadMerchantOrders();
       } catch (err) {
-        setMsg("Gagal menghapus produk.", "error");
+        console.error("Gagal memperbarui status:", err);
+        alert("Gagal memperbarui status pesanan: " + (err.message || "Kesalahan server"));
       }
     }
 
-    /* LOGOUT */
-    async function logoutFromMitra() {
-      if (supabaseClient) {
-        await supabaseClient.auth.signOut();
-      }
-      window.location.href = "index.html";
+    function initRealtime() {
+      if (!supabaseClient || realtimeChannel) return;
+
+      realtimeChannel = supabaseClient
+        .channel("merchant_orders_realtime")
+        .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, payload => {
+          console.log("Realtime merchant update:", payload);
+          loadMerchantOrders();
+        })
+        .subscribe();
     }
 
-    /* INIT */
-    document.addEventListener("DOMContentLoaded", async function() {
-      if (window.supabase && window.supabase.createClient) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-          auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
-        });
-
-        const { data } = await supabaseClient.auth.getSession();
-        if (data && data.session) {
-          currentUser = data.session.user;
-          byId("mitraEmail").textContent = currentUser.email;
-          loadMitraProducts();
-        } else {
-          window.location.href = "login.html";
-        }
-      }
-    });
+    document.addEventListener("DOMContentLoaded", initSupabase);
   </script>
 </body>
 </html>
