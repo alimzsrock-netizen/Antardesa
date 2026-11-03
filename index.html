@@ -230,7 +230,7 @@
     .catalog-refresh { width: auto; min-width: 86px; padding: 9px 12px; font-size: 0.8em; }
     .catalog-footer { margin-top: 13px; font-size: 0.75em; line-height: 1.5; color: var(--muted-color); }
 
-    /* PROFIL & VERIFIKASI P2 */
+    /* PROFIL & ALAMAT L1 STYLES */
     .profile-card { border: 1px solid var(--panel-border); background: var(--card-sub-bg); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
     .profile-avatar { width: 86px; height: 86px; min-width: 86px; border-radius: 50%; background: var(--panel-bg); border: 2px solid var(--panel-border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 30px; font-weight: bold; }
@@ -256,7 +256,7 @@
     .checkbox-group input[type="checkbox"] { width: auto; margin-top: 3px; }
     .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.85em; }
 
-    /* VERIFIKASI P2 STYLES */
+    /* BADGE VERIFIKASI & ALAMAT */
     .verification-status-badge {
       display: inline-block;
       padding: 4px 9px;
@@ -268,6 +268,39 @@
     .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
     .status-approved { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .status-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+    /* ALAMAT CARD STYLES */
+    .address-item {
+      padding: 12px;
+      border: 1px solid var(--panel-border);
+      background: var(--panel-bg);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .address-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .address-label-badge {
+      background: var(--card-sub-bg);
+      color: var(--accent-color);
+      border: 1px solid var(--panel-border);
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+    .primary-badge {
+      background: var(--accent-color);
+      color: white;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.7em;
+      font-weight: bold;
+    }
 
     @media (max-width: 380px) {
       .header-top { align-items: flex-start; flex-direction: column; }
@@ -527,6 +560,57 @@
             </div>
           </div>
 
+          <!-- KARTU MODUL L1: MANAJEMEN ALAMAT & LOKASI -->
+          <div class="profile-card" id="addressCard">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 style="margin:0; font-size:1em;">Alamat & Lokasi Tersimpan 📍</h3>
+              <button id="btnAddNewAddress" class="profile-detail-edit-btn" type="button">+ Tambah Alamat</button>
+            </div>
+            
+            <p class="muted" style="font-size:0.8em; margin-bottom:10px;">
+              Simpan alamat rumah, toko, atau kebun untuk memudahkan pemesanan dan penjemputan paket.
+            </p>
+
+            <!-- DAFTAR ALAMAT -->
+            <div id="addressList">
+              <p id="addressEmptyNote" class="muted" style="font-size:0.8em; text-align:center; padding:10px;">
+                Belum ada alamat tersimpan. Tekan '+ Tambah Alamat' untuk menambahkan.
+              </p>
+            </div>
+
+            <!-- FORMULIR INPUT / EDIT ALAMAT -->
+            <div id="addressFormBox" class="profile-edit-box hidden" style="margin-top:12px;">
+              <h4 id="addressFormTitle" style="margin:0 0 10px; font-size:0.95em;">Tambah Alamat Baru</h4>
+
+              <label for="addrLabel" style="margin-top:0;">Label Alamat:</label>
+              <input id="addrLabel" type="text" maxlength="40" placeholder="Contoh: Rumah / Toko / Kebun Kopi">
+
+              <label for="addrRecipient">Nama Penerima / Penanggung Jawab:</label>
+              <input id="addrRecipient" type="text" maxlength="120" placeholder="Contoh: Budi Susanto">
+
+              <label for="addrPhone">Nomor WhatsApp / HP Penerima:</label>
+              <input id="addrPhone" type="tel" maxlength="20" placeholder="Contoh: 081234567890">
+
+              <label for="addrFull">Alamat Lengkap / Dusun / RT / RW / Desa:</label>
+              <textarea id="addrFull" maxlength="300" placeholder="Jelaskan nama jalan, dusun, desa, atau kecamatan"></textarea>
+
+              <label for="addrNote">Detail Patokan Lokasi (Opsional):</label>
+              <input id="addrNote" type="text" maxlength="200" placeholder="Contoh: Samping masjid hijau / dekat gerbang RT 02">
+
+              <div class="checkbox-group">
+                <input type="checkbox" id="addrIsPrimary">
+                <label for="addrIsPrimary">Jadikan sebagai Alamat Utama</label>
+              </div>
+
+              <div class="profile-edit-actions" style="margin-top:12px;">
+                <button id="btnSaveAddress" class="primary" type="button">Simpan Alamat</button>
+                <button id="btnCancelAddress" class="secondary" type="button">Batal</button>
+              </div>
+            </div>
+
+            <p id="addressMessage" class="profile-message" role="status" aria-live="polite"></p>
+          </div>
+
           <!-- KARTU MODUL P2: STATUS & FORM PENGAJUAN VERIFIKASI PERAN -->
           <div class="profile-card" id="verificationCard">
             <h3 style="margin:0 0 6px; font-size:1em;">Verifikasi Mitra Usaha & Kurir</h3>
@@ -534,20 +618,17 @@
               Kembangkan usaha dagangmu atau jadilah pengantar lokal di desa dengan mendaftar sebagai Mitra atau Kurir.
             </p>
 
-            <!-- TAMPILAN STATUS PENGAJUAN SAAT INI -->
             <div id="verificationStatusBox" class="hidden" style="margin-bottom:12px; padding:10px; border-radius:10px; background:var(--panel-bg); border:1px solid var(--panel-border);">
               <span class="profile-detail-label">Status Pengajuan Verifikasi:</span>
               <div id="verificationStatusBadge" class="verification-status-badge status-pending">Memeriksa status...</div>
               <div id="verificationStatusDetail" class="muted" style="font-size:0.8em; margin-top:6px; line-height:1.4;"></div>
             </div>
 
-            <!-- TOMBOL PILIH PERAN BAGI PELANGGAN -->
             <div id="verificationActionBtns" class="profile-edit-actions" style="grid-template-columns: 1fr 1fr; display:grid;">
               <button id="btnApplyMitra" class="secondary" type="button">🏪 Daftar Mitra</button>
               <button id="btnApplyKurir" class="secondary" type="button">🛵 Daftar Kurir</button>
             </div>
 
-            <!-- FORMULIR PENGAJUAN VERIFIKASI -->
             <div id="verificationFormBox" class="profile-edit-box hidden" style="margin-top:12px;">
               <h4 id="verificationFormTitle" style="margin:0 0 10px; font-size:0.95em;">Formulir Pengajuan</h4>
               
@@ -637,7 +718,7 @@
         </div>
 
         <div class="profile-status-note">
-          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Pengaturan akun & alur pengajuan verifikasi Mitra/Kurir telah diintegrasikan pada rilis Modul P2.
+          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Pengaturan akun, verifikasi peran, dan manajemen alamat lokasi telah diintegrasikan pada rilis Modul L1.
         </div>
       </div>
     </section>
@@ -676,6 +757,8 @@
     let currentRole = null;
     let currentProfile = null;
     let currentVerificationRequest = null;
+    let currentUserAddresses = [];
+    let editingAddressId = null;
     let selectedService = "";
     let targetVerificationRole = "mitra";
     const simulatedOrders = [];
@@ -859,6 +942,14 @@
 
     function setVerificationMessage(message, type) {
       const element = byId("verificationMessage");
+      element.textContent = message;
+      element.className = "profile-message";
+      if (type === "error") { element.classList.add("error"); }
+      if (type === "success") { element.classList.add("success"); }
+    }
+
+    function setAddressMessage(message, type) {
+      const element = byId("addressMessage");
       element.textContent = message;
       element.className = "profile-message";
       if (type === "error") { element.classList.add("error"); }
@@ -1261,6 +1352,276 @@
       }
     });
 
+    /* ========================================= MODUL L1: LOGIKA MANAJEMEN ALAMAT & LOKASI ========================================= */
+    async function loadUserAddresses() {
+      if (!supabaseClient || !currentUser) return;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("user_addresses")
+          .select("id,label,recipient_name,phone_number,full_address,area_note,is_primary,created_at")
+          .eq("user_id", currentUser.id)
+          .order("is_primary", { ascending: false })
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        currentUserAddresses = Array.isArray(data) ? data : [];
+        renderUserAddresses();
+      } catch (err) {
+        console.warn("Gagal memuat daftar alamat:", err);
+      }
+    }
+
+    function renderUserAddresses() {
+      const container = byId("addressList");
+      container.replaceChildren();
+
+      if (currentUserAddresses.length === 0) {
+        const emptyNote = document.createElement("p");
+        emptyNote.className = "muted";
+        emptyNote.style.cssText = "font-size:0.8em; text-align:center; padding:10px;";
+        emptyNote.textContent = "Belum ada alamat tersimpan. Tekan '+ Tambah Alamat' untuk menambahkan.";
+        container.append(emptyNote);
+        return;
+      }
+
+      currentUserAddresses.forEach(function(addr) {
+        const item = document.createElement("div");
+        item.className = "address-item";
+
+        const header = document.createElement("div");
+        header.className = "address-item-header";
+
+        const labelBadge = document.createElement("span");
+        labelBadge.className = "address-label-badge";
+        labelBadge.textContent = addr.label;
+
+        header.append(labelBadge);
+
+        if (addr.is_primary) {
+          const primaryBadge = document.createElement("span");
+          primaryBadge.className = "primary-badge";
+          primaryBadge.textContent = "Utama";
+          header.append(primaryBadge);
+        }
+
+        const body = document.createElement("div");
+        body.style.cssText = "font-size:0.85em; line-height:1.5; margin-bottom:8px;";
+        
+        const recipient = document.createElement("strong");
+        recipient.style.display = "block";
+        recipient.textContent = addr.recipient_name + " (" + addr.phone_number + ")";
+
+        const fullAddr = document.createElement("div");
+        fullAddr.style.cssText = "color:var(--text-color); margin-top:2px;";
+        fullAddr.textContent = addr.full_address;
+
+        body.append(recipient, fullAddr);
+
+        if (addr.area_note) {
+          const note = document.createElement("div");
+          note.className = "muted";
+          note.style.fontSize = "0.75em";
+          note.textContent = "Patokan: " + addr.area_note;
+          body.append(note);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "profile-edit-actions";
+
+        if (!addr.is_primary) {
+          const btnSetPrimary = document.createElement("button");
+          btnSetPrimary.className = "secondary";
+          btnSetPrimary.style.padding = "6px 10px";
+          btnSetPrimary.style.fontSize = "0.75em";
+          btnSetPrimary.type = "button";
+          btnSetPrimary.textContent = "Atur Utama";
+          btnSetPrimary.addEventListener("click", function() { setAddressPrimary(addr.id); });
+          actions.append(btnSetPrimary);
+        }
+
+        const btnEdit = document.createElement("button");
+        btnEdit.className = "secondary";
+        btnEdit.style.padding = "6px 10px";
+        btnEdit.style.fontSize = "0.75em";
+        btnEdit.type = "button";
+        btnEdit.textContent = "Edit";
+        btnEdit.addEventListener("click", function() { openAddressForm(addr); });
+
+        const btnDelete = document.createElement("button");
+        btnDelete.className = "danger-button";
+        btnDelete.style.padding = "6px 10px";
+        btnDelete.style.fontSize = "0.75em";
+        btnDelete.type = "button";
+        btnDelete.textContent = "Hapus";
+        btnDelete.addEventListener("click", function() { deleteAddress(addr.id); });
+
+        actions.append(btnEdit, btnDelete);
+
+        item.append(header, body, actions);
+        container.append(item);
+      });
+    }
+
+    function openAddressForm(addr = null) {
+      editingAddressId = addr ? addr.id : null;
+      const formBox = byId("addressFormBox");
+      const title = byId("addressFormTitle");
+
+      title.textContent = addr ? "Edit Alamat" : "Tambah Alamat Baru";
+      
+      const metadata = currentUser ? currentUser.user_metadata || {} : {};
+      byId("addrLabel").value = addr ? addr.label : "Rumah";
+      byId("addrRecipient").value = addr ? addr.recipient_name : (currentProfile?.full_name || metadata.full_name || "");
+      byId("addrPhone").value = addr ? addr.phone_number : (metadata.phone || currentUser?.phone || "");
+      byId("addrFull").value = addr ? addr.full_address : "";
+      byId("addrNote").value = addr ? (addr.area_note || "") : "";
+      byId("addrIsPrimary").checked = addr ? addr.is_primary : (currentUserAddresses.length === 0);
+
+      formBox.classList.remove("hidden");
+      setAddressMessage("", "");
+    }
+
+    byId("btnAddNewAddress").addEventListener("click", function() { openAddressForm(null); });
+    byId("btnCancelAddress").addEventListener("click", function() {
+      byId("addressFormBox").classList.add("hidden");
+      editingAddressId = null;
+    });
+
+    async function setAddressPrimary(addressId) {
+      if (!supabaseClient || !currentUser) return;
+      setAddressMessage("Memperbarui alamat utama...", "");
+
+      try {
+        // 1. Unset all addresses primary state
+        await supabaseClient
+          .from("user_addresses")
+          .update({ is_primary: false })
+          .eq("user_id", currentUser.id);
+
+        // 2. Set target address as primary
+        const { error } = await supabaseClient
+          .from("user_addresses")
+          .update({ is_primary: true, updated_at: new Date().toISOString() })
+          .eq("id", addressId)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+
+        setAddressMessage("Alamat utama berhasil diperbarui.", "success");
+        await loadUserAddresses();
+      } catch (err) {
+        console.error("Gagal menyetel alamat utama:", err);
+        setAddressMessage("Gagal menyetel alamat utama. Coba lagi.", "error");
+      }
+    }
+
+    async function deleteAddress(addressId) {
+      if (!supabaseClient || !currentUser) return;
+      if (!confirm("Apakah Anda yakin ingin menghapus alamat ini?")) return;
+
+      setAddressMessage("Menghapus alamat...", "");
+
+      try {
+        const { error } = await supabaseClient
+          .from("user_addresses")
+          .delete()
+          .eq("id", addressId)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+
+        setAddressMessage("Alamat berhasil dihapus.", "success");
+        await loadUserAddresses();
+      } catch (err) {
+        console.error("Gagal menghapus alamat:", err);
+        setAddressMessage("Gagal menghapus alamat. Coba lagi.", "error");
+      }
+    }
+
+    byId("btnSaveAddress").addEventListener("click", async function() {
+      if (!supabaseClient || !currentUser) return;
+
+      const label = byId("addrLabel").value.trim();
+      const recipientName = byId("addrRecipient").value.trim();
+      const phoneNumber = byId("addrPhone").value.trim();
+      const fullAddress = byId("addrFull").value.trim();
+      const areaNote = byId("addrNote").value.trim();
+      const isPrimary = byId("addrIsPrimary").checked;
+
+      if (label.length < 1) {
+        setAddressMessage("Label alamat harus diisi (misal: Rumah/Toko).", "error");
+        return;
+      }
+      if (recipientName.length < 2) {
+        setAddressMessage("Nama penerima harus diisi.", "error");
+        return;
+      }
+      if (phoneNumber.length < 8) {
+        setAddressMessage("Nomor WhatsApp/HP penerima harus diisi.", "error");
+        return;
+      }
+      if (fullAddress.length < 5) {
+        setAddressMessage("Alamat lengkap harus diisi jelas.", "error");
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = "Menyimpan...";
+      setAddressMessage("Menyimpan data alamat...", "");
+
+      try {
+        // Jika diset sebagai primary, reset dulu alamat lain
+        if (isPrimary) {
+          await supabaseClient
+            .from("user_addresses")
+            .update({ is_primary: false })
+            .eq("user_id", currentUser.id);
+        }
+
+        const payload = {
+          user_id: currentUser.id,
+          label: label,
+          recipient_name: recipientName,
+          phone_number: phoneNumber,
+          full_address: fullAddress,
+          area_note: areaNote,
+          is_primary: isPrimary || currentUserAddresses.length === 0,
+          updated_at: new Date().toISOString()
+        };
+
+        let responseError = null;
+
+        if (editingAddressId) {
+          const { error } = await supabaseClient
+            .from("user_addresses")
+            .update(payload)
+            .eq("id", editingAddressId)
+            .eq("user_id", currentUser.id);
+          responseError = error;
+        } else {
+          const { error } = await supabaseClient
+            .from("user_addresses")
+            .insert([payload]);
+          responseError = error;
+        }
+
+        if (responseError) throw responseError;
+
+        setAddressMessage("Alamat berhasil disimpan.", "success");
+        byId("addressFormBox").classList.add("hidden");
+        editingAddressId = null;
+        await loadUserAddresses();
+      } catch (err) {
+        console.error("Gagal menyimpan alamat:", err);
+        setAddressMessage(err.message || "Gagal menyimpan alamat. Periksa koneksi lalu coba lagi.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Simpan Alamat";
+      }
+    });
+
     /* ========================================= MODUL P2: LOGIKA VERIFIKASI MITRA & KURIR ========================================= */
     async function loadVerificationStatus() {
       if (!supabaseClient || !currentUser) return;
@@ -1328,7 +1689,6 @@
       lblBusiness.textContent = role === "mitra" ? "Nama Toko / Hasil Kebun / Usaha:" : "Jangkauan Wilayah Operasional Kurir:";
       txtBusiness.placeholder = role === "mitra" ? "Contoh: Warung Berkah / Kebun Kopi Mandiri" : "Contoh: Kecamatan Pagar Alam Selatan & Desa Sekitar";
 
-      // Isi data awal dari profil atau pengajuan lama jika ada
       const metadata = currentUser ? currentUser.user_metadata || {} : {};
       byId("verifFullName").value = currentVerificationRequest?.full_name || currentProfile?.full_name || metadata.full_name || "";
       byId("verifPhone").value = currentVerificationRequest?.phone || metadata.phone || currentUser?.phone || "";
@@ -1424,6 +1784,9 @@
       currentRole = null;
       currentProfile = null;
       currentVerificationRequest = null;
+      currentUserAddresses = [];
+      editingAddressId = null;
+
       byId("headerAccountActions").innerHTML = `
         <a class="account-login" href="login.html">Masuk</a>
         <a class="account-register" href="register.html">Daftar</a>
@@ -1437,6 +1800,7 @@
       setText("profileDescription", "Kamu sedang menggunakan beranda publik. Kamu tetap bisa menjelajahi layanan dan katalog produk tanpa login.");
       setProfileMessage("", "");
       setVerificationMessage("", "");
+      setAddressMessage("", "");
       byId("profileAvatarImage").removeAttribute("src");
       byId("profileAvatarImage").classList.add("hidden");
       byId("profileAvatarFallback").classList.remove("hidden");
@@ -1449,6 +1813,9 @@
       currentRole = null;
       currentProfile = null;
       currentVerificationRequest = null;
+      currentUserAddresses = [];
+      editingAddressId = null;
+
       byId("headerAccountActions").innerHTML = `
         <a class="account-login" href="#profile" onclick="show('profile'); return false;">Akun saya</a>
       `;
@@ -1547,8 +1914,13 @@
 
         showSignedInState(data.session.user);
         
-        Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus()]).catch(function(err) {
-          console.warn("Gagal memuat peran/profil/verifikasi pengguna:", err);
+        Promise.all([
+          loadUserRole(), 
+          loadUserProfile(), 
+          loadVerificationStatus(),
+          loadUserAddresses()
+        ]).catch(function(err) {
+          console.warn("Gagal memuat peran/profil/verifikasi/alamat pengguna:", err);
         });
 
       } catch (error) {
@@ -1847,7 +2219,12 @@
             showSignedInState(session.user);
             window.setTimeout(function() {
               if (currentUser && currentUser.id === session.user.id) {
-                Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus()]);
+                Promise.all([
+                  loadUserRole(), 
+                  loadUserProfile(), 
+                  loadVerificationStatus(),
+                  loadUserAddresses()
+                ]);
               }
             }, 0);
           }
