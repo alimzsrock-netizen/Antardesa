@@ -1,93 +1,84 @@
+/* =========================================
+   ANTARDESA SERVICE WORKER v0.3.0-RC2
+   Strategi: Network-First untuk Dokumen HTML
+   ========================================= */
 
-/*
- * AntarDesa PWA Service Worker
- * Cache hanya aset statis yang ditentukan.
- * Tidak menyimpan HTML, akun, pesanan, atau respons API.
- */
+const CACHE_NAME = "antardesa-cache-v0.3.0-rc2";
 
-const CACHE_NAME = 'antardesa-static-v2';
-
-const STATIC_ASSETS = [
-  './style.css',
-  './ui-components.css',
-  './ui-messages.js',
-  './app.js',
-  './icons/icon.svg',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+const ASSETS_TO_CACHE = [
+  "./",
+  "./index.html",
+  "./ui-components.css",
+  "./ui-messages.js",
+  "./manifest.json"
 ];
 
-self.addEventListener('install', function(event) {
+/* 1. Tahap Install: Simpan aset dasar & paksa aktivasi instan */
+self.addEventListener("install", function(event) {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .then(function() {
-        return self.skipWaiting();
-      })
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
 });
 
-self.addEventListener('activate', function(event) {
+/* 2. Tahap Activate: Bersihkan cache versi lama secara otomatis */
+self.addEventListener("activate", function(event) {
   event.waitUntil(
-    caches.keys()
-      .then(function(keys) {
-        return Promise.all(
-          keys
-            .filter(function(key) {
-              return key.startsWith('antardesa-static-') &&
-                     key !== CACHE_NAME;
-            })
-            .map(function(key) {
-              return caches.delete(key);
-            })
-        );
-      })
-      .then(function() {
-        return self.clients.claim();
-      })
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log("[ServiceWorker] Menghapus cache lama:", cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(function() {
+      return self.clients.claim();
+    })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+/* 3. Tahap Fetch: Menerapkan Network-First untuk Halaman Utama/HTML */
+self.addEventListener("fetch", function(event) {
   const request = event.request;
 
-  if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-
-  if (url.origin !== self.location.origin) return;
-
-  if (
-    request.mode === 'navigate' ||
-    request.destination === 'document'
-  ) {
+  if (request.method !== "GET") {
     return;
   }
 
-  const allowed = STATIC_ASSETS.some(function(asset) {
-    return new URL(asset, self.location.href).href === url.href;
-  });
-
-  if (!allowed) return;
-
-  event.respondWith(
-    fetch(request)
-      .then(function(response) {
-        if (response && response.ok) {
-          const copy = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then(function(cache) {
-              cache.put(request, copy);
+  /* Untuk halaman navigasi/HTML: Ambil dari Jaringan dulu. Jika offline/gagal, ambil dari Cache. */
+  if (request.mode === "navigate" || (request.headers.get("accept") && request.headers.get("accept").includes("text/html"))) {
+    event.respondWith(
+      fetch(request)
+        .then(function(networkResponse) {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(function(cache) {
+              cache.put(request, responseToCache);
             });
-        }
+          }
+          return networkResponse;
+        })
+        .catch(function() {
+          /* Fallback jika tidak ada jaringan sama sekali */
+          return caches.match(request).then(function(cachedResponse) {
+            return cachedResponse || caches.match("./index.html");
+          });
+        })
+    );
+    return;
+  }
 
-        return response;
-      })
-      .catch(function() {
-        return caches.match(request);
-      })
+  /* Untuk aset statis pendukung (CSS, JS, Gambar): Ambil dari Cache dulu, jika tidak ada ambil dari Jaringan */
+  event.respondWith(
+    caches.match(request).then(function(cachedResponse) {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(request);
+    })
   );
 });
