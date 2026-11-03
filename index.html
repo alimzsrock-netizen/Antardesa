@@ -2503,7 +2503,7 @@
       summaryBox.classList.remove("hidden");
     }
 
-    /* EKSEKUSI CHECKOUT NYATA (MODUL O1) */
+    /* EKSEKUSI CHECKOUT NYATA (MODUL O1) - Disesuaikan untuk merchant_id & mitra_id */
     byId("btnCheckout").addEventListener("click", async function() {
       if (!supabaseClient || !currentUser) {
         alert("Silakan masuk ke akun terlebih dahulu.");
@@ -2527,21 +2527,21 @@
       this.textContent = "Memproses Pesanan...";
 
       try {
-        // Asumsi produk pertama menentukan mitra_id penjual
         const firstProduct = cartItems[0].product;
-        const mitraId = firstProduct.user_id || firstProduct.mitra_id || currentUser.id; // Fallback ke currentUser jika uji mandiri
+        const mitraId = firstProduct.user_id || firstProduct.mitra_id || firstProduct.merchant_id || currentUser.id;
 
         let subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
         let shippingFee = 5000;
         let totalAmount = subtotal + shippingFee;
         let addressSnapshot = `${primaryAddr.label} - ${primaryAddr.recipient_name} (${primaryAddr.phone_number}), ${primaryAddr.full_address}`;
 
-        // 1. Insert ke tabel orders
+        // 1. Insert ke tabel orders (menyertakan merchant_id dan mitra_id agar kompatibel dengan database)
         const { data: orderData, error: orderError } = await supabaseClient
           .from("orders")
           .insert([{
             customer_id: currentUser.id,
             mitra_id: mitraId,
+            merchant_id: mitraId,
             status: "pending_confirmation",
             total_amount: totalAmount,
             shipping_fee: shippingFee,
@@ -2571,7 +2571,7 @@
 
         if (itemsError) throw itemsError;
 
-        alert("Pesanan berhasil dibuat dan dikirim ke Mitra! Silakan cek riwayat pesanan.");
+        alert("Pesanan berhasil dibuat dan dikirim! Silakan cek riwayat pesanan.");
         cartItems = [];
         updateCartBadge();
         renderCartPage();
