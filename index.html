@@ -1307,7 +1307,6 @@
       }
 
       try {
-        /* Batasi penantian getSession maksimal 4 detik */
         const { data, error } = await withTimeout(supabaseClient.auth.getSession(), 4000);
         
         if (error) { throw error; }
@@ -1318,7 +1317,6 @@
 
         showSignedInState(data.session.user);
         
-        /* Panggil data peran dan profil secara asinkron tanpa memblokir antarmuka */
         Promise.all([loadUserRole(), loadUserProfile()]).catch(function(err) {
           console.warn("Gagal memuat peran/profil pengguna:", err);
         });
@@ -1511,7 +1509,6 @@
           .order("created_at", { ascending: false })
           .limit(PRODUCT_LIMIT);
 
-        /* Batasi query produk maksimal 4 detik */
         const { data, error } = await withTimeout(queryPromise, 4000);
 
         if (error) { throw error; }
@@ -1591,15 +1588,13 @@
       }
     }
 
-    /* ========================================= INISIALISASI UTAMA (OPTIMISTIC & INSTAN) ========================================= */
+    /* ========================================= INISIALISASI UTAMA ========================================= */
     document.addEventListener("DOMContentLoaded", function() {
-      /* 1. Render UI dasar & lokal secara langsung (0 ms) */
       renderEmptyOrders();
       loadAppSettings();
       restoreLastTab();
       showGuestState();
 
-      /* 2. Inisialisasi Supabase SDK */
       if (window.supabase && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           auth: {
@@ -1610,7 +1605,6 @@
           }
         });
 
-        /* 3. Panggil data jaringan (dilindungi timeout 4 detik) */
         loadPublicProducts();
         refreshSession();
 
@@ -1634,12 +1628,16 @@
       }
     });
 
-    /* ========================================= SERVICE WORKER ========================================= */
+    /* ========================================= SERVICE WORKER (PAKSA CHECK KE SERVER) ========================================= */
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
-        navigator.serviceWorker.register("./service-worker.js", { scope: "./" }).catch(function(error) {
-          console.error("Service Worker gagal:", error);
-        });
+        navigator.serviceWorker.register("./service-worker.js?v=rc2", { scope: "./", updateViaCache: "none" })
+          .then(function(reg) {
+            reg.update();
+          })
+          .catch(function(error) {
+            console.error("Service Worker gagal:", error);
+          });
       });
     }
   </script>
