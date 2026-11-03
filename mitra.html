@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="ui-components.css">
   <style>
     * { box-sizing: border-box; }
-    
+
     :root {
       --bg-color: #121e19;
       --text-color: #e2ebe6;
@@ -24,258 +24,285 @@
       --font-scale: 15px;
     }
 
-    body { 
-      margin: 0; 
-      background: var(--bg-color); 
-      color: var(--text-color); 
-      font: var(--font-scale) Arial, sans-serif; 
+    body {
+      margin: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font: var(--font-scale) Arial, sans-serif;
     }
 
-    header { 
-      background: var(--header-bg); 
-      color: white; 
-      padding: 22px 18px; 
-      border-radius: 0 0 24px 24px; 
+    header {
+      background: var(--header-bg);
+      color: white;
+      padding: 22px 18px 26px;
+      border-radius: 0 0 24px 24px;
     }
     .header-inner { max-width: 650px; margin: auto; }
-    header h1 { margin: 0; font-size: 1.5em; }
-    header p { margin: 4px 0 0; font-size: 0.85em; opacity: 0.9; }
+    header h1 { margin: 0; font-size: 1.8em; }
+    header p { margin: 7px 0 0; font-size: 0.85em; }
 
-    main { max-width: 650px; margin: auto; padding: 18px 16px 90px; }
+    main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
 
-    .panel { 
-      background: var(--panel-bg); 
-      border: 1px solid var(--panel-border); 
-      border-radius: 16px; 
-      padding: 18px; 
-      margin-bottom: 18px; 
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
     }
-    .panel h2 { margin: 0 0 8px; font-size: 1.2em; }
-    .muted { color: var(--muted-color); font-size: 0.85em; line-height: 1.5; }
+    .panel h2 { margin: 0 0 8px; font-size: 1.25em; }
+    .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
 
-    .primary { 
-      background: var(--accent-color); 
-      color: white; 
-      border: 0; 
-      border-radius: 10px; 
-      padding: 11px 14px; 
-      font-weight: bold; 
-      cursor: pointer; 
-      font-size: 0.9em;
+    .card-sub {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .primary {
+      background: var(--accent-color);
+      color: white;
+      border: 0;
+      border-radius: 11px;
+      padding: 12px 16px;
+      font-weight: bold;
       width: 100%;
       display: block;
       text-align: center;
-    }
-    .secondary { 
-      background: var(--panel-bg); 
-      color: var(--accent-color); 
-      border: 1px solid var(--accent-color); 
-      border-radius: 10px; 
-      padding: 10px 14px; 
-      font-weight: bold; 
-      cursor: pointer; 
+      text-decoration: none;
+      cursor: pointer;
       font-size: 0.9em;
     }
-    .danger-btn {
-      background: #2a1f1f;
-      color: #f8a59d;
-      border: 1px solid #5c3232;
-      border-radius: 10px;
+    .secondary {
+      background: var(--panel-bg);
+      color: var(--accent-color);
+      border: 1px solid var(--accent-color);
+      border-radius: 11px;
       padding: 10px 14px;
+      width: 100%;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.85em;
       font-weight: bold;
-      cursor: pointer; 
-      font-size: 0.9em;
+    }
+    .danger-button {
+      background: var(--panel-bg);
+      color: #f8a59d;
+      border: 1px solid #b42318;
+      border-radius: 11px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
     }
 
-    button:disabled { opacity: 0.6; cursor: wait; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    label { display: block; font-weight: bold; font-size: 0.85em; margin: 12px 0 6px; }
+    input, textarea, select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font: inherit;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+    textarea { min-height: 80px; }
+
     .hidden { display: none !important; }
 
-    label { display: block; font-weight: bold; font-size: 0.85em; margin: 12px 0 4px; }
-    input, textarea, select { 
-      width: 100%; 
-      padding: 10px; 
-      border: 1px solid var(--input-border); 
-      border-radius: 8px; 
-      font: inherit; 
-      background: var(--input-bg); 
-      color: var(--text-color); 
-    }
-
-    /* BADGE & STATUS */
-    .badge-green { background: #133827; color: #4ade80; border: 1px solid #1f573d; padding: 4px 9px; border-radius: 6px; font-size: 0.75em; font-weight: bold; display: inline-block; }
-    
-    .merchant-order-card, .merchant-product-card {
+    /* PRODUK LIST STYLES */
+    .product-item {
       background: var(--card-sub-bg);
       border: 1px solid var(--panel-border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .order-status-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.75em;
-      font-weight: bold;
-    }
-    .status-pending { background: #3b2e16; color: #f6e05e; border: 1px solid #6c521a; }
-    .status-processing { background: #133827; color: #4ade80; border: 1px solid #1f573d; }
-    .status-delivering { background: #1e3a8a; color: #93c5fd; border: 1px solid #1d4ed8; }
-    .status-completed { background: #262626; color: #d4d4d4; border: 1px solid #404040; }
-
-    .action-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      border-radius: 12px;
+      padding: 12px;
       margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid var(--panel-border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
     }
+    .product-item-img {
+      width: 68px;
+      height: 68px;
+      min-width: 68px;
+      border-radius: 10px;
+      background: var(--panel-bg);
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--accent-color);
+      border: 1px solid var(--panel-border);
+    }
+    .product-item-info { flex: 1; min-width: 0; }
+    .product-item-title { font-weight: bold; font-size: 0.95em; margin-bottom: 3px; overflow-wrap: anywhere; }
+    .product-item-price { color: var(--accent-color); font-weight: bold; font-size: 0.9em; }
+    .product-item-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7em;
+      font-weight: bold;
+      margin-left: 6px;
+    }
+    .badge-active { background: #065f46; color: #a7f3d0; }
+    .badge-inactive { background: #451a1a; color: #fca5a5; }
+
+    .actions-grid { display: flex; gap: 6px; margin-top: 8px; }
 
     /* NAVIGASI BAWAH */
-    nav { 
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      right: 0; 
-      background: var(--nav-bg); 
-      border-top: 1px solid var(--nav-border); 
-      display: flex; 
-      justify-content: space-around; 
-      padding: 10px 8px calc(10px + env(safe-area-inset-bottom)); 
-      z-index: 5; 
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--nav-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+      z-index: 5;
     }
-    nav button { 
-      background: none; 
-      border: 0; 
-      font: inherit; 
-      font-size: 0.75em; 
-      color: var(--muted-color); 
-      min-width: 55px; 
-      padding: 4px; 
-      cursor: pointer; 
+    nav a, nav button {
+      background: none;
+      border: 0;
+      font: inherit;
+      font-size: 0.75em;
+      color: var(--muted-color);
+      text-decoration: none;
+      text-align: center;
+      min-width: 60px;
+      padding: 4px;
+      cursor: pointer;
     }
-    nav button.active { color: var(--accent-color); font-weight: bold; }
+    nav a.active, nav button.active { color: var(--accent-color); font-weight: bold; }
+
+    .status-msg { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); overflow-wrap: anywhere; }
+    .status-msg.error { color: #f8a59d; font-weight: bold; }
+    .status-msg.success { color: var(--accent-color); font-weight: bold; }
   </style>
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
     <div class="header-inner">
-      <h1>AntarDesa.</h1>
+      <h1>AntarDesa</h1>
       <p>Dashboard Mitra Usaha 🏪</p>
     </div>
   </header>
 
+  <!-- UTAMA -->
   <main>
-    <!-- TAB 1: TOKO & PRODUK -->
-    <section id="tab-toko" class="mitra-page">
-      <div class="panel">
-        <h2 style="font-size:1.1em; margin-bottom:6px;">Profil dan Verifikasi Mitra</h2>
-        <div style="background:var(--card-sub-bg); border:1px solid var(--panel-border); border-radius:12px; padding:14px; line-height:1.6; font-size:0.9em;">
-          <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
-          <div><strong>Peran:</strong> Mitra</div>
-          <div><strong>Verifikasi:</strong> Terverifikasi <span class="badge-green">Aktif</span></div>
+
+    <!-- PROFIL MITRA -->
+    <div class="panel">
+      <h2>Profil & Verifikasi Mitra</h2>
+      <p class="muted">
+        Informasi berikut dibaca dari sesi aktif akun Anda.
+      </p>
+
+      <div class="card-sub">
+        <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
+        <div style="margin-top:4px;"><strong>Status Usaha:</strong> <span id="mitraStatus" style="color:var(--accent-color); font-weight:bold;">Terverifikasi</span></div>
+      </div>
+    </div>
+
+    <!-- KELOLA PRODUK (MODUL K2) -->
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h2>Kelola Produk Toko 📦</h2>
+        <button id="btnOpenAddForm" class="secondary" type="button" style="width:auto; padding:7px 12px;">+ Tambah Produk</button>
+      </div>
+      <p class="muted">
+        Atur barang dagangan atau hasil kebun yang ingin ditampilkan pada katalog Pasar Desa.
+      </p>
+
+      <!-- FORM TAMBAH / EDIT PRODUK -->
+      <div id="productFormBox" class="card-sub hidden" style="border: 1px solid var(--accent-color);">
+        <h3 id="formProductTitle" style="margin:0 0 10px; font-size:1em;">Tambah Produk Baru</h3>
+
+        <label for="prodName" style="margin-top:0;">Nama Produk:</label>
+        <input id="prodName" type="text" maxlength="100" placeholder="Contoh: Kopi Robusta Pagar Alam 250g">
+
+        <label for="prodCategory">Kategori:</label>
+        <select id="prodCategory">
+          <option value="Hasil Kebun">Hasil Kebun</option>
+          <option value="Makanan & Minuman">Makanan & Minuman</option>
+          <option value="Sembako & Kebutuhan">Sembako & Kebutuhan</option>
+          <option value="Kerajinan Desa">Kerajinan Desa</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+
+        <label for="prodPrice">Harga (Rp):</label>
+        <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
+
+        <label for="prodStock">Stok Barang:</label>
+        <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
+
+        <label for="prodImage">Foto Produk (JPG/PNG/WebP, Maks 5MB):</label>
+        <input id="prodImage" type="file" accept="image/jpeg,image/png,image/webp">
+
+        <label for="prodDesc">Deskripsi Produk:</label>
+        <textarea id="prodDesc" maxlength="500" placeholder="Jelaskan kualitas, rasa, atau keunggulan produk Anda"></textarea>
+
+        <div class="actions-grid" style="margin-top:12px;">
+          <button id="btnSaveProduct" class="primary" type="button">Simpan Produk</button>
+          <button id="btnCancelProduct" class="secondary" type="button">Batal</button>
         </div>
       </div>
 
-      <!-- KELOLA PRODUK TOKO -->
-      <div class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <h2 style="font-size:1.1em; margin:0;">Kelola Produk Toko 🛒</h2>
-          <button class="primary" type="button" style="width:auto; padding:7px 12px; font-size:0.8em;" onclick="openProductForm(null)">+ Tambah Produk</button>
-        </div>
-        <p class="muted" style="margin-bottom:12px;">Tambah, edit, atau hapus produk yang tampil di katalog Pasar Desa secara real-time.</p>
+      <p id="productMsg" class="status-msg" role="status" aria-live="polite"></p>
 
-        <!-- FORM TAMBAH / EDIT PRODUK -->
-        <div id="productFormBox" class="panel hidden" style="background:var(--card-sub-bg); margin-bottom:14px;">
-          <h3 id="formProductTitle" style="margin-top:0; font-size:1em;">Tambah Produk Baru</h3>
-          <input type="hidden" id="editProductId">
-
-          <label for="prodName">Nama Produk:</label>
-          <input id="prodName" type="text" maxlength="120" placeholder="Contoh: Kopi Robusta 250g">
-
-          <label for="prodCategory">Kategori:</label>
-          <input id="prodCategory" type="text" maxlength="50" placeholder="Contoh: Hasil Kebun / Makanan">
-
-          <label for="prodPrice">Harga (Rp):</label>
-          <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
-
-          <label for="prodStock">Stok:</label>
-          <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
-
-          <label for="prodImage">URL Gambar Produk (Opsional):</label>
-          <input id="prodImage" type="url" placeholder="https://example.com/image.jpg">
-
-          <label for="prodDesc">Deskripsi:</label>
-          <textarea id="prodDesc" rows="3" placeholder="Jelaskan detail produk Anda"></textarea>
-
-          <div class="action-row" style="margin-top:14px;">
-            <button class="primary" type="button" style="flex:1;" onclick="saveProduct()">Simpan Produk</button>
-            <button class="secondary" type="button" style="flex:1;" onclick="closeProductForm()">Batal</button>
-          </div>
-        </div>
-
-        <div id="merchantProductList">
-          <p class="muted" style="text-align:center; padding:16px;">Memuat produk Anda...</p>
-        </div>
+      <!-- DAFTAR PRODUK MITRA -->
+      <div id="mitraProductList">
+        <p class="muted" style="text-align:center; padding:12px;">Memuat daftar produk...</p>
       </div>
-    </section>
+    </div>
 
-    <!-- TAB 2: GPS / LOKASI USAHA -->
-    <section id="tab-gps" class="mitra-page hidden">
-      <div class="panel">
-        <h2>Lokasi Toko & GPS 📍</h2>
-        <p class="muted">Titik koordinat usaha Anda untuk memudahkan kurir melakukan penjemputan.</p>
-        <div style="background:var(--card-sub-bg); border:1px dashed var(--accent-color); border-radius:10px; padding:14px; text-align:center; margin-top:12px;">
-          <strong style="color:var(--accent-color); font-family:monospace;">GPS Toko Aktif & Terverifikasi</strong>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: PESANAN MASUK -->
-    <section id="tab-pesanan" class="mitra-page hidden">
-      <div class="panel">
-        <h2>Pesanan Masuk (Real-Time) 📦</h2>
-        <p class="muted">Daftar pesanan nyata dari pelanggan.</p>
-        <div id="merchantOrdersList" style="margin-top:14px;">
-          <p class="muted" style="text-align:center; padding:20px;">Memuat pesanan...</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: AKUN -->
-    <section id="tab-akun" class="mitra-page hidden">
-      <div class="panel">
-        <h2>Pengaturan Akun Mitra 👤</h2>
-        <p class="muted">Kelola sesi masuk dan informasi akun Anda.</p>
-        <div style="margin-top:16px;">
-          <button class="danger-btn" type="button" onclick="logoutMitra()">🚪 Keluar dari Akun</button>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- NAVIGASI BAWAH -->
   <nav aria-label="Navigasi Mitra">
-    <button id="nav-toko" class="active" type="button" onclick="switchTab('toko')"><span>🏪</span><br>Toko</button>
-    <button id="nav-gps" type="button" onclick="switchTab('gps')"><span>📍</span><br>GPS</button>
-    <button id="nav-pesanan" type="button" onclick="switchTab('pesanan')"><span>📦</span><br>Pesanan</button>
-    <button id="nav-akun" type="button" onclick="switchTab('akun')"><span>👤</span><br>Akun</button>
+    <a href="index.html">
+      <span>⌂</span><br>Beranda
+    </a>
+    <a href="#" class="active">
+      <span>🏪</span><br>Toko
+    </a>
+    <a href="#" onclick="alert('Modul GPS lokasi toko akan datang'); return false;">
+      <span>📍</span><br>GPS
+    </a>
+    <a href="#" onclick="alert('Modul Pesanan Masuk akan datang'); return false;">
+      <span>📋</span><br>Pesanan
+    </a>
+    <a href="#" onclick="logoutFromMitra(); return false;">
+      <span>🚪</span><br>Keluar
+    </a>
   </nav>
 
+  <!-- EXTERNAL SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     "use strict";
 
     const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+    const BUCKET_NAME = "product-images";
 
     let supabaseClient = null;
     let currentUser = null;
-    let merchantOrders = [];
-    let merchantProducts = [];
-    let realtimeChannel = null;
+    let mitraProducts = [];
+    let editingProductId = null;
 
     const rupiahFormatter = new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -283,179 +310,300 @@
       maximumFractionDigits: 0
     });
 
-    function formatPrice(val) {
-      const num = Number(val);
-      return Number.isFinite(num) ? rupiahFormatter.format(num) : "Rp0";
+    function byId(id) { return document.getElementById(id); }
+
+    function setMsg(text, type) {
+      const el = byId("productMsg");
+      el.textContent = text;
+      el.className = "status-msg";
+      if (type === "error") el.classList.add("error");
+      if (type === "success") el.classList.add("success");
     }
 
-    function switchTab(tabName) {
-      document.querySelectorAll(".mitra-page").forEach(p => p.classList.add("hidden"));
-      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    /* KOMPRESI FOTO HP OTOMATIS (RESIZE MAX 800PX, JPEG 0.75) */
+    function compressImage(file, maxWidth = 800, quality = 0.75) {
+      return new Promise(function(resolve) {
+        if (!file || !file.type.startsWith("image/")) {
+          resolve(file);
+          return;
+        }
 
-      const targetPage = document.getElementById("tab-" + tabName);
-      const targetNav = document.getElementById("nav-" + tabName);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            let width = img.width;
+            let height = img.height;
 
-      if (targetPage) targetPage.classList.remove("hidden");
-      if (targetNav) targetNav.classList.add("active");
-      window.scrollTo(0, 0);
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
 
-      if (tabName === "pesanan") loadMerchantOrders();
-      if (tabName === "toko") loadMerchantProducts();
-    }
+            canvas.width = width;
+            canvas.height = height;
 
-    async function initSupabase() {
-      if (!window.supabase || !window.supabase.createClient) return;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
 
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
+            canvas.toBlob(
+              function(blob) {
+                if (blob) {
+                  const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                    type: "image/jpeg",
+                    lastModified: Date.now()
+                  });
+                  resolve(compressedFile);
+                } else {
+                  resolve(file);
+                }
+              },
+              "image/jpeg",
+              quality
+            );
+          };
+          img.onerror = function() { resolve(file); };
+        };
+        reader.onerror = function() { resolve(file); };
       });
-
-      const { data: sessionData } = await supabaseClient.auth.getSession();
-      if (!sessionData || !sessionData.session || !sessionData.session.user) {
-        alert("Silakan masuk terlebih dahulu dengan akun Mitra.");
-        window.location.href = "login.html";
-        return;
-      }
-
-      currentUser = sessionData.session.user;
-      document.getElementById("mitraEmail").textContent = currentUser.email;
-
-      loadMerchantProducts();
-      loadMerchantOrders();
-      initRealtime();
     }
 
-    /* ==================== KELOLA PRODUK ==================== */
-    async function loadMerchantProducts() {
+    /* LOAD PRODUCTS */
+    async function loadMitraProducts() {
       if (!supabaseClient || !currentUser) return;
-      const container = document.getElementById("merchantProductList");
+
+      const container = byId("mitraProductList");
+      container.innerHTML = '<p class="muted" style="text-align:center; padding:12px;">Memuat produk Anda...</p>';
 
       try {
         const { data, error } = await supabaseClient
           .from("products")
-          .select("id,name,category,price,stock,image_url,description,is_active")
+          .select("id,name,description,category,price,stock,image_url,is_active,created_at")
           .eq("user_id", currentUser.id)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        merchantProducts = Array.isArray(data) ? data : [];
-        renderMerchantProducts();
+
+        mitraProducts = Array.isArray(data) ? data : [];
+        renderMitraProducts();
       } catch (err) {
         console.error("Gagal memuat produk:", err);
-        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal memuat produk dari server.</p>';
+        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal memuat daftar produk.</p>';
       }
     }
 
-    function renderMerchantProducts() {
-      const container = document.getElementById("merchantProductList");
+    /* RENDER PRODUCTS */
+    function renderMitraProducts() {
+      const container = byId("mitraProductList");
       container.replaceChildren();
 
-      if (merchantProducts.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Belum ada produk. Klik "+ Tambah Produk" di atas.</p>';
+      if (mitraProducts.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:14px;">Belum ada produk. Klik "+ Tambah Produk" di atas.</p>';
         return;
       }
 
-      merchantProducts.forEach(prod => {
-        const card = document.createElement("div");
-        card.className = "merchant-product-card";
+      mitraProducts.forEach(function(prod) {
+        const item = document.createElement("div");
+        item.className = "product-item";
 
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div>
-              <strong style="font-size:0.95em;">${prod.name}</strong>
-              <div class="muted" style="font-size:0.8em; margin-top:2px;">Kategori: ${prod.category || "-"} | Stok: ${prod.stock}</div>
-              <div style="color:var(--accent-color); font-weight:bold; font-size:0.9em; margin-top:4px;">${formatPrice(prod.price)}</div>
-            </div>
-            <span class="badge-green">${prod.is_active !== false ? "Aktif" : "Nonaktif"}</span>
-          </div>
-          <div class="action-row">
-            <button class="secondary" style="padding:6px 10px; font-size:0.8em;" onclick='openProductForm(${JSON.stringify(prod)})'>Edit</button>
-            <button class="danger-btn" style="padding:6px 10px; font-size:0.8em;" onclick="deleteProduct('${prod.id}')">Hapus</button>
-          </div>
-        `;
-        container.append(card);
+        // Image
+        const imgBox = document.createElement("div");
+        imgBox.className = "product-item-img";
+        if (prod.image_url) {
+          const img = document.createElement("img");
+          img.src = prod.image_url;
+          img.alt = prod.name;
+          img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:10px;";
+          imgBox.append(img);
+        } else {
+          imgBox.textContent = "📦";
+        }
+
+        // Info
+        const info = document.createElement("div");
+        info.className = "product-item-info";
+
+        const title = document.createElement("div");
+        title.className = "product-item-title";
+        title.textContent = prod.name;
+
+        const badge = document.createElement("span");
+        badge.className = "product-item-badge " + (prod.is_active ? "badge-active" : "badge-inactive");
+        badge.textContent = prod.is_active ? "Aktif" : "Nonaktif";
+        title.append(badge);
+
+        const price = document.createElement("div");
+        price.className = "product-item-price";
+        price.textContent = rupiahFormatter.format(prod.price) + " | Stok: " + prod.stock;
+
+        const actions = document.createElement("div");
+        actions.className = "actions-grid";
+
+        const btnToggle = document.createElement("button");
+        btnToggle.className = "secondary";
+        btnToggle.style.padding = "5px 8px";
+        btnToggle.style.fontSize = "0.75em";
+        btnToggle.textContent = prod.is_active ? "Sembunyikan" : "Tampilkan";
+        btnToggle.addEventListener("click", function() { toggleProductStatus(prod); });
+
+        const btnEdit = document.createElement("button");
+        btnEdit.className = "secondary";
+        btnEdit.style.padding = "5px 8px";
+        btnEdit.style.fontSize = "0.75em";
+        btnEdit.textContent = "Edit";
+        btnEdit.addEventListener("click", function() { openProductForm(prod); });
+
+        const btnDelete = document.createElement("button");
+        btnDelete.className = "danger-button";
+        btnDelete.style.padding = "5px 8px";
+        btnDelete.style.fontSize = "0.75em";
+        btnDelete.textContent = "Hapus";
+        btnDelete.addEventListener("click", function() { deleteProduct(prod.id); });
+
+        actions.append(btnToggle, btnEdit, btnDelete);
+        info.append(title, price, actions);
+        item.append(imgBox, info);
+        container.append(item);
       });
     }
 
-    function openProductForm(prod) {
-      document.getElementById("productFormBox").classList.remove("hidden");
-      if (prod) {
-        document.getElementById("formProductTitle").textContent = "Edit Produk";
-        document.getElementById("editProductId").value = prod.id;
-        document.getElementById("prodName").value = prod.name || "";
-        document.getElementById("prodCategory").value = prod.category || "";
-        document.getElementById("prodPrice").value = prod.price || "";
-        document.getElementById("prodStock").value = prod.stock || "";
-        document.getElementById("prodImage").value = prod.image_url || "";
-        document.getElementById("prodDesc").value = prod.description || "";
-      } else {
-        document.getElementById("formProductTitle").textContent = "Tambah Produk Baru";
-        document.getElementById("editProductId").value = "";
-        document.getElementById("prodName").value = "";
-        document.getElementById("prodCategory").value = "";
-        document.getElementById("prodPrice").value = "";
-        document.getElementById("prodStock").value = "";
-        document.getElementById("prodImage").value = "";
-        document.getElementById("prodDesc").value = "";
-      }
+    /* FORM HANDLERS */
+    function openProductForm(prod = null) {
+      editingProductId = prod ? prod.id : null;
+      byId("formProductTitle").textContent = prod ? "Edit Produk" : "Tambah Produk Baru";
+
+      byId("prodName").value = prod ? prod.name : "";
+      byId("prodCategory").value = prod ? prod.category : "Hasil Kebun";
+      byId("prodPrice").value = prod ? prod.price : "";
+      byId("prodStock").value = prod ? prod.stock : "";
+      byId("prodDesc").value = prod ? (prod.description || "") : "";
+      byId("prodImage").value = "";
+
+      byId("productFormBox").classList.remove("hidden");
+      setMsg("", "");
     }
 
-    function closeProductForm() {
-      document.getElementById("productFormBox").classList.add("hidden");
-    }
+    byId("btnOpenAddForm").addEventListener("click", function() { openProductForm(null); });
+    byId("btnCancelProduct").addEventListener("click", function() {
+      byId("productFormBox").classList.add("hidden");
+      editingProductId = null;
+    });
 
-    async function saveProduct() {
+    /* SAVE PRODUCT (DENGAN KOMPRESI OTOMATIS) */
+    byId("btnSaveProduct").addEventListener("click", async function() {
       if (!supabaseClient || !currentUser) return;
 
-      const id = document.getElementById("editProductId").value;
-      const name = document.getElementById("prodName").value.trim();
-      const category = document.getElementById("prodCategory").value.trim();
-      const price = Number(document.getElementById("prodPrice").value);
-      const stock = Number(document.getElementById("prodStock").value);
-      const imageUrl = document.getElementById("prodImage").value.trim();
-      const description = document.getElementById("prodDesc").value.trim();
+      const name = byId("prodName").value.trim();
+      const category = byId("prodCategory").value;
+      const price = parseFloat(byId("prodPrice").value);
+      const stock = parseInt(byId("prodStock").value, 10);
+      const desc = byId("prodDesc").value.trim();
+      const imageFile = byId("prodImage").files[0];
 
-      if (!name || isNaN(price) || isNaN(stock)) {
-        alert("Nama produk, harga, dan stok wajib diisi dengan benar.");
-        return;
-      }
+      if (!name) { setMsg("Nama produk wajib diisi.", "error"); return; }
+      if (isNaN(price) || price < 0) { setMsg("Harga tidak valid.", "error"); return; }
+      if (isNaN(stock) || stock < 0) { setMsg("Jumlah stok tidak valid.", "error"); return; }
 
-      const payload = {
-        user_id: currentUser.id,
-        name: name,
-        category: category || "Umum",
-        price: price,
-        stock: stock,
-        image_url: imageUrl || null,
-        description: description || null,
-        is_active: true,
-        updated_at: new Date().toISOString()
-      };
+      this.disabled = true;
+      this.textContent = "Memproses...";
+      setMsg("Menyiapkan data produk...", "");
 
       try {
-        let err = null;
-        if (id) {
-          const res = await supabaseClient.from("products").update(payload).eq("id", id).eq("user_id", currentUser.id);
-          err = res.error;
-        } else {
-          const res = await supabaseClient.from("products").insert([payload]);
-          err = res.error;
+        let imageUrl = null;
+
+        if (imageFile) {
+          setMsg("Mengompresi foto produk...", "");
+          const compressedFile = await compressImage(imageFile, 800, 0.75);
+
+          setMsg("Mengunggah foto...", "");
+          const filePath = `${currentUser.id}/${Date.now()}.jpg`;
+
+          const { error: uploadErr } = await supabaseClient
+            .storage
+            .from(BUCKET_NAME)
+            .upload(filePath, compressedFile, { upsert: true, contentType: "image/jpeg" });
+
+          if (uploadErr) throw uploadErr;
+
+          const { data: pubUrlData } = supabaseClient
+            .storage
+            .from(BUCKET_NAME)
+            .getPublicUrl(filePath);
+
+          imageUrl = pubUrlData?.publicUrl || null;
         }
 
-        if (err) throw err;
+        setMsg("Menyimpan ke database...", "");
+        const payload = {
+          user_id: currentUser.id,
+          name: name,
+          category: category,
+          price: price,
+          stock: stock,
+          description: desc,
+          updated_at: new Date().toISOString()
+        };
 
-        alert("Produk berhasil disimpan!");
-        closeProductForm();
-        loadMerchantProducts();
+        if (imageUrl) {
+          payload.image_url = imageUrl;
+        }
+
+        let resError = null;
+
+        if (editingProductId) {
+          const { error } = await supabaseClient
+            .from("products")
+            .update(payload)
+            .eq("id", editingProductId)
+            .eq("user_id", currentUser.id);
+          resError = error;
+        } else {
+          payload.is_active = true;
+          const { error } = await supabaseClient
+            .from("products")
+            .insert([payload]);
+          resError = error;
+        }
+
+        if (resError) throw resError;
+
+        setMsg("Produk berhasil disimpan!", "success");
+        byId("productFormBox").classList.add("hidden");
+        editingProductId = null;
+        await loadMitraProducts();
       } catch (err) {
         console.error("Gagal menyimpan produk:", err);
-        alert("Gagal menyimpan produk: " + (err.message || "Kesalahan server"));
+        setMsg(err.message || "Gagal menyimpan produk. Coba lagi.", "error");
+      } finally {
+        this.disabled = false;
+        this.textContent = "Simpan Produk";
+      }
+    });
+
+    /* TOGGLE ACTIVE STATUS */
+    async function toggleProductStatus(prod) {
+      if (!supabaseClient || !currentUser) return;
+      try {
+        const { error } = await supabaseClient
+          .from("products")
+          .update({ is_active: !prod.is_active, updated_at: new Date().toISOString() })
+          .eq("id", prod.id)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+        await loadMitraProducts();
+      } catch (err) {
+        alert("Gagal memperbarui status produk.");
       }
     }
 
+    /* DELETE PRODUCT */
     async function deleteProduct(productId) {
       if (!supabaseClient || !currentUser) return;
-      if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
+      if (!confirm("Hapus produk ini dari toko Anda?")) return;
 
       try {
         const { error } = await supabaseClient
@@ -465,92 +613,38 @@
           .eq("user_id", currentUser.id);
 
         if (error) throw error;
-        alert("Produk berhasil dihapus.");
-        loadMerchantProducts();
+        setMsg("Produk berhasil dihapus.", "success");
+        await loadMitraProducts();
       } catch (err) {
-        console.error("Gagal menghapus produk:", err);
-        alert("Gagal menghapus produk.");
+        setMsg("Gagal menghapus produk.", "error");
       }
     }
 
-    /* ==================== KELOLA PESANAN ==================== */
-    async function loadMerchantOrders() {
-      if (!supabaseClient || !currentUser) return;
-      const container = document.getElementById("merchantOrdersList");
-
-      try {
-        const { data, error } = await supabaseClient
-          .from("orders")
-          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,mitra_id,merchant_id")
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        merchantOrders = Array.isArray(data) ? data.filter(o => o.mitra_id === currentUser.id || o.merchant_id === currentUser.id || !o.mitra_id) : [];
-        if (merchantOrders.length === 0 && Array.isArray(data) && data.length > 0) merchantOrders = data;
-
-        renderMerchantOrders();
-      } catch (err) {
-        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal mengambil pesanan.</p>';
+    /* LOGOUT */
+    async function logoutFromMitra() {
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
       }
-    }
-
-    function renderMerchantOrders() {
-      const container = document.getElementById("merchantOrdersList");
-      container.replaceChildren();
-
-      if (merchantOrders.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada pesanan masuk.</p>';
-        return;
-      }
-
-      merchantOrders.forEach(ord => {
-        const card = document.createElement("div");
-        card.className = "merchant-order-card";
-
-        const badgeClass = ord.status === "processing" ? "status-processing" : ord.status === "completed" ? "status-completed" : "status-pending";
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <strong>Pesanan #${ord.id.substring(0, 8).toUpperCase()}</strong>
-            <span class="order-status-badge ${badgeClass}">${ord.status}</span>
-          </div>
-          <div style="font-size:0.85em; line-height:1.4; margin-bottom:8px;">
-            <strong>Total:</strong> ${formatPrice(ord.total_amount)}<br><strong>Alamat:</strong> ${ord.address_snapshot}
-          </div>
-          <div class="action-row">
-            ${ord.status === "pending_confirmation" || ord.status === "pending" ? `<button class="primary" style="width:auto; padding:6px 12px; font-size:0.8em;" onclick="updateOrderStatus('${ord.id}', 'processing')">✔ Proses</button>` : ""}
-            ${ord.status === "processing" ? `<button class="primary" style="width:auto; padding:6px 12px; font-size:0.8em;" onclick="updateOrderStatus('${ord.id}', 'finding_courier')">🛵 Cari Kurir</button>` : ""}
-            <button class="danger-btn" style="padding:6px 12px; font-size:0.8em;" onclick="updateOrderStatus('${ord.id}', 'cancelled')">Batalkan</button>
-          </div>
-        `;
-        container.append(card);
-      });
-    }
-
-    async function updateOrderStatus(orderId, newStatus) {
-      if (!supabaseClient) return;
-      try {
-        const { error } = await supabaseClient.from("orders").update({ status: newStatus, updated_at: new Date().toISOString() }).eq("id", orderId);
-        if (error) throw error;
-        alert("Status pesanan diperbarui!");
-        loadMerchantOrders();
-      } catch (err) {
-        alert("Gagal memperbarui status.");
-      }
-    }
-
-    async function logoutMitra() {
-      if (!supabaseClient) return;
-      await supabaseClient.auth.signOut();
       window.location.href = "index.html";
     }
 
-    function initRealtime() {
-      if (!supabaseClient || realtimeChannel) return;
-      realtimeChannel = supabaseClient.channel("merchant_realtime").on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => loadMerchantOrders()).subscribe();
-    }
+    /* INIT */
+    document.addEventListener("DOMContentLoaded", async function() {
+      if (window.supabase && window.supabase.createClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
+        });
 
-    document.addEventListener("DOMContentLoaded", initSupabase);
+        const { data } = await supabaseClient.auth.getSession();
+        if (data && data.session) {
+          currentUser = data.session.user;
+          byId("mitraEmail").textContent = currentUser.email;
+          loadMitraProducts();
+        } else {
+          window.location.href = "login.html";
+        }
+      }
+    });
   </script>
 </body>
 </html>
