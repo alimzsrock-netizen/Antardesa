@@ -207,7 +207,7 @@
     .account-actions-main { display: grid; gap: 9px; margin-top: 12px; }
     .account-message { color: var(--muted-color); font-size: 0.8em; line-height: 1.5; margin-top: 10px; }
 
-    /* KATALOG PRODUK */
+    /* KATALOG PRODUK MODUL K1 */
     .catalog-section { margin-top: 26px; }
     .catalog-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
     .catalog-heading h2 { margin: 0; font-size: 1.3em; }
@@ -216,21 +216,99 @@
     .catalog-tools input, .catalog-tools select { min-width: 0; }
     .catalog-count { color: var(--muted-color); font-size: 0.8em; margin-bottom: 12px; }
     .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .product-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 14px; overflow: hidden; min-width: 0; }
+    .product-card { 
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-radius: 14px; 
+      overflow: hidden; 
+      min-width: 0; 
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .product-card:active { transform: scale(0.98); }
     .product-image { width: 100%; aspect-ratio: 1 / 1; background: var(--card-sub-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 38px; }
     .product-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .product-content { padding: 11px; }
     .product-category { display: inline-block; color: var(--accent-color); background: var(--card-sub-bg); padding: 4px 7px; border-radius: 6px; font-size: 0.7em; font-weight: bold; margin-bottom: 7px; max-width: 100%; overflow-wrap: anywhere; }
-    .product-name { font-size: 0.95em; font-weight: bold; line-height: 1.4; margin: 0 0 7px; overflow-wrap: anywhere; }
+    .product-name { font-size: 0.95em; font-weight: bold; line-height: 1.4; margin: 0 0 7px; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .product-price { color: var(--accent-color); font-weight: bold; font-size: 1em; margin-bottom: 7px; overflow-wrap: anywhere; }
-    .product-stock { color: var(--muted-color); font-size: 0.75em; margin-bottom: 8px; }
-    .product-description { color: var(--muted-color); font-size: 0.75em; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-line; }
+    .product-stock { color: var(--muted-color); font-size: 0.75em; margin-bottom: 4px; }
     .product-placeholder { font-size: 38px; }
     .catalog-state { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px 14px; text-align: center; color: var(--muted-color); font-size: 0.85em; line-height: 1.6; }
     .catalog-refresh { width: auto; min-width: 86px; padding: 9px 12px; font-size: 0.8em; }
     .catalog-footer { margin-top: 13px; font-size: 0.75em; line-height: 1.5; color: var(--muted-color); }
 
-    /* PROFIL & ALAMAT L1 STYLES */
+    /* MODAL DETAIL PRODUK (MODUL K1) */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+    .modal-card {
+      background: var(--panel-bg);
+      color: var(--text-color);
+      width: 100%;
+      max-width: 650px;
+      max-height: 88vh;
+      border-radius: 20px 20px 0 0;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .modal-close-btn {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-product-img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: var(--card-sub-bg);
+      margin-bottom: 14px;
+    }
+    .modal-seller-box {
+      background: var(--card-sub-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* PROFIL & ALAMAT STYLES */
     .profile-card { border: 1px solid var(--panel-border); background: var(--card-sub-bg); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
     .profile-avatar { width: 86px; height: 86px; min-width: 86px; border-radius: 50%; background: var(--panel-bg); border: 2px solid var(--panel-border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 30px; font-weight: bold; }
@@ -256,7 +334,6 @@
     .checkbox-group input[type="checkbox"] { width: auto; margin-top: 3px; }
     .checkbox-group label { margin: 0; font-weight: normal; font-size: 0.85em; }
 
-    /* BADGE VERIFIKASI & ALAMAT */
     .verification-status-badge {
       display: inline-block;
       padding: 4px 9px;
@@ -269,7 +346,6 @@
     .status-approved { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .status-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
-    /* ALAMAT CARD STYLES */
     .address-item {
       padding: 12px;
       border: 1px solid var(--panel-border);
@@ -395,7 +471,7 @@
           <button id="refreshCatalogButton" class="secondary catalog-refresh" type="button">Muat ulang</button>
         </div>
         <p class="muted catalog-description">
-          Temukan hasil kebun dan produk dari Mitra AntarDesa. Katalog ini dapat dijelajahi oleh semua pengguna.
+          Temukan hasil kebun dan produk dari Mitra AntarDesa. Klik kartu produk untuk melihat detail lengkap.
         </p>
 
         <div class="catalog-tools">
@@ -419,6 +495,43 @@
         Kandidat rilis untuk pengujian. Fitur layanan pada halaman ini masih berupa simulasi lokal. Belum menerima pesanan atau transaksi nyata.
       </div>
     </section>
+
+    <!-- MODAL DETAIL PRODUK (MODUL K1) -->
+    <div id="productDetailModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalProductName">
+      <div class="modal-card">
+        <div class="modal-header">
+          <span id="modalProductCategory" class="product-category" style="margin:0;">Kategori</span>
+          <button id="btnCloseModal" class="modal-close-btn" type="button" aria-label="Tutup detail">✕</button>
+        </div>
+
+        <div id="modalImageContainer">
+          <img id="modalProductImg" class="modal-product-img hidden" alt="Foto detail produk">
+          <div id="modalProductImgPlaceholder" class="product-image modal-product-img" style="font-size:50px;">📦</div>
+        </div>
+
+        <h3 id="modalProductName" style="margin:0 0 6px; font-size:1.2em;">Nama Produk</h3>
+        <div id="modalProductPrice" class="product-price" style="font-size:1.2em; margin-bottom:4px;">Rp0</div>
+        <div id="modalProductStock" class="product-stock" style="margin-bottom:12px;">Stok tersedia: 0</div>
+
+        <!-- INFO SELLER / MITRA -->
+        <div class="modal-seller-box">
+          <span style="font-size:24px;">🏪</span>
+          <div>
+            <strong id="modalSellerName" style="display:block; font-size:0.85em;">Mitra AntarDesa</strong>
+            <span id="modalSellerLocation" class="muted" style="font-size:0.75em;">Lokasi usaha terverifikasi</span>
+          </div>
+        </div>
+
+        <label style="margin-top:12px; margin-bottom:4px;">Deskripsi Produk:</label>
+        <div id="modalProductDesc" class="muted" style="font-size:0.85em; line-height:1.6; white-space:pre-line; margin-bottom:18px;">
+          Belum ada deskripsi.
+        </div>
+
+        <button class="primary" type="button" onclick="alert('Fitur pemesanan dan checkout saat ini masih dikunci (simulasi).')">
+          🛒 Pesan via Titip Belanja
+        </button>
+      </div>
+    </div>
 
     <!-- HALAMAN FORM SIMULASI -->
     <section id="formpage" class="page hidden">
@@ -507,7 +620,6 @@
 
           <!-- KARTU 2: DETAIL AKUN & EDIT DATA -->
           <div class="profile-card">
-            <!-- NAMA LENGKAP -->
             <div class="profile-detail">
               <div class="profile-detail-header">
                 <div>
@@ -526,7 +638,6 @@
               </div>
             </div>
 
-            <!-- EMAIL -->
             <div class="profile-detail">
               <div class="profile-detail-header">
                 <div>
@@ -546,14 +657,12 @@
               </div>
             </div>
 
-            <!-- NOMOR HP (DITUNDA) -->
             <div class="profile-detail">
               <span class="profile-detail-label">Nomor HP</span>
               <span class="profile-detail-value" id="profilePhone">Belum tersedia</span>
               <span class="muted" style="font-size:0.7em; display:block; margin-top:2px;">*Perubahan nomor HP saat ini ditunda.</span>
             </div>
 
-            <!-- PERAN & VERIFIKASI -->
             <div class="profile-detail">
               <span class="profile-detail-label">Jenis akun dan verifikasi</span>
               <span class="profile-detail-value" id="profileRole">Memeriksa peran akun...</span>
@@ -571,14 +680,12 @@
               Simpan alamat rumah, toko, atau kebun untuk memudahkan pemesanan dan penjemputan paket.
             </p>
 
-            <!-- DAFTAR ALAMAT -->
             <div id="addressList">
               <p id="addressEmptyNote" class="muted" style="font-size:0.8em; text-align:center; padding:10px;">
                 Belum ada alamat tersimpan. Tekan '+ Tambah Alamat' untuk menambahkan.
               </p>
             </div>
 
-            <!-- FORMULIR INPUT / EDIT ALAMAT -->
             <div id="addressFormBox" class="profile-edit-box hidden" style="margin-top:12px;">
               <h4 id="addressFormTitle" style="margin:0 0 10px; font-size:0.95em;">Tambah Alamat Baru</h4>
 
@@ -718,7 +825,7 @@
         </div>
 
         <div class="profile-status-note">
-          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Pengaturan akun, verifikasi peran, dan manajemen alamat lokasi telah diintegrasikan pada rilis Modul L1.
+          Dashboard utama tetap menjadi halaman awal untuk semua pengguna. Eksplorasi katalog & detail produk telah diintegrasikan pada rilis Modul K1.
         </div>
       </div>
     </section>
@@ -1494,13 +1601,11 @@
       setAddressMessage("Memperbarui alamat utama...", "");
 
       try {
-        // 1. Unset all addresses primary state
         await supabaseClient
           .from("user_addresses")
           .update({ is_primary: false })
           .eq("user_id", currentUser.id);
 
-        // 2. Set target address as primary
         const { error } = await supabaseClient
           .from("user_addresses")
           .update({ is_primary: true, updated_at: new Date().toISOString() })
@@ -1572,7 +1677,6 @@
       setAddressMessage("Menyimpan data alamat...", "");
 
       try {
-        // Jika diset sebagai primary, reset dulu alamat lain
         if (isPrimary) {
           await supabaseClient
             .from("user_addresses")
@@ -1991,6 +2095,51 @@
       state.style.color = isError ? "#b42318" : "#61746b";
     }
 
+    /* ========================================= MODUL K1: MODAL DETAIL PRODUK ========================================= */
+    function openProductDetailModal(product) {
+      const modal = byId("productDetailModal");
+      const img = byId("modalProductImg");
+      const imgPlaceholder = byId("modalProductImgPlaceholder");
+
+      setText("modalProductCategory", product.category || "Produk Desa");
+      setText("modalProductName", product.name);
+      setText("modalProductPrice", formatPrice(product.price));
+      
+      const stockValue = Number(product.stock);
+      setText("modalProductStock", Number.isFinite(stockValue) && stockValue > 0 ? "Stok tersedia: " + stockValue + " unit" : "Stok saat ini habis");
+      setText("modalProductDesc", product.description || "Belum ada deskripsi lengkap untuk produk ini.");
+
+      // Seller Info
+      setText("modalSellerName", product.seller_name || product.store_name || "Mitra AntarDesa");
+      setText("modalSellerLocation", product.seller_location || "Wilayah Operasional AntarDesa");
+
+      const imageUrl = safeImageUrl(product.image_url);
+      if (imageUrl) {
+        img.src = imageUrl;
+        img.classList.remove("hidden");
+        imgPlaceholder.classList.add("hidden");
+      } else {
+        img.removeAttribute("src");
+        img.classList.add("hidden");
+        imgPlaceholder.classList.remove("hidden");
+      }
+
+      modal.classList.remove("hidden");
+      document.body.style.overflow = "hidden"; // Kunci scroll background
+    }
+
+    function closeProductDetailModal() {
+      byId("productDetailModal").classList.add("hidden");
+      document.body.style.overflow = ""; // Pulihkan scroll
+    }
+
+    byId("btnCloseModal").addEventListener("click", closeProductDetailModal);
+    byId("productDetailModal").addEventListener("click", function(event) {
+      if (event.target === this) {
+        closeProductDetailModal();
+      }
+    });
+
     /* ========================================= KARTU PRODUK ========================================= */
     function createProductCard(product) {
       const card = document.createElement("article");
@@ -2021,12 +2170,17 @@
       const name = createTextElement("h3", "product-name", product.name);
       const price = createTextElement("div", "product-price", formatPrice(product.price));
       const stockValue = Number(product.stock);
-      const stockText = Number.isFinite(stockValue) && stockValue > 0 ? "Stok tersedia: " + stockValue : "Stok habis";
+      const stockText = Number.isFinite(stockValue) && stockValue > 0 ? "Stok: " + stockValue : "Stok habis";
       const stock = createTextElement("div", "product-stock", stockText);
-      const description = createTextElement("div", "product-description", product.description || "Belum ada deskripsi produk.");
 
-      content.append(category, name, price, stock, description);
+      content.append(category, name, price, stock);
       card.append(imageContainer, content);
+
+      // KLIK KARTU -> BUKA DETAIL MODAL
+      card.addEventListener("click", function() {
+        openProductDetailModal(product);
+      });
+
       return card;
     }
 
