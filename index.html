@@ -308,7 +308,7 @@
       gap: 10px;
     }
 
-    /* PROFIL & ALAMAT STYLES */
+    /* PROFIL & ALAMAT STYLES (MODUL L2 UPDATED) */
     .profile-card { border: 1px solid var(--panel-border); background: var(--card-sub-bg); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
     .profile-avatar { width: 86px; height: 86px; min-width: 86px; border-radius: 50%; background: var(--panel-bg); border: 2px solid var(--panel-border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 30px; font-weight: bold; }
@@ -375,6 +375,35 @@
       padding: 2px 7px;
       border-radius: 5px;
       font-size: 0.7em;
+      font-weight: bold;
+    }
+
+    /* GPS BADGE & BOX (MODUL L2) */
+    .gps-box {
+      background: var(--card-sub-bg);
+      border: 1px dashed var(--accent-color);
+      border-radius: 9px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .gps-coords {
+      font-family: monospace;
+      font-size: 0.85em;
+      color: var(--accent-color);
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    .btn-maps {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--panel-bg);
+      color: var(--accent-color);
+      border: 1px solid var(--accent-color);
+      padding: 5px 9px;
+      border-radius: 7px;
+      text-decoration: none;
+      font-size: 0.75em;
       font-weight: bold;
     }
 
@@ -669,15 +698,15 @@
             </div>
           </div>
 
-          <!-- KARTU MODUL L1: MANAJEMEN ALAMAT & LOKASI -->
+          <!-- KARTU MODUL L1 & L2: MANAJEMEN ALAMAT & LOKASI GPS PRESISI -->
           <div class="profile-card" id="addressCard">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <h3 style="margin:0; font-size:1em;">Alamat & Lokasi Tersimpan 📍</h3>
+              <h3 style="margin:0; font-size:1em;">Alamat & Lokasi Presisi 📍</h3>
               <button id="btnAddNewAddress" class="profile-detail-edit-btn" type="button">+ Tambah Alamat</button>
             </div>
             
             <p class="muted" style="font-size:0.8em; margin-bottom:10px;">
-              Simpan alamat rumah, toko, atau kebun untuk memudahkan pemesanan dan penjemputan paket.
+              Simpan titik lokasi GPS presisi rumah, toko, atau kebun untuk mempermudah navigasi kurir.
             </p>
 
             <div id="addressList">
@@ -697,6 +726,17 @@
 
               <label for="addrPhone">Nomor WhatsApp / HP Penerima:</label>
               <input id="addrPhone" type="tel" maxlength="20" placeholder="Contoh: 081234567890">
+
+              <!-- KUNCI GPS MODUL L2 -->
+              <div class="gps-box">
+                <button id="btnGetGPS" class="secondary" type="button" style="padding:8px 12px; font-size:0.8em;">
+                  🎯 Gunakan Lokasi GPS Saya Saat Ini
+                </button>
+                <div id="gpsStatus" class="muted" style="font-size:0.75em; margin-top:6px;">
+                  Sinyal GPS belum diaktifkan. Tekan tombol di atas untuk mengunci koordinat presisi.
+                </div>
+                <div id="gpsCoordsText" class="gps-coords hidden"></div>
+              </div>
 
               <label for="addrFull">Alamat Lengkap / Dusun / RT / RW / Desa:</label>
               <textarea id="addrFull" maxlength="300" placeholder="Jelaskan nama jalan, dusun, desa, atau kecamatan"></textarea>
@@ -866,6 +906,7 @@
     let currentVerificationRequest = null;
     let currentUserAddresses = [];
     let editingAddressId = null;
+    let currentTempCoords = null; // MODUL L2: Menyimpan { lat, lng } sementara
     let selectedService = "";
     let targetVerificationRole = "mitra";
     const simulatedOrders = [];
@@ -1462,14 +1503,14 @@
       }
     });
 
-    /* ========================================= MODUL L1: LOGIKA MANAJEMEN ALAMAT & LOKASI ========================================= */
+    /* ========================================= MODUL L1 & L2: MANAJEMEN ALAMAT & LOKASI GPS PRESISI ========================================= */
     async function loadUserAddresses() {
       if (!supabaseClient || !currentUser) return;
 
       try {
         const { data, error } = await supabaseClient
           .from("user_addresses")
-          .select("id,label,recipient_name,phone_number,full_address,area_note,is_primary,created_at")
+          .select("id,label,recipient_name,phone_number,full_address,area_note,latitude,longitude,is_primary,created_at")
           .eq("user_id", currentUser.id)
           .order("is_primary", { ascending: false })
           .order("created_at", { ascending: false });
@@ -1537,6 +1578,26 @@
           body.append(note);
         }
 
+        // TAMPILAN GPS MODUL L2
+        if (addr.latitude && addr.longitude) {
+          const gpsRow = document.createElement("div");
+          gpsRow.style.cssText = "margin-top:6px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;";
+          
+          const coordsText = document.createElement("span");
+          coordsText.style.cssText = "font-family:monospace; font-size:0.75em; color:var(--accent-color); font-weight:bold;";
+          coordsText.textContent = "📍 GPS: " + Number(addr.latitude).toFixed(6) + ", " + Number(addr.longitude).toFixed(6);
+
+          const mapsBtn = document.createElement("a");
+          mapsBtn.className = "btn-maps";
+          mapsBtn.href = "https://www.google.com/maps?q=" + addr.latitude + "," + addr.longitude;
+          mapsBtn.target = "_blank";
+          mapsBtn.rel = "noopener noreferrer";
+          mapsBtn.textContent = "🗺️ Buka di Google Maps";
+
+          gpsRow.append(coordsText, mapsBtn);
+          body.append(gpsRow);
+        }
+
         const actions = document.createElement("div");
         actions.className = "profile-edit-actions";
 
@@ -1576,6 +1637,8 @@
 
     function openAddressForm(addr = null) {
       editingAddressId = addr ? addr.id : null;
+      currentTempCoords = addr && addr.latitude ? { lat: addr.latitude, lng: addr.longitude } : null;
+
       const formBox = byId("addressFormBox");
       const title = byId("addressFormTitle");
 
@@ -1589,14 +1652,71 @@
       byId("addrNote").value = addr ? (addr.area_note || "") : "";
       byId("addrIsPrimary").checked = addr ? addr.is_primary : (currentUserAddresses.length === 0);
 
+      // GPS Form Display Reset
+      const coordsText = byId("gpsCoordsText");
+      const gpsStatus = byId("gpsStatus");
+      if (currentTempCoords) {
+        coordsText.textContent = "📍 Koordinat: " + Number(currentTempCoords.lat).toFixed(6) + ", " + Number(currentTempCoords.lng).toFixed(6);
+        coordsText.classList.remove("hidden");
+        gpsStatus.textContent = "Koordinat tersimpan pada alamat ini.";
+      } else {
+        coordsText.classList.add("hidden");
+        gpsStatus.textContent = "Sinyal GPS belum diaktifkan. Tekan tombol di atas untuk mengunci koordinat presisi.";
+      }
+
       formBox.classList.remove("hidden");
       setAddressMessage("", "");
     }
+
+    /* MODUL L2: AMBIL LOKASI GPS PERANGKAT HP */
+    byId("btnGetGPS").addEventListener("click", function() {
+      const btn = this;
+      const status = byId("gpsStatus");
+      const coordsText = byId("gpsCoordsText");
+
+      if (!navigator.geolocation) {
+        status.textContent = "Perangkat HP / browser Anda tidak mendukung fitur lokasi GPS.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "🔄 Mengunci Sinyal GPS...";
+      status.textContent = "Sedang mengambil koordinat GPS dari perangkat Anda. Izinkan akses lokasi jika diminta.";
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const accuracy = position.coords.accuracy ? Math.round(position.coords.accuracy) : null;
+
+          currentTempCoords = { lat: lat, lng: lng };
+          coordsText.textContent = "📍 Terkunci: " + lat.toFixed(6) + ", " + lng.toFixed(6) + (accuracy ? " (Akurasi: ±" + accuracy + "m)" : "");
+          coordsText.classList.remove("hidden");
+          status.textContent = "✅ Koordinat GPS berhasil terkunci!";
+          
+          btn.disabled = false;
+          btn.textContent = "🎯 Perbarui Lokasi GPS Saya";
+        },
+        function(error) {
+          console.warn("Gagal mengambil GPS:", error);
+          let errMessage = "Gagal mengambil lokasi GPS.";
+          if (error.code === error.PERMISSION_DENIED) errMessage = "Izin lokasi ditolak. Silakan aktifkan GPS HP Anda.";
+          if (error.code === error.POSITION_UNAVAILABLE) errMessage = "Sinyal GPS tidak tersedia saat ini.";
+          if (error.code === error.TIMEOUT) errMessage = "Waktu pengambilan lokasi GPS habis.";
+
+          status.textContent = errMessage;
+          btn.disabled = false;
+          btn.textContent = "🎯 Gunakan Lokasi GPS Saya Saat Ini";
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
 
     byId("btnAddNewAddress").addEventListener("click", function() { openAddressForm(null); });
     byId("btnCancelAddress").addEventListener("click", function() {
       byId("addressFormBox").classList.add("hidden");
       editingAddressId = null;
+      currentTempCoords = null;
     });
 
     async function setAddressPrimary(addressId) {
@@ -1677,7 +1797,7 @@
 
       this.disabled = true;
       this.textContent = "Menyimpan...";
-      setAddressMessage("Menyimpan data alamat...", "");
+      setAddressMessage("Menyimpan data alamat & lokasi...", "");
 
       try {
         if (isPrimary) {
@@ -1694,6 +1814,8 @@
           phone_number: phoneNumber,
           full_address: fullAddress,
           area_note: areaNote,
+          latitude: currentTempCoords ? currentTempCoords.lat : null,
+          longitude: currentTempCoords ? currentTempCoords.lng : null,
           is_primary: isPrimary || currentUserAddresses.length === 0,
           updated_at: new Date().toISOString()
         };
@@ -1716,9 +1838,10 @@
 
         if (responseError) throw responseError;
 
-        setAddressMessage("Alamat berhasil disimpan.", "success");
+        setAddressMessage("Alamat dan titik lokasi GPS berhasil disimpan.", "success");
         byId("addressFormBox").classList.add("hidden");
         editingAddressId = null;
+        currentTempCoords = null;
         await loadUserAddresses();
       } catch (err) {
         console.error("Gagal menyimpan alamat:", err);
