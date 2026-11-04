@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#116b45">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101216">
 <title>Dashboard Kurir | AntarDesa</title>
 
 <link rel="stylesheet" href="ui-components.css">
@@ -12,208 +12,369 @@
 
 <style>
 :root{
- --green:#116b45;
- --green-dark:#0b4d32;
- --bg:#f3f7f4;
- --text:#1c2922;
- --muted:#66756c;
- --border:#dce7df;
- --white:#fff;
+  color-scheme:dark;
+  --bg:#101216;
+  --panel:#20242d;
+  --panel-2:#252b35;
+  --text:#f4f6f8;
+  --muted:#a7adb7;
+  --line:#343b47;
+  --green:#43d17d;
+  --green-dark:#173d2b;
+  --blue:#65b8ef;
+  --red:#ff7777;
+  --yellow:#f4c66a;
+  --nav-height:76px;
 }
 *{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
 body{
- margin:0;
- background:var(--bg);
- color:var(--text);
- font-family:system-ui,-apple-system,sans-serif;
+  margin:0;
+  min-height:100vh;
+  padding-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom) + 18px);
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-header{
- background:var(--green);
- color:white;
- padding:20px 16px;
+button{font:inherit}
+button:focus-visible,a:focus-visible{
+  outline:3px solid var(--green);
+  outline-offset:3px;
 }
-.header-inner,main{
- max-width:900px;
- margin:auto;
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(16,18,22,.96);
+  border-bottom:1px solid var(--line);
+  padding:15px 16px;
+  backdrop-filter:blur(12px);
 }
-header h1{margin:0 0 5px;font-size:24px}
-header p{margin:0;opacity:.9;font-size:14px}
-main{padding:16px}
-.toolbar{
- display:flex;
- flex-wrap:wrap;
- gap:9px;
- margin-bottom:18px;
+.topbar-inner,main,.bottom-inner{
+  width:min(100%,760px);
+  margin:0 auto;
 }
-button, a.btn-action{
- border:0;
- border-radius:10px;
- padding:12px 15px;
- background:var(--green);
- color:white;
- font-weight:700;
- font-size:14px;
- cursor:pointer;
- text-decoration:none;
- display:inline-block;
- text-align:center;
+.topbar-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 }
-button.secondary, a.btn-action.secondary{
- background:white;
- color:var(--green-dark);
- border:1px solid var(--border);
+.brand h1{font-size:19px;line-height:1.25;margin:0;font-weight:800}
+.brand p{font-size:12px;color:var(--muted);margin:4px 0 0}
+.header-status{
+  flex:none;
+  color:var(--green);
+  background:rgba(67,209,125,.12);
+  border:1px solid rgba(67,209,125,.25);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:750;
 }
-button.danger{background:#b42318}
-button:disabled{opacity:.55;cursor:not-allowed}
-button:focus-visible, a.btn-action:focus-visible{
- outline:3px solid #85c9a8;
- outline-offset:2px;
+main{padding:17px 15px 24px}
+#message{
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:var(--panel);
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.55;
+  margin-bottom:15px;
+  overflow-wrap:anywhere;
 }
-section{margin-bottom:24px}
-h2{font-size:19px;margin:0 0 12px}
-.card{
- background:var(--white);
- border:1px solid var(--border);
- border-radius:14px;
- padding:16px;
- margin-bottom:12px;
- box-shadow:0 2px 8px #183b2410;
- overflow-wrap:anywhere;
-}
-.card h3{font-size:16px;margin:0 0 10px}
-.detail{font-size:14px;line-height:1.8}
-.muted{color:var(--muted);font-size:13px}
-.status{
- display:inline-block;
- background:#e4f5eb;
- color:var(--green-dark);
- border-radius:20px;
- padding:5px 10px;
- font-size:12px;
- font-weight:700;
- margin-bottom:10px;
-}
-.status.delivering{
- background:#e0f2fe;
- color:#0369a1;
-}
-.status.completed{
- background:#f3f4f6;
- color:#374151;
-}
-.card-actions{
- display:flex;
- gap:8px;
- margin-top:12px;
- flex-wrap:wrap;
-}
-.card-actions button, .card-actions a{
- flex:1;
- min-width:140px;
-}
-.notice{
- background:white;
- border:1px solid var(--border);
- padding:14px;
- border-radius:12px;
- margin-bottom:15px;
- font-size:14px;
- line-height:1.6;
- overflow-wrap:anywhere;
-}
-.notice.error{
- background:#fff0ef;
- border-color:#f4c7c3;
- color:#8d2119;
-}
-.notice.success{
- background:#e7f7ec;
- border-color:#b9e4c7;
- color:#155d35;
-}
+#message.error{color:#ffd0d0;border-color:#713d43;background:#321f24}
+#message.success{color:#baf4ce;border-color:#286344;background:#183326}
 .hidden{display:none!important}
-.read-only{background:#f4faf6;border:1px solid #cde5d5;padding:12px;border-radius:10px;font-size:13px;line-height:1.6;margin:12px 0}
-.state-note{color:var(--muted);font-size:13px;line-height:1.6}
-.detail{overflow-wrap:anywhere}
-.detail .missing{color:var(--muted)}
-.delivery-details{
- margin-top:12px;
- padding:14px;
- background:#f4faf6;
- border:1px solid #cde5d5;
- border-radius:10px;
- overflow-wrap:anywhere;
+.page{display:none}
+.page.active{display:block}
+.page-heading{margin:4px 0 15px}
+.page-heading h2{font-size:21px;line-height:1.3;margin:0 0 5px}
+.page-heading p{font-size:13px;line-height:1.55;color:var(--muted);margin:0}
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:20px 0 11px;
 }
-.delivery-details h4{
- margin:0 0 10px;
- color:var(--green-dark);
+.section-title h3{font-size:15px;margin:0}
+.muted{color:var(--muted)}
+.small{font-size:12px;line-height:1.55}
+.panel,.delivery-card,.summary-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
 }
-.delivery-details .line{
- font-size:14px;
- line-height:1.6;
- margin:8px 0;
- white-space:pre-wrap;
+.panel{padding:15px}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
 }
-.delivery-details .line strong{
- display:block;
+.summary-card{padding:14px;min-height:104px}
+.summary-label{font-size:12px;color:var(--muted);line-height:1.4}
+.summary-value{font-size:27px;font-weight:850;line-height:1.2;margin-top:9px;color:var(--text)}
+.summary-icon{font-size:18px;margin-bottom:5px}
+.delivery-card{
+  padding:15px;
+  margin:0 0 11px;
+  overflow-wrap:anywhere;
 }
-.delivery-error{
- margin-top:10px;
- color:#b42318;
- font-size:13px;
- line-height:1.5;
+.card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:10px;
 }
-footer{
- text-align:center;
- padding:12px 16px 28px;
- color:var(--muted);
- font-size:12px;
+.card-title{font-size:15px;font-weight:800;line-height:1.4;margin:0}
+.status{
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:5px 9px;
+  background:#263b30;
+  color:#a8f0c2;
+  font-size:10px;
+  font-weight:800;
+  line-height:1.3;
+}
+.status.delivering{background:#173448;color:#a9ddff}
+.status.completed{background:#29313b;color:#d2d8e0}
+.status.cancelled{background:#40272a;color:#ffc0c0}
+.card-details{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px 12px;
+}
+.detail-item{min-width:0}
+.detail-label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.detail-value{display:block;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.card-id{font-size:11px;color:var(--muted);margin-top:11px;overflow-wrap:anywhere}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.action-btn{
+  flex:1 1 145px;
+  min-height:43px;
+  border:1px solid transparent;
+  border-radius:11px;
+  padding:10px 12px;
+  background:var(--green);
+  color:#092114;
+  font-size:12px;
+  font-weight:850;
+  cursor:pointer;
+}
+.action-btn.secondary{
+  background:var(--panel-2);
+  border-color:var(--line);
+  color:var(--text);
+}
+.action-btn.danger{background:#6b292d;color:#ffe1e1}
+.action-btn:disabled{opacity:.5;cursor:not-allowed}
+.empty-state{
+  border:1px dashed #46505e;
+  border-radius:14px;
+  padding:19px 15px;
+  color:var(--muted);
+  text-align:center;
+  font-size:13px;
+  line-height:1.6;
+  background:rgba(32,36,45,.55);
+}
+.empty-icon{font-size:25px;margin-bottom:7px}
+.activity-row{
+  display:flex;
+  gap:11px;
+  align-items:flex-start;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
+.activity-row:last-child{border-bottom:0;padding-bottom:0}
+.activity-dot{
+  width:9px;height:9px;flex:none;border-radius:50%;
+  background:var(--green);margin-top:5px;
+}
+.activity-row strong{display:block;font-size:13px}
+.activity-row span{display:block;color:var(--muted);font-size:11px;margin-top:3px;line-height:1.5}
+.detail-box{
+  margin-top:12px;
+  padding:13px;
+  border:1px solid #3b5948;
+  border-radius:12px;
+  background:#192820;
+}
+.detail-box h4{font-size:13px;margin:0 0 10px;color:#baf4ce}
+.detail-line{margin:9px 0 0;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.detail-line strong{display:block;color:#b7c1bb;font-size:11px;margin-bottom:2px}
+.detail-error{font-size:12px;color:#ffaaaa;line-height:1.5}
+.account-card{padding:16px}
+.account-avatar{
+  width:48px;height:48px;border-radius:15px;
+  display:grid;place-items:center;
+  background:#1b4930;color:var(--green);font-size:23px;
+  margin-bottom:12px;
+}
+.account-email{font-size:13px;overflow-wrap:anywhere;margin:5px 0 13px}
+.account-status{
+  display:inline-block;padding:6px 10px;border-radius:999px;
+  background:rgba(67,209,125,.12);color:#aaf0c2;
+  font-size:11px;font-weight:800;
+}
+.account-note{
+  margin-top:13px;padding:12px;border-radius:11px;
+  background:#292b30;color:var(--muted);font-size:12px;line-height:1.6;
+}
+.toolbar{display:flex;gap:8px;margin:0 0 14px}
+.toolbar button{
+  border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px;background:var(--panel-2);
+  color:var(--text);font-size:12px;font-weight:750;
+}
+.toolbar button:disabled{opacity:.5}
+.bottom-nav{
+  position:fixed;
+  z-index:20;
+  left:0;right:0;bottom:0;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(25,28,34,.97);
+  border-top:1px solid var(--line);
+  backdrop-filter:blur(14px);
+}
+.bottom-inner{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
+.nav-btn{
+  min-width:0;
+  border:0;
+  border-radius:12px;
+  padding:7px 2px 6px;
+  color:var(--muted);
+  background:transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  cursor:pointer;
+}
+.nav-btn .nav-icon{font-size:19px;line-height:1.2}
+.nav-btn .nav-label{font-size:10px;font-weight:750;white-space:nowrap}
+.nav-btn.active{color:var(--green);background:rgba(67,209,125,.10)}
+footer{text-align:center;color:#747d89;font-size:10px;padding:8px 12px 14px}
+@media(min-width:600px){
+  main{padding-top:22px}
+  .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .delivery-card{padding:18px}
 }
 </style>
 </head>
 
 <body>
-
-<header>
-<div class="header-inner">
-<h1>🚚 AntarDesa Kurir</h1>
-<p>Dashboard pengambilan dan pengiriman pesanan</p>
-</div>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <h1>🚚 AntarDesa Kurir</h1>
+      <p>Kelola tugas pengantaran Anda</p>
+    </div>
+    <span id="headerStatus" class="header-status">Memeriksa akun</span>
+  </div>
 </header>
 
 <main>
-<div id="message" class="notice" role="status" aria-live="polite">
- Memeriksa akun kurir...
-</div>
+  <div id="message" role="status" aria-live="polite">Memeriksa akun kurir...</div>
 
-<div id="dashboard" class="hidden">
-<div class="toolbar">
-<button id="refreshBtn" type="button">↻ Muat Ulang</button>
-<button id="logoutBtn" type="button" class="secondary">Keluar</button>
-</div>
+  <div id="dashboard" class="hidden">
+    <section id="page-home" class="page active" aria-labelledby="homeTitle">
+      <div class="page-heading">
+        <h2 id="homeTitle">Beranda</h2>
+        <p>Ringkasan aktivitas pengantaran Anda.</p>
+      </div>
+      <div class="toolbar">
+        <button id="refreshBtn" type="button">↻ Muat ulang</button>
+      </div>
+      <div class="summary-grid">
+        <article class="summary-card">
+          <div class="summary-icon">📦</div>
+          <div class="summary-label">Pesanan tersedia</div>
+          <div id="availableCount" class="summary-value">0</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-icon">🛵</div>
+          <div class="summary-label">Pengiriman aktif</div>
+          <div id="activeCount" class="summary-value">0</div>
+        </article>
+      </div>
+      <div class="section-title"><h3>Aktivitas terbaru</h3></div>
+      <div id="recentActivity" class="panel" aria-live="polite"></div>
+    </section>
 
-<section>
-<h2>📦 Pesanan Tersedia</h2>
-<p class="muted">
- Pesanan berstatus siap dikirim dan belum memiliki kurir.
- Detail penerima dapat dilihat setelah penugasan diambil.
-</p>
-<div id="availableList" aria-live="polite"></div>
-</section>
+    <section id="page-available" class="page" aria-labelledby="availableTitle">
+      <div class="page-heading">
+        <h2 id="availableTitle">Daftar Pesanan</h2>
+        <p>Pesanan siap diambil yang belum memiliki kurir.</p>
+      </div>
+      <div id="availableList" aria-live="polite"></div>
+    </section>
 
-<section>
-<h2>🛵 Pengiriman Saya</h2>
-<div id="activeList" aria-live="polite"></div>
-</section>
+    <section id="page-active" class="page" aria-labelledby="activeTitle">
+      <div class="page-heading">
+        <h2 id="activeTitle">Pengiriman</h2>
+        <p>Hanya tugas pengiriman yang ditugaskan kepada akun Anda.</p>
+      </div>
+      <div id="activeList" aria-live="polite"></div>
+    </section>
 
-<section>
-<h2>✅ Riwayat Pengiriman Selesai</h2>
-<div id="historyList" aria-live="polite"></div>
-</section>
-</div>
+    <section id="page-history" class="page" aria-labelledby="historyTitle">
+      <div class="page-heading">
+        <h2 id="historyTitle">Riwayat</h2>
+        <p>Pengiriman yang telah selesai atau dibatalkan.</p>
+      </div>
+      <div id="historyList" aria-live="polite"></div>
+    </section>
+
+    <section id="page-account" class="page" aria-labelledby="accountTitle">
+      <div class="page-heading">
+        <h2 id="accountTitle">Akun</h2>
+        <p>Informasi akun dan sesi kurir.</p>
+      </div>
+      <article class="panel account-card">
+        <div class="account-avatar">👤</div>
+        <strong id="accountEmail">-</strong>
+        <p class="account-email muted">Akun yang sedang digunakan</p>
+        <span class="account-status">Kurir terverifikasi</span>
+        <div class="account-note">
+          Akun Anda telah lolos verifikasi kurir. Pengaturan status kesiapan menerima pesanan belum diaktifkan karena belum ada kolom atau RPC status ketersediaan kurir yang diverifikasi pada database. Daftar pesanan tetap mengikuti ketersediaan pesanan dari server.
+        </div>
+      </article>
+      <div class="card-actions">
+        <button id="logoutBtn" class="action-btn danger" type="button">Keluar dari akun</button>
+      </div>
+    </section>
+  </div>
 </main>
 
 <footer>AntarDesa · Hubungkan desa, dekatkan layanan.</footer>
+
+<nav id="bottomNav" class="bottom-nav hidden" aria-label="Navigasi kurir">
+  <div class="bottom-inner">
+    <button class="nav-btn active" type="button" data-page="home" aria-current="page">
+      <span class="nav-icon">⌂</span><span class="nav-label">Beranda</span>
+    </button>
+    <button class="nav-btn" type="button" data-page="available">
+      <span class="nav-icon">▤</span><span class="nav-label">Daftar Pesanan</span>
+    </button>
+    <button class="nav-btn" type="button" data-page="active">
+      <span class="nav-icon">🛵</span><span class="nav-label">Pengiriman</span>
+    </button>
+    <button class="nav-btn" type="button" data-page="history">
+      <span class="nav-icon">◷</span><span class="nav-label">Riwayat</span>
+    </button>
+    <button class="nav-btn" type="button" data-page="account">
+      <span class="nav-icon">♙</span><span class="nav-label">Akun</span>
+    </button>
+  </div>
+</nav>
 
 <script>
 (() => {
@@ -221,563 +382,426 @@ footer{
 
 const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
-
 const $ = id => document.getElementById(id);
 
 const G1_FALLBACK = Object.freeze({
- "UI-01":"Sedang memuat data…",
- "UI-04":"Belum ada penugasan yang dapat ditampilkan.",
- "UI-06":"Data belum dapat dimuat. Silakan coba lagi.",
- "UI-07":"Sesi Anda berakhir. Silakan login kembali.",
- "UI-08":"Anda tidak memiliki akses ke halaman ini."
+  "UI-01":"Sedang memuat data…",
+  "UI-04":"Belum ada penugasan yang dapat ditampilkan.",
+  "UI-06":"Data belum dapat dimuat. Silakan coba lagi.",
+  "UI-07":"Sesi Anda berakhir. Silakan login kembali.",
+  "UI-08":"Anda tidak memiliki akses ke halaman ini."
 });
 
-function g1(id){
- const fallback = G1_FALLBACK[id] || "";
- try{
-  const value = window.AntarDesaUI?.get?.(id);
-  return typeof value === "string" && value ? value : fallback;
- }catch(error){
-  console.warn("Pesan G1 tidak tersedia:", id);
-  return fallback;
- }
+function uiMessage(id){
+  const fallback = G1_FALLBACK[id] || "";
+  try{
+    const value = window.AntarDesaUI?.get?.(id);
+    return typeof value === "string" && value ? value : fallback;
+  }catch(error){
+    console.warn("Pesan UI tidak tersedia:", id);
+    return fallback;
+  }
 }
 
 let db = null;
 let currentUser = null;
-let busy = false;
+let isRefreshing = false;
+let isMutating = false;
+let refreshQueued = false;
 let realtimeChannel = null;
-const G4_READ_ONLY = false;
+let realtimeTimer = null;
+let availableRows = [];
+let myRows = [];
 
 function showMessage(message, type=""){
- const el = $("message");
- el.textContent = message;
- el.className = "notice" + (type ? " " + type : "");
- el.classList.remove("hidden");
+  const el = $("message");
+  el.textContent = message;
+  el.className = type;
+  el.classList.remove("hidden");
 }
-
 function hideMessage(){
- $("message").classList.add("hidden");
+  $("message").classList.add("hidden");
 }
-
 function makeElement(tag, className, text){
- const el = document.createElement(tag);
- if(className) el.className = className;
- if(text !== undefined) el.textContent = text;
- return el;
+  const el = document.createElement(tag);
+  if(className) el.className = className;
+  if(text !== undefined) el.textContent = text;
+  return el;
 }
-
 function formatMoney(value){
- if(value === null || value === undefined || value === "" || !Number.isFinite(Number(value))) return "Belum tersedia";
- return new Intl.NumberFormat("id-ID",{
-  style:"currency", currency:"IDR", maximumFractionDigits:0
- }).format(Number(value));
+  if(value === null || value === undefined || value === "" || !Number.isFinite(Number(value))) return "Belum tersedia";
+  return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(value));
 }
-
 function formatDate(value){
- if(!value) return "Belum tersedia";
- const date = new Date(value);
- if(Number.isNaN(date.getTime())) return "Belum tersedia";
- return new Intl.DateTimeFormat("id-ID",{
-  dateStyle:"medium",
-  timeStyle:"short"
- }).format(date);
+  if(!value) return "Belum tersedia";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return "Belum tersedia";
+  return new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeStyle:"short"}).format(date);
 }
-
 function shortId(value){
- return value ? String(value).slice(0, 8).toUpperCase() + "…" : "Belum tersedia";
+  return value ? String(value).slice(0,8).toUpperCase()+"…" : "Belum tersedia";
 }
-
-function emptyMessage(container, message){
- container.replaceChildren(
-  makeElement("p", "muted", message)
- );
-}
-
-function createCard(title, details, status, statusClass=""){
- const card = makeElement("article", "card");
-
- card.appendChild(
-  makeElement("h3", "", title)
- );
-
- if(status){
-  const statusEl = makeElement("div", "status" + (statusClass ? " " + statusClass : ""), status);
-  card.appendChild(statusEl);
- }
-
- const detail = makeElement("div", "detail");
-
- details.forEach(([label, value]) => {
-  const line = makeElement("div");
-  line.appendChild(
-   makeElement("strong", "", label + ": ")
+function emptyState(container, icon, message){
+  const box = makeElement("div","empty-state");
+  box.append(
+    makeElement("div","empty-icon",icon),
+    makeElement("div","",message)
   );
-  line.appendChild(
-   document.createTextNode(value === null || value === undefined || value === "" ? "Belum tersedia" : String(value))
-  );
-  detail.appendChild(line);
- });
-
- card.appendChild(detail);
- return card;
+  container.replaceChildren(box);
 }
+function addDetailItem(parent,label,value){
+  const item = makeElement("div","detail-item");
+  item.append(
+    makeElement("span","detail-label",label),
+    makeElement("span","detail-value",value === null || value === undefined || value === "" ? "Belum tersedia" : String(value))
+  );
+  parent.appendChild(item);
+}
+function createDeliveryCard(order, mode){
+  const card = makeElement("article","delivery-card");
+  const top = makeElement("div","card-top");
+  const title = makeElement("h3","card-title",(mode==="available" ? "Pesanan #" : "Pengiriman #")+shortId(order.order_id));
+  let statusText = "Siap diambil";
+  let statusClass = "";
+  if(mode==="active"){statusText="Sedang diantar";statusClass="delivering";}
+  if(order.order_status==="completed"){statusText="Selesai";statusClass="completed";}
+  if(order.order_status==="cancelled"){statusText="Dibatalkan";statusClass="cancelled";}
+  top.append(title,makeElement("span","status "+statusClass,statusText));
+  card.appendChild(top);
 
-/* AKSES AKUN */
+  const details = makeElement("div","card-details");
+  addDetailItem(details,"ID mitra",shortId(order.merchant_id));
+  addDetailItem(details,"Total pesanan",formatMoney(order.total_amount));
+  if(mode==="available"){
+    addDetailItem(details,"Ongkir",formatMoney(order.shipping_fee));
+    addDetailItem(details,"Dibuat",formatDate(order.created_at));
+  }else{
+    addDetailItem(details,"Ditugaskan",formatDate(order.assigned_at));
+    addDetailItem(details,order.completed_at ? "Selesai pada" : "Status waktu",""+(order.completed_at ? formatDate(order.completed_at) : "Dalam proses"));
+  }
+  card.appendChild(details);
+  card.appendChild(makeElement("div","card-id","ID pesanan: "+String(order.order_id || "Tidak tersedia")));
+
+  if(mode!=="available" && order.order_status!=="cancelled") addDetailButton(card,order.order_id);
+
+  if(mode==="available"){
+    const actions=makeElement("div","card-actions");
+    const claim=makeElement("button","action-btn","🛵 Ambil tugas");
+    claim.type="button";
+    claim.addEventListener("click",()=>claimOrder(order.order_id,claim));
+    actions.appendChild(claim);
+    card.appendChild(actions);
+  }else if(mode==="active"){
+    const actions=makeElement("div","card-actions");
+    const complete=makeElement("button","action-btn","✓ Selesaikan pengantaran");
+    complete.type="button";
+    complete.addEventListener("click",()=>completeOrder(order.order_id,complete));
+    actions.appendChild(complete);
+    card.appendChild(actions);
+  }
+  return card;
+}
 
 async function checkCourier(){
- if(!db){
-  throw new Error("Koneksi Supabase belum tersedia.");
- }
+  const {data,error}=await db.auth.getUser();
+  if(error) throw error;
+  if(!data?.user){
+    showMessage(uiMessage("UI-07"),"error");
+    window.location.replace("login.html");
+    return false;
+  }
+  currentUser=data.user;
 
- const {data, error} = await db.auth.getUser();
+  const {data:roleData,error:roleError}=await db
+    .from("user_roles")
+    .select("role,is_verified")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
 
- if(error) throw error;
-
- if(!data?.user){
-  showMessage(g1("UI-07"), "error");
-  window.location.replace("login.html");
-  return false;
- }
-
- currentUser = data.user;
-
- const {data: roleData, error: roleError} = await db
-  .from("user_roles")
-  .select("role,is_verified")
-  .eq("user_id", currentUser.id)
-  .maybeSingle();
-
- if(roleError && roleError.code !== "PGRST116") throw roleError;
-
- if(
-  !roleData ||
-  roleData.role !== "kurir" ||
-  roleData.is_verified !== true
- ){
-  $("dashboard").classList.add("hidden");
-  showMessage(
-   g1("UI-08"),
-   "error"
-  );
-  return false;
- }
-
- $("dashboard").classList.remove("hidden");
- hideMessage();
- return true;
+  if(roleError) throw roleError;
+  if(!roleData || roleData.role!=="kurir" || roleData.is_verified!==true){
+    $("dashboard").classList.add("hidden");
+    $("bottomNav").classList.add("hidden");
+    $("headerStatus").textContent="Akses ditolak";
+    showMessage(uiMessage("UI-08"),"error");
+    return false;
+  }
+  $("dashboard").classList.remove("hidden");
+  $("bottomNav").classList.remove("hidden");
+  $("headerStatus").textContent="Kurir terverifikasi";
+  $("accountEmail").textContent=currentUser.email || "Email tidak tersedia";
+  return true;
 }
-
-/* PESANAN TERSEDIA */
 
 async function loadAvailable(){
- const container = $("availableList");
-
- emptyMessage(
-  container,
-  g1("UI-01")
- );
-
- let readyOrders = [];
-
- try {
-  // 1. Coba panggil RPC resmi terlebih dahulu
-  const { data: rpcData, error: rpcErr } = await db.rpc("list_antardesa_ready_deliveries");
-
-  if (!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
-   readyOrders = rpcData.map(o => ({
-    order_id: o.order_id,
-    merchant_id: o.merchant_id,
-    item_count: o.item_count || 1,
-    total_amount: o.total_amount,
-    created_at: o.created_at,
-    shipping_fee: o.shipping_fee || 5000,
-    address_snapshot: o.delivery_address || "Alamat Pelanggan"
-   }));
-  } else {
-   // 2. Fallback direct query jika RPC belum disetup atau return kosong
-   const { data: tableData, error: tableErr } = await db
-    .from("orders")
-    .select("id, status, total_amount, shipping_fee, address_snapshot, created_at, merchant_id, mitra_id")
-    .in("status", ["finding_courier", "processing"])
-    .is("courier_id", null)
-    .order("created_at", { ascending: false });
-
-   if (!tableErr && Array.isArray(tableData)) {
-    readyOrders = tableData.map(o => ({
-     order_id: o.id,
-     merchant_id: o.mitra_id || o.merchant_id,
-     item_count: 1,
-     total_amount: o.total_amount,
-     created_at: o.created_at,
-     shipping_fee: o.shipping_fee || 5000,
-     address_snapshot: o.address_snapshot || "Alamat Pelanggan"
-    }));
-   }
-  }
- } catch(e) {
-  console.warn("Gagal memuat pesanan siap antar:", e);
- }
-
- container.replaceChildren();
-
- if(!readyOrders.length){
-  emptyMessage(
-   container,
-   "Belum ada pesanan siap dikirim saat ini."
-  );
-  return;
- }
-
- readyOrders.forEach(order => {
-  const card = createCard(
-   "Pesanan #" + shortId(order.order_id),
-   [
-    ["ID pesanan", order.order_id],
-    ["ID mitra", shortId(order.merchant_id)],
-    ["Ongkir kurir", formatMoney(order.shipping_fee)],
-    ["Total pesanan", formatMoney(order.total_amount)],
-    ["Dibuat pada", formatDate(order.created_at)]
-   ],
-   "Siap Diambil 🛵"
-  );
-
-  const actionBox = makeElement("div", "card-actions");
-  const btnClaim = makeElement("button", "", "🛵 Ambil Tugas Pengantaran");
-  btnClaim.type = "button";
-  btnClaim.addEventListener("click", () => claimOrder(order.order_id, btnClaim));
-
-  actionBox.appendChild(btnClaim);
-  card.appendChild(actionBox);
-  container.appendChild(card);
- });
-}
-
-/* DETAIL ALAMAT KHUSUS KURIR PEMILIK PENUGASAN */
-
-function addDetailButton(card, orderId, orderSnapshot=""){
- const button = makeElement("button", "secondary", "📍 Lihat Detail Pengantaran");
- button.type = "button";
- const container = makeElement("div", "delivery-details hidden");
- let opened = false, loading = false;
-
- button.addEventListener("click", async () => {
-  if(loading || busy) return;
-  if(opened){
-   container.replaceChildren();
-   container.classList.add("hidden");
-   opened = false;
-   button.textContent = "📍 Lihat Detail Pengantaran";
-   return;
-  }
-
-  loading = true;
-  button.disabled = true;
-  button.textContent = "Mengambil detail pengantaran...";
+  const {data,error}=await db.rpc("list_antardesa_ready_deliveries");
+  if(error) throw new Error("Gagal memuat daftar pesanan tersedia: "+error.message);
+  if(!Array.isArray(data)) throw new Error("Format daftar pesanan tersedia tidak sesuai.");
+  availableRows=data;
+  const container=$("availableList");
   container.replaceChildren();
-  container.classList.remove("hidden");
-
-  try{
-   let recipientName = "Pelanggan AntarDesa";
-   let recipientPhone = "-";
-   let deliveryAddress = orderSnapshot || "Alamat lokasi pengantaran";
-   let deliveryNote = "-";
-
-   const { data, error } = await db.rpc("get_antardesa_delivery_details", { p_order_id: orderId });
-   
-   if(!error && Array.isArray(data) && data.length === 1) {
-    const item = data[0];
-    recipientName = item.recipient_name || recipientName;
-    recipientPhone = item.recipient_phone || recipientPhone;
-    deliveryAddress = item.delivery_address || deliveryAddress;
-    deliveryNote = item.delivery_note || deliveryNote;
-   }
-
-   container.appendChild(makeElement("h4", "", "📍 Detail Pengantaran"));
-
-   [
-    ["Nama penerima", recipientName],
-    ["Nomor telepon", recipientPhone],
-    ["Alamat lengkap", deliveryAddress],
-    ["Catatan pengantaran", deliveryNote]
-   ].forEach(([label, value]) => {
-    const line = makeElement("div", "line");
-    line.append(
-     makeElement("strong", "", label),
-     makeElement("span", "", value === null || value === undefined || value === "" ? "Belum tersedia" : String(value))
-    );
-    container.appendChild(line);
-   });
-
-   opened = true;
-   button.textContent = "Sembunyikan Detail Pengantaran";
-  } catch(error) {
-   console.error("Gagal membaca detail pengantaran:", error);
-   container.replaceChildren(makeElement("p", "delivery-error", g1("UI-06")));
-   button.textContent = "Coba Lagi Lihat Detail";
-  } finally {
-   loading = false;
-   button.disabled = false;
+  if(!data.length){
+    emptyState(container,"📭","Belum ada pesanan siap dikirim saat ini.");
+    return;
   }
- });
-
- card.append(button, container);
+  data.forEach(order=>container.appendChild(createDeliveryCard(order,"available")));
 }
-
-/* PENGIRIMAN MILIK SAYA */
 
 async function loadMyDeliveries(){
- const active = $("activeList");
- const history = $("historyList");
+  const {data,error}=await db.rpc("list_my_antardesa_deliveries");
+  if(error) throw new Error("Gagal memuat pengiriman Anda: "+error.message);
+  if(!Array.isArray(data)) throw new Error("Format data pengiriman tidak sesuai.");
+  myRows=data;
 
- emptyMessage(active, g1("UI-01"));
- emptyMessage(history, g1("UI-01"));
+  const activeRows=data.filter(item=>item.order_status==="delivering");
+  const historyRows=data.filter(item=>["completed","cancelled"].includes(item.order_status));
 
- let rows = [];
+  const active=$("activeList");
+  const history=$("historyList");
+  active.replaceChildren();
+  history.replaceChildren();
 
- try {
-  const { data: rpcData, error: rpcErr } = await db.rpc("list_my_antardesa_deliveries");
+  if(!activeRows.length) emptyState(active,"🛵","Belum ada pengiriman aktif.");
+  else activeRows.forEach(order=>active.appendChild(createDeliveryCard(order,"active")));
 
-  if(!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
-   rows = rpcData;
-  } else {
-   const { data: tableData, error: tableErr } = await db
-    .from("orders")
-    .select("id, status, total_amount, shipping_fee, address_snapshot, created_at, updated_at, merchant_id, mitra_id")
-    .eq("courier_id", currentUser.id)
-    .order("updated_at", { ascending: false });
+  if(!historyRows.length) emptyState(history,"🗂️","Belum ada pengiriman selesai atau dibatalkan.");
+  else historyRows.forEach(order=>history.appendChild(createDeliveryCard(order,"history")));
+}
 
-   if(!tableErr && Array.isArray(tableData)) {
-    rows = tableData.map(o => ({
-     order_id: o.id,
-     order_status: o.status,
-     merchant_id: o.mitra_id || o.merchant_id,
-     item_count: 1,
-     total_amount: o.total_amount,
-     assigned_at: o.created_at,
-     completed_at: o.updated_at,
-     address_snapshot: o.address_snapshot
-    }));
-   }
+function renderHome(){
+  const activeRows=myRows.filter(item=>item.order_status==="delivering");
+  $("availableCount").textContent=String(availableRows.length);
+  $("activeCount").textContent=String(activeRows.length);
+
+  const combined=[
+    ...myRows.map(row=>({...row,_kind:"mine",_date:row.completed_at||row.assigned_at})),
+    ...availableRows.map(row=>({...row,_kind:"available",_date:row.created_at}))
+  ].sort((a,b)=>new Date(b._date||0)-new Date(a._date||0)).slice(0,4);
+
+  const container=$("recentActivity");
+  container.replaceChildren();
+  if(!combined.length){
+    emptyState(container,"🧭","Belum ada aktivitas terbaru. Pesanan baru akan muncul di Daftar Pesanan.");
+    return;
   }
- } catch(e) {
-  console.warn("Memuat pengiriman milik saya dengan fallback.");
- }
-
- active.replaceChildren();
- history.replaceChildren();
-
- const activeRows = rows.filter(item => item.order_status === "delivering" || item.order_status === "processing");
- const completedRows = rows.filter(item => item.order_status === "completed");
-
- if(!activeRows.length) emptyMessage(active, g1("UI-04"));
- if(!completedRows.length) emptyMessage(history, "Belum ada pengiriman yang selesai.");
-
- activeRows.forEach(order => {
-  const card = createCard(
-   "Pengiriman #" + shortId(order.order_id),
-   [
-    ["ID pesanan", order.order_id],
-    ["ID mitra", shortId(order.merchant_id)],
-    ["Total pesanan", formatMoney(order.total_amount)],
-    ["Diambil pada", formatDate(order.assigned_at)]
-   ],
-   "Sedang diantar 🛵",
-   "delivering"
-  );
-
-  addDetailButton(card, order.order_id, order.address_snapshot);
-
-  const actionBox = makeElement("div", "card-actions");
-  const btnComplete = makeElement("button", "", "✅ Selesaikan Pengantaran");
-  btnComplete.type = "button";
-  btnComplete.addEventListener("click", () => completeOrder(order.order_id, btnComplete));
-
-  actionBox.appendChild(btnComplete);
-  card.appendChild(actionBox);
-  active.appendChild(card);
- });
-
- completedRows.forEach(order => {
-  const card = createCard(
-   "Pesanan #" + shortId(order.order_id),
-   [
-    ["ID pesanan", order.order_id],
-    ["ID mitra", shortId(order.merchant_id)],
-    ["Total pesanan", formatMoney(order.total_amount)],
-    ["Mulai pengiriman", formatDate(order.assigned_at)],
-    ["Selesai pada", formatDate(order.completed_at)]
-   ],
-   "Selesai ✅",
-   "completed"
-  );
-
-  addDetailButton(card, order.order_id, order.address_snapshot);
-  history.appendChild(card);
- });
+  combined.forEach(item=>{
+    const row=makeElement("div","activity-row");
+    const dot=makeElement("span","activity-dot");
+    const body=makeElement("div");
+    let title="Pesanan tersedia";
+    let subtitle="Menunggu kurir mengambil tugas";
+    if(item._kind==="mine"){
+      title="Pengiriman #"+shortId(item.order_id);
+      if(item.order_status==="delivering") subtitle="Sedang dalam proses pengantaran";
+      else if(item.order_status==="completed") subtitle="Pengiriman selesai · "+formatDate(item.completed_at);
+      else if(item.order_status==="cancelled") subtitle="Pesanan dibatalkan";
+      else subtitle="Status: "+String(item.order_status||"Tidak diketahui");
+    }else{
+      title="Pesanan baru #"+shortId(item.order_id);
+      subtitle="Tersedia · "+formatDate(item.created_at);
+    }
+    body.append(makeElement("strong","",title),makeElement("span","",subtitle));
+    row.append(dot,body);
+    container.appendChild(row);
+  });
 }
 
-/* AMBIL PESANAN */
+function addDetailButton(card,orderId){
+  const actions=makeElement("div","card-actions");
+  const button=makeElement("button","action-btn secondary","📍 Lihat detail pengantaran");
+  button.type="button";
+  const box=makeElement("div","detail-box hidden");
+  let opened=false;
+  let loading=false;
 
-async function claimOrder(orderId, button){
- if(busy) return;
-
- if(!window.confirm("Ambil pesanan ini untuk kamu antar? Pastikan kamu siap menjalankan pengiriman.")) return;
-
- busy = true;
- button.disabled = true;
- button.textContent = "Mengambil pesanan...";
-
- try{
-  const { data, error } = await db.rpc("claim_antardesa_delivery", { p_order_id: orderId });
-
-  if(error) {
-   const { error: directErr } = await db
-    .from("orders")
-    .update({
-     courier_id: currentUser.id,
-     status: "delivering",
-     updated_at: new Date().toISOString()
-    })
-    .eq("id", orderId);
-
-   if(directErr) throw directErr;
-  }
-
-  showMessage("Pesanan berhasil diambil! Silakan lakukan pengantaran.", "success");
-  await refreshDashboard();
- }catch(error){
-  console.error("Gagal mengambil pesanan:", error);
-  showMessage("Pesanan tidak dapat diambil. Mungkin sudah diambil kurir lain. " + (error.message || ""), "error");
- }finally{
-  busy = false;
-  button.disabled = false;
-  button.textContent = "🛵 Ambil Tugas Pengantaran";
- }
+  button.addEventListener("click",async()=>{
+    if(loading || isMutating) return;
+    if(opened){
+      box.classList.add("hidden");
+      box.replaceChildren();
+      opened=false;
+      button.textContent="📍 Lihat detail pengantaran";
+      return;
+    }
+    loading=true;
+    button.disabled=true;
+    button.textContent="Memuat detail…";
+    box.classList.remove("hidden");
+    box.replaceChildren(makeElement("p","small muted","Mengambil detail pengantaran dari server…"));
+    try{
+      const {data,error}=await db.rpc("get_antardesa_delivery_details",{p_order_id:orderId});
+      if(error) throw error;
+      if(!Array.isArray(data) || data.length!==1){
+        throw new Error("Detail tidak tersedia atau penugasan tidak dapat diverifikasi.");
+      }
+      const item=data[0];
+      box.replaceChildren(makeElement("h4","","📍 Detail pengantaran"));
+      [
+        ["Nama penerima",item.recipient_name],
+        ["Nomor telepon",item.recipient_phone],
+        ["Alamat lengkap",item.delivery_address],
+        ["Catatan pengantaran",item.delivery_note]
+      ].forEach(([label,value])=>{
+        const line=makeElement("div","detail-line");
+        line.append(makeElement("strong","",label),makeElement("span","",value||"Belum tersedia"));
+        box.appendChild(line);
+      });
+      opened=true;
+      button.textContent="Sembunyikan detail";
+    }catch(error){
+      console.error("Gagal memuat detail pengantaran:",error);
+      box.replaceChildren(makeElement("p","detail-error","Detail gagal dimuat: "+(error.message||"Kesalahan tidak diketahui")));
+      button.textContent="Coba muat detail lagi";
+    }finally{
+      loading=false;
+      button.disabled=false;
+    }
+  });
+  actions.appendChild(button);
+  card.append(actions,box);
 }
 
-/* SELESAIKAN PENGIRIMAN */
-
-async function completeOrder(orderId, button){
- if(busy) return;
-
- if(!window.confirm("Apakah pengiriman benar-benar sudah selesai dan pesanan telah diterima?")) return;
-
- busy = true;
- button.disabled = true;
- button.textContent = "Memproses...";
-
- try{
-  const { data, error } = await db.rpc("complete_antardesa_delivery", { p_order_id: orderId });
-
-  if(error) {
-   const { error: directErr } = await db
-    .from("orders")
-    .update({
-     status: "completed",
-     updated_at: new Date().toISOString()
-    })
-    .eq("id", orderId)
-    .eq("courier_id", currentUser.id);
-
-   if(directErr) throw directErr;
-  }
-
-  showMessage("Pengiriman berhasil ditandai selesai. Terima kasih!", "success");
-  await refreshDashboard();
- }catch(error){
-  console.error("Gagal menyelesaikan pengiriman:", error);
-  showMessage("Gagal menyelesaikan pengiriman. " + (error.message || ""), "error");
- }finally{
-  busy = false;
-  button.disabled = false;
-  button.textContent = "✅ Selesaikan Pengantaran";
- }
+function setNavigation(page){
+  document.querySelectorAll(".page").forEach(section=>{
+    section.classList.toggle("active",section.id==="page-"+page);
+  });
+  document.querySelectorAll(".nav-btn").forEach(button=>{
+    const selected=button.dataset.page===page;
+    button.classList.toggle("active",selected);
+    if(selected) button.setAttribute("aria-current","page");
+    else button.removeAttribute("aria-current");
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
 }
-
-/* MUAT ULANG SEMUA DATA */
-
-async function refreshDashboard(){
- if(busy) return;
-
- busy = true;
- $("refreshBtn").disabled = true;
-
- showMessage(g1("UI-01"));
-
- try{
-  const allowed = await checkCourier();
-  if(!allowed) return;
-
-  await Promise.all([
-   loadAvailable(),
-   loadMyDeliveries()
-  ]);
-
-  hideMessage();
- }catch(error){
-  console.error(error);
-  showMessage(
-   !navigator.onLine ? (window.AntarDesaUI?.get?.("UI-05") || "Koneksi internet terputus. Periksa jaringan dan coba lagi.") : g1("UI-06"),
-   "error"
-  );
- }finally{
-  busy = false;
-  $("refreshBtn").disabled = false;
- }
-}
-
-/* REALTIME LISTENER UNTUK MONITORING TUGAS BARU */
-function initRealtime() {
- if (!db || realtimeChannel) return;
- realtimeChannel = db.channel("courier_realtime_orders")
-  .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
-   refreshDashboard();
-  })
-  .subscribe();
-}
-
-/* EVENT LISTENERS */
-
-$("refreshBtn").addEventListener("click", refreshDashboard);
-
-$("logoutBtn").addEventListener("click", async () => {
- if(busy) return;
- if(!window.confirm("Yakin ingin keluar dari akun?")) return;
-
- $("logoutBtn").disabled = true;
-
- try{
-  const { error } = await db.auth.signOut();
-  if(error) throw error;
-  window.location.replace("login.html");
- }catch(error){
-  console.error(error);
-  showMessage("Gagal keluar. " + (error.message || ""), "error");
-  $("logoutBtn").disabled = false;
- }
+document.querySelectorAll(".nav-btn").forEach(button=>{
+  button.addEventListener("click",()=>setNavigation(button.dataset.page));
 });
 
-/* INISIALISASI APLIKASI */
-
-async function start(){
- try{
-  if(!window.supabase){
-   throw new Error("Library Supabase gagal dimuat. Periksa koneksi internet.");
+async function refreshDashboard(){
+  if(isMutating){
+    refreshQueued=true;
+    return;
   }
-
-  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  await refreshDashboard();
-  initRealtime();
- }catch(error){
-  console.error(error);
-  showMessage(g1("UI-06"), "error");
- }
+  if(isRefreshing){
+    refreshQueued=true;
+    return;
+  }
+  isRefreshing=true;
+  $("refreshBtn").disabled=true;
+  showMessage(uiMessage("UI-01"));
+  try{
+    const allowed=await checkCourier();
+    if(!allowed) return;
+    const results=await Promise.allSettled([loadAvailable(),loadMyDeliveries()]);
+    const failures=results.filter(result=>result.status==="rejected");
+    if(failures.length){
+      const messages=failures.map(result=>result.reason?.message||"Kesalahan memuat data.");
+      showMessage(messages.join(" | "),"error");
+    }else{
+      renderHome();
+      hideMessage();
+    }
+  }catch(error){
+    console.error("Gagal memuat dashboard kurir:",error);
+    showMessage(!navigator.onLine
+      ? "Koneksi internet terputus. Periksa jaringan dan coba lagi."
+      : (error.message||uiMessage("UI-06")),"error");
+  }finally{
+    isRefreshing=false;
+    $("refreshBtn").disabled=false;
+    if(refreshQueued && !isMutating){
+      refreshQueued=false;
+      refreshDashboard();
+    }
+  }
 }
 
-start();
+async function claimOrder(orderId,button){
+  if(isMutating || isRefreshing) return;
+  if(!window.confirm("Ambil pesanan ini untuk Anda antar? Pastikan Anda siap menjalankan pengiriman.")) return;
+  isMutating=true;
+  button.disabled=true;
+  button.textContent="Mengambil tugas…";
+  try{
+    const {data,error}=await db.rpc("claim_antardesa_delivery",{p_order_id:orderId});
+    if(error) throw error;
+    if(data!=="delivering") throw new Error("Server tidak mengonfirmasi status pengiriman.");
+    showMessage("Pesanan berhasil diklaim dan penugasan kurir telah dicatat.","success");
+  }catch(error){
+    console.error("Gagal mengklaim pesanan:",error);
+    showMessage(error.message||"Pesanan tidak dapat diklaim. Muat ulang daftar pesanan.","error");
+  }finally{
+    isMutating=false;
+    button.disabled=false;
+    button.textContent="🛵 Ambil tugas";
+    await refreshDashboard();
+  }
+}
 
+async function completeOrder(orderId,button){
+  if(isMutating || isRefreshing) return;
+  if(!window.confirm("Pastikan pesanan benar-benar telah diterima. Tandai pengiriman ini selesai?")) return;
+  isMutating=true;
+  button.disabled=true;
+  button.textContent="Menyelesaikan…";
+  try{
+    const {data,error}=await db.rpc("complete_antardesa_delivery",{p_order_id:orderId});
+    if(error) throw error;
+    if(data!=="completed") throw new Error("Server tidak mengonfirmasi penyelesaian pengiriman.");
+    showMessage("Pengiriman berhasil ditandai selesai.","success");
+  }catch(error){
+    console.error("Gagal menyelesaikan pengiriman:",error);
+    showMessage(error.message||"Pengiriman gagal diselesaikan.","error");
+  }finally{
+    isMutating=false;
+    button.disabled=false;
+    button.textContent="✓ Selesaikan pengantaran";
+    await refreshDashboard();
+  }
+}
+
+$("refreshBtn").addEventListener("click",refreshDashboard);
+$("logoutBtn").addEventListener("click",async()=>{
+  if(isMutating || isRefreshing) return;
+  if(!window.confirm("Yakin ingin keluar dari akun kurir?")) return;
+  $("logoutBtn").disabled=true;
+  try{
+    const {error}=await db.auth.signOut();
+    if(error) throw error;
+    window.location.replace("login.html");
+  }catch(error){
+    console.error("Gagal logout:",error);
+    showMessage("Gagal keluar: "+(error.message||"Silakan coba lagi."),"error");
+    $("logoutBtn").disabled=false;
+  }
+});
+
+function initRealtime(){
+  if(!db || realtimeChannel) return;
+  realtimeChannel=db.channel("courier_orders_realtime")
+    .on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>{
+      if(realtimeTimer) window.clearTimeout(realtimeTimer);
+      realtimeTimer=window.setTimeout(()=>{
+        refreshDashboard();
+      },700);
+    })
+    .subscribe();
+}
+
+async function start(){
+  try{
+    if(!window.supabase) throw new Error("Library Supabase gagal dimuat. Periksa koneksi internet.");
+    db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const allowed=await checkCourier();
+    if(!allowed) return;
+    await refreshDashboard();
+    initRealtime();
+  }catch(error){
+    console.error("Inisialisasi dashboard kurir gagal:",error);
+    showMessage(error.message||uiMessage("UI-06"),"error");
+  }
+}
+start();
 })();
 </script>
 </body>
