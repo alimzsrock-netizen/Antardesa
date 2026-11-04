@@ -679,9 +679,12 @@
             <span id="cartTotalText">Rp0</span>
           </div>
 
-          <button id="btnCheckout" class="primary" type="button">
-            🚀 Buat Pesanan Sekarang (Checkout Nyata)
+          <button id="btnCheckout" class="primary" type="button" disabled aria-disabled="true">
+            Checkout belum diaktifkan
           </button>
+          <p id="checkoutLockMessage" class="muted" role="status" aria-live="polite" style="margin:8px 0 0; text-align:center;">
+            Keranjang hanya untuk pratinjau. Pembuatan pesanan dan transaksi nyata belum tersedia.
+          </p>
         </div>
       </div>
 
@@ -1035,6 +1038,8 @@
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
     const AVATAR_BUCKET = "profile-avatars";
     const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
+    // Checkout nyata sengaja dinonaktifkan untuk seluruh rilis kandidat ini.
+    const CHECKOUT_ENABLED = false;
 
     let supabaseClient = null;
     let currentUser = null;
@@ -1068,6 +1073,24 @@
     function byId(id) { return document.getElementById(id); }
     function setText(id, value) { byId(id).textContent = value === null || value === undefined ? "" : String(value); }
     function setHidden(id, hidden) { byId(id).classList.toggle("hidden", hidden); }
+
+    function setPlainMessage(container, message, options = {}) {
+      const paragraph = document.createElement("p");
+      paragraph.className = options.className || "muted";
+      paragraph.style.cssText = options.style || "";
+      paragraph.textContent = String(message || "");
+      container.replaceChildren(paragraph);
+    }
+
+    function resetDashboardLinks() {
+      ["roleDashboardLink", "profileDashboardLink"].forEach(function(id) {
+        const link = byId(id);
+        link.classList.add("hidden");
+        link.removeAttribute("href");
+        link.textContent = "Buka Dashboard";
+      });
+      setHidden("retryRoleButton", true);
+    }
 
     /* ========================================= UTILITAS TIMEOUT JARINGAN ========================================= */
     function withTimeout(promise, ms = 4000) {
@@ -1111,16 +1134,10 @@
     }
 
     function restoreLastTab() {
-      try {
-        const lastTab = localStorage.getItem("antardesa_last_tab");
-        if (lastTab && ["home", "services", "cart", "profile"].includes(lastTab)) {
-          show(lastTab);
-        } else {
-          show("home");
-        }
-      } catch (e) {
-        show("home");
-      }
+      // Semua sesi, termasuk pengunjung dan akun yang sudah login, selalu
+      // memulai aplikasi dari dashboard utama. Tab terakhir tidak dipulihkan.
+      try { localStorage.setItem("antardesa_last_tab", "home"); } catch (e) {}
+      show("home");
     }
 
     /* ========================================= PENGATURAN TEMA & TEKS ========================================= */
@@ -1784,6 +1801,11 @@
     }
 
     function openAddressForm(addr = null) {
+      if (!supabaseClient || !currentUser) {
+        setAddressMessage("Silakan login terlebih dahulu untuk mengelola alamat.", "error");
+        show("profile");
+        return;
+      }
       editingAddressId = addr ? addr.id : null;
       currentTempCoords = addr && addr.latitude ? { lat: addr.latitude, lng: addr.longitude } : null;
 
@@ -2051,6 +2073,12 @@
     }
 
     function openVerificationForm(role) {
+      if (!supabaseClient || !currentUser) {
+        setVerificationMessage("Silakan login terlebih dahulu untuk mengajukan verifikasi.", "error");
+        show("profile");
+        return;
+      }
+      if (!["mitra", "kurir"].includes(role)) return;
       targetVerificationRole = role;
       const formBox = byId("verificationFormBox");
       formBox.classList.remove("hidden");
@@ -2118,28 +2146,32 @@
 
     /* ========================================= MODUL O1: TRANSAKSI NYATA & REALTIME ========================================= */
     async function loadMyOrders() {
+      const container = byId("myOrdersList");
       if (!supabaseClient || !currentUser) {
-        byId("myOrdersList").innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Silakan login untuk melihat riwayat pesanan.</p>';
+        myOrders = [];
+        setPlainMessage(container, "Silakan login untuk melihat riwayat pesanan.", { style: "text-align:center; padding:16px;" });
         return;
       }
 
-      const container = byId("myOrdersList");
-      container.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Memuat riwayat pesanan...</p>';
+      const requestedUserId = currentUser.id;
+      setPlainMessage(container, "Memuat riwayat pesanan...", { style: "text-align:center; padding:16px;" });
 
       try {
         const { data, error } = await supabaseClient
           .from("orders")
           .select("id,status,total_amount,shipping_fee,address_snapshot,created_at")
-          .eq("customer_id", currentUser.id)
+          .eq("customer_id", requestedUserId)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-
+        // Abaikan respons akun lama jika pengguna berganti saat query berjalan.
+        if (!currentUser || currentUser.id !== requestedUserId) return;
         myOrders = Array.isArray(data) ? data : [];
         renderMyOrders();
       } catch (err) {
+        if (!currentUser || currentUser.id !== requestedUserId) return;
         console.error("Gagal memuat pesanan:", err);
-        container.innerHTML = '<p class="muted" style="color:#b42318; text-align:center;">Gagal memuat riwayat pesanan dari server.</p>';
+        setPlainMessage(container, "Gagal memuat riwayat pesanan dari server.", { style: "color:#b42318; text-align:center;" });
       }
     }
 
@@ -2148,7 +2180,7 @@
       container.replaceChildren();
 
       if (myOrders.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Belum ada pesanan aktif. Lakukan checkout dari keranjang belanja.</p>';
+        setPlainMessage(container, "Belum ada riwayat pesanan.", { style: "text-align:center; padding:16px;" });
         return;
       }
 
@@ -2175,7 +2207,11 @@
 
         const info = document.createElement("div");
         info.style.cssText = "font-size:0.85em; line-height:1.4; color:var(--text-color);";
-        info.innerHTML = `<strong>Total:</strong> ${formatPrice(ord.total_amount)}<br><strong>Alamat:</strong> ${ord.address_snapshot}`;
+        const totalLabel = document.createElement("strong");
+        totalLabel.textContent = "Total: ";
+        const addressLabel = document.createElement("strong");
+        addressLabel.textContent = "Alamat: ";
+        info.append(totalLabel, document.createTextNode(formatPrice(ord.total_amount)), document.createElement("br"), addressLabel, document.createTextNode(String(ord.address_snapshot || "")));
 
         card.append(topRow, info);
         container.append(card);
@@ -2196,18 +2232,31 @@
     }
 
     /* ========================================= TAMPILAN PENGGUNA TAMU & LOGIN ========================================= */
+    let roleLoadSequence = 0;
+
     function showGuestState() {
+      roleLoadSequence++;
       currentUser = null;
       currentRole = null;
       currentProfile = null;
       currentVerificationRequest = null;
       currentUserAddresses = [];
       editingAddressId = null;
+      myOrders = [];
+      resetDashboardLinks();
 
-      byId("headerAccountActions").innerHTML = `
-        <a class="account-login" href="login.html">Masuk</a>
-        <a class="account-register" href="register.html">Daftar</a>
-      `;
+      const actions = byId("headerAccountActions");
+      actions.replaceChildren();
+      const loginLink = document.createElement("a");
+      loginLink.className = "account-login";
+      loginLink.href = "login.html";
+      loginLink.textContent = "Masuk";
+      const registerLink = document.createElement("a");
+      registerLink.className = "account-register";
+      registerLink.href = "register.html";
+      registerLink.textContent = "Daftar";
+      actions.append(loginLink, registerLink);
+
       setText("welcomeTitle", "Selamat datang! 👋");
       setText("welcomeDescription", "Jelajahi layanan dan produk AntarDesa tanpa harus masuk terlebih dahulu.");
       setHidden("guestLinks", false);
@@ -2215,22 +2264,46 @@
       setHidden("profileGuestActions", false);
       setHidden("profileAccountActions", true);
       setText("profileDescription", "Kamu sedang menggunakan beranda publik.");
+      setText("accountRoleLabel", "Pengunjung");
+      setText("profileRole", "Belum login");
+      setAccountMessage("Masuk untuk menggunakan fitur akun.", false);
       setProfileMessage("", "");
       setVerificationMessage("", "");
       setAddressMessage("", "");
+      setPlainMessage(byId("myOrdersList"), "Silakan login untuk melihat riwayat pesanan.", { style: "text-align:center; padding:16px;" });
+      if (ordersRealtimeChannel && supabaseClient) {
+        supabaseClient.removeChannel(ordersRealtimeChannel);
+        ordersRealtimeChannel = null;
+      }
     }
 
     function showSignedInState(user) {
+      if (!user || !user.id) { showGuestState(); return; }
+      const isDifferentUser = !currentUser || currentUser.id !== user.id;
+      if (isDifferentUser) {
+        roleLoadSequence++;
+        currentRole = null;
+        currentProfile = null;
+        currentVerificationRequest = null;
+        currentUserAddresses = [];
+        editingAddressId = null;
+        myOrders = [];
+      }
       currentUser = user;
-      currentRole = null;
-      currentProfile = null;
-      currentVerificationRequest = null;
-      currentUserAddresses = [];
-      editingAddressId = null;
+      if (isDifferentUser) resetDashboardLinks();
 
-      byId("headerAccountActions").innerHTML = `
-        <a class="account-login" href="#profile" onclick="show('profile'); return false;">Akun saya</a>
-      `;
+      const actions = byId("headerAccountActions");
+      actions.replaceChildren();
+      const accountLink = document.createElement("a");
+      accountLink.className = "account-login";
+      accountLink.href = "#profile";
+      accountLink.textContent = "Akun saya";
+      accountLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        show("profile");
+      });
+      actions.append(accountLink);
+
       setText("welcomeTitle", "Selamat datang kembali! 👋");
       setText("welcomeDescription", "Kamu sudah masuk ke AntarDesa.");
       setHidden("guestLinks", true);
@@ -2241,40 +2314,57 @@
       setText("accountName", "Memuat profil...");
       const metadata = user.user_metadata || {};
       setText("profilePhone", metadata.phone || user.phone || "Nomor HP belum tersedia");
+      setText("accountRoleLabel", "Memeriksa status akun...");
+      setText("profileRole", "Memeriksa peran akun...");
       setAccountMessage("Memeriksa status akun...", false);
-      
       initOrdersRealtime();
     }
 
     async function loadUserRole() {
       if (!supabaseClient || !currentUser) { return; }
+      const requestedUserId = currentUser.id;
+      const sequence = ++roleLoadSequence;
+      resetDashboardLinks();
+      setText("accountRoleLabel", "Memeriksa status akun...");
+      setText("profileRole", "Memeriksa peran akun...");
+      setAccountMessage("Memeriksa status akun...", false);
+
       try {
         const { data, error } = await supabaseClient
           .from("user_roles")
           .select("role,is_verified")
-          .eq("user_id", currentUser.id)
+          .eq("user_id", requestedUserId)
           .single();
 
         if (error) { throw error; }
         if (!data) { throw new Error("ROLE_NOT_FOUND"); }
+        if (!currentUser || currentUser.id !== requestedUserId || sequence !== roleLoadSequence) { return; }
 
         currentRole = data;
         const roleInfo = getRoleInfo(data.role, data.is_verified);
         setText("accountRoleLabel", roleInfo.label);
         setText("profileRole", roleInfo.label);
+        setAccountMessage(roleInfo.page ? "Status akun berhasil diverifikasi." : "Akun belum memiliki akses dashboard. Selesaikan verifikasi jika diperlukan.", false);
 
         if (roleInfo.page) {
           const topLink = byId("roleDashboardLink");
           const profileLink = byId("profileDashboardLink");
-          topLink.href = roleInfo.page;
-          profileLink.href = roleInfo.page;
-          topLink.textContent = roleInfo.dashboard;
-          profileLink.textContent = roleInfo.dashboard;
-          topLink.classList.remove("hidden");
-          profileLink.classList.remove("hidden");
+          [topLink, profileLink].forEach(function(link) {
+            link.href = roleInfo.page;
+            link.textContent = roleInfo.dashboard;
+            link.classList.remove("hidden");
+          });
         }
+        setHidden("retryRoleButton", true);
       } catch (error) {
+        if (!currentUser || currentUser.id !== requestedUserId || sequence !== roleLoadSequence) { return; }
         console.error("Pemeriksaan peran gagal:", error);
+        currentRole = null;
+        resetDashboardLinks();
+        setText("accountRoleLabel", "Peran akun belum dapat diverifikasi");
+        setText("profileRole", "Pemeriksaan peran gagal");
+        setAccountMessage("Koneksi atau data peran belum dapat diperiksa. Tekan tombol coba lagi.", true);
+        setHidden("retryRoleButton", false);
       }
     }
 
@@ -2284,22 +2374,27 @@
         return;
       }
       try {
-        const { data, error } = await withTimeout(supabaseClient.auth.getSession(), 4000);
-        if (error || !data || !data.session || !data.session.user) {
+        const { data, error } = await withTimeout(supabaseClient.auth.getSession(), 5000);
+        if (error) { throw error; }
+        if (!data || !data.session || !data.session.user) {
           showGuestState();
           return;
         }
         showSignedInState(data.session.user);
-        Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus(), loadUserAddresses(), loadMyOrders()]);
+        await Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus(), loadUserAddresses(), loadMyOrders()]);
       } catch (error) {
-        showGuestState();
+        console.warn("Pemulihan sesi belum berhasil:", error);
+        // getSession umumnya membaca sesi lokal. Jika gagal karena gangguan,
+        // jangan menganggap akun telah logout secara permanen.
+        setAccountMessage("Sesi belum dapat diperiksa. Muat ulang halaman atau coba lagi.", true);
       }
     }
 
     async function logoutFromApp() {
       if (!supabaseClient) { return; }
       try {
-        await supabaseClient.auth.signOut();
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
         showGuestState();
         show("home");
       } catch (error) {
@@ -2423,16 +2518,24 @@
       const addrContainer = byId("cartPrimaryAddress");
 
       const primaryAddr = currentUserAddresses.find(a => a.is_primary) || currentUserAddresses[0];
+      addrContainer.replaceChildren();
       if (primaryAddr) {
-        addrContainer.innerHTML = `<strong>${primaryAddr.label} - ${primaryAddr.recipient_name} (${primaryAddr.phone_number})</strong><br>${primaryAddr.full_address}`;
+        const recipient = document.createElement("strong");
+        recipient.textContent = String(primaryAddr.label || "Alamat") + " - " + String(primaryAddr.recipient_name || "") + " (" + String(primaryAddr.phone_number || "") + ")";
+        const address = document.createElement("div");
+        address.textContent = String(primaryAddr.full_address || "");
+        addrContainer.append(recipient, document.createElement("br"), address);
       } else {
-        addrContainer.innerHTML = `<span style="color:#b42318;">Belum ada alamat tersimpan. Silakan atur di menu Akun.</span>`;
+        const note = document.createElement("span");
+        note.style.color = "#b42318";
+        note.textContent = "Belum ada alamat tersimpan. Silakan atur di menu Akun.";
+        addrContainer.append(note);
       }
 
       listContainer.replaceChildren();
 
       if (cartItems.length === 0) {
-        listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Keranjang belanja masih kosong.</p>';
+        setPlainMessage(listContainer, "Keranjang belanja masih kosong.", { style: "text-align:center; padding:20px;" });
         summaryBox.classList.add("hidden");
         return;
       }
@@ -2448,7 +2551,10 @@
 
         const info = document.createElement("div");
         info.className = "cart-item-info";
-        info.innerHTML = `<div class="cart-item-title">${prod.name}</div><div class="cart-item-price">${formatPrice(prod.price)} x ${cartItem.quantity} = ${formatPrice(itemTotal)}</div>`;
+        info.append(
+          createTextElement("div", "cart-item-title", prod.name || "Produk"),
+          createTextElement("div", "cart-item-price", formatPrice(prod.price) + " x " + cartItem.quantity + " = " + formatPrice(itemTotal))
+        );
 
         const actions = document.createElement("div");
         actions.style.cssText = "display:flex; align-items:center; gap:6px;";
@@ -2493,101 +2599,25 @@
         listContainer.append(card);
       });
 
-      const shippingFee = 5000;
-      const totalPayment = subtotal + shippingFee;
-
       setText("cartSubtotalText", formatPrice(subtotal));
-      setText("cartShippingText", formatPrice(shippingFee));
-      setText("cartTotalText", formatPrice(totalPayment));
+      setText("cartShippingText", "Belum dihitung");
+      setText("cartTotalText", "Belum tersedia");
+      const checkoutButton = byId("btnCheckout");
+      checkoutButton.disabled = true;
+      checkoutButton.textContent = "Checkout belum diaktifkan";
+      setText("checkoutLockMessage", "Keranjang hanya untuk pratinjau. Tidak ada pesanan atau transaksi yang akan dibuat.");
 
       summaryBox.classList.remove("hidden");
     }
 
-    /* EKSEKUSI CHECKOUT NYATA (MODUL O1) - Disesuaikan untuk unit_price & fallback aman */
-    byId("btnCheckout").addEventListener("click", async function() {
-      if (!supabaseClient || !currentUser) {
-        alert("Silakan masuk ke akun terlebih dahulu.");
-        show("profile");
+    /* ========================================= CHECKOUT DINONAKTIFKAN ========================================= */
+    byId("btnCheckout").disabled = true;
+    byId("btnCheckout").addEventListener("click", function() {
+      // Pertahanan berlapis: tombol disabled dan handler ini tidak pernah
+      // mengirim INSERT ke tabel orders maupun order_items.
+      if (!CHECKOUT_ENABLED) {
+        setText("checkoutLockMessage", "Checkout masih dinonaktifkan. Tidak ada pesanan yang dibuat.");
         return;
-      }
-
-      const primaryAddr = currentUserAddresses.find(a => a.is_primary) || currentUserAddresses[0];
-      if (!primaryAddr) {
-        alert("Silakan atur alamat utama terlebih dahulu pada menu Akun.");
-        show("profile");
-        return;
-      }
-
-      if (cartItems.length === 0) {
-        alert("Keranjang belanja masih kosong.");
-        return;
-      }
-
-      this.disabled = true;
-      this.textContent = "Memproses Pesanan...";
-
-      try {
-        const firstProduct = cartItems[0].product;
-        const mitraId = firstProduct.user_id || firstProduct.mitra_id || firstProduct.merchant_id || currentUser.id;
-
-        let subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-        let shippingFee = 5000;
-        let totalAmount = subtotal + shippingFee;
-        let addressSnapshot = `${primaryAddr.label} - ${primaryAddr.recipient_name} (${primaryAddr.phone_number}), ${primaryAddr.full_address}`;
-
-        // 1. Insert ke tabel orders (menyertakan merchant_id dan mitra_id agar kompatibel dengan database)
-        const { data: orderData, error: orderError } = await supabaseClient
-          .from("orders")
-          .insert([{
-            customer_id: currentUser.id,
-            mitra_id: mitraId,
-            merchant_id: mitraId,
-            status: "pending_confirmation",
-            total_amount: totalAmount,
-            shipping_fee: shippingFee,
-            address_snapshot: addressSnapshot,
-            latitude: primaryAddr.latitude || null,
-            longitude: primaryAddr.longitude || null
-          }])
-          .select("id")
-          .single();
-
-        if (orderError) throw orderError;
-
-        const orderId = orderData.id;
-
-        // 2. Insert rincian ke tabel order_items (Memastikan unit_price, price, dan subtotal terisi aman)
-        const orderItemsPayload = cartItems.map(item => {
-          const itemPrice = Number(item.product.price ?? item.product.unit_price ?? item.product.harga ?? 0);
-          const qty = Number(item.quantity ?? 1);
-          return {
-            order_id: orderId,
-            product_id: item.product.id,
-            product_name: item.product.name || "",
-            quantity: qty,
-            unit_price: itemPrice,
-            price: itemPrice,
-            subtotal: itemPrice * qty
-          };
-        });
-
-        const { error: itemsError } = await supabaseClient
-          .from("order_items")
-          .insert(orderItemsPayload);
-
-        if (itemsError) throw itemsError;
-
-        alert("Pesanan berhasil dibuat dan dikirim! Silakan cek riwayat pesanan.");
-        cartItems = [];
-        updateCartBadge();
-        renderCartPage();
-        loadMyOrders();
-      } catch (err) {
-        console.error("Checkout gagal:", err);
-        alert(err.message || "Gagal memproses checkout pesanan.");
-      } finally {
-        this.disabled = false;
-        this.textContent = "🚀 Buat Pesanan Sekarang (Checkout Nyata)";
       }
     });
 
@@ -2711,15 +2741,28 @@
           auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage }
         });
         loadPublicProducts();
-        refreshSession();
 
+        // Pasang listener sebelum membaca sesi agar perubahan autentikasi
+        // selama proses startup tidak terlewat.
         supabaseClient.auth.onAuthStateChange(function(event, session) {
-          if (event === "SIGNED_OUT") { showGuestState(); return; }
-          if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED")) {
+          if (event === "SIGNED_OUT" || !session || !session.user) {
+            if (event === "SIGNED_OUT") {
+              showGuestState();
+              show("home");
+            }
+            return;
+          }
+          if (["INITIAL_SESSION", "SIGNED_IN", "USER_UPDATED"].includes(event)) {
+            const userId = session.user.id;
             showSignedInState(session.user);
-            setTimeout(() => { if (currentUser) { Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus(), loadUserAddresses(), loadMyOrders()]); } }, 0);
+            setTimeout(function() {
+              if (currentUser && currentUser.id === userId) {
+                Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus(), loadUserAddresses(), loadMyOrders()]);
+              }
+            }, 0);
           }
         });
+        refreshSession();
       }
     });
 
