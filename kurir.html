@@ -219,24 +219,11 @@ footer{
 (() => {
 "use strict";
 
-/*
- ANTARDESA
- TAHAP 7.1.52C (REVISI LENGKAP & REALTIME)
-
- Dashboard Kurir:
- - Pesanan tersedia (RPC + Fallback Direct Query)
- - Ambil pesanan (claimOrder)
- - Detail pengantaran melalui RPC & Direct Address
- - Selesaikan pengiriman (completeOrder)
- - Riwayat pengiriman
-*/
-
 const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
 
 const $ = id => document.getElementById(id);
 
-/* G1: fallback lokal agar kegagalan modul UI tidak mengunci tombol. */
 const G1_FALLBACK = Object.freeze({
  "UI-01":"Sedang memuat data…",
  "UI-04":"Belum ada penugasan yang dapat ditampilkan.",
@@ -260,7 +247,7 @@ let db = null;
 let currentUser = null;
 let busy = false;
 let realtimeChannel = null;
-const G4_READ_ONLY = false; // Batasan baca-saja dibuka agar kurir dapat mengklaim pesanan
+const G4_READ_ONLY = false;
 
 function showMessage(message, type=""){
  const el = $("message");
@@ -394,10 +381,10 @@ async function loadAvailable(){
  let readyOrders = [];
 
  try {
-  // 1. Coba panggil RPC resmi
+  // 1. Coba panggil RPC resmi terlebih dahulu
   const { data: rpcData, error: rpcErr } = await db.rpc("list_antardesa_ready_deliveries");
 
-  if(!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
+  if (!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
    readyOrders = rpcData.map(o => ({
     order_id: o.order_id,
     merchant_id: o.merchant_id,
@@ -408,7 +395,7 @@ async function loadAvailable(){
     address_snapshot: o.delivery_address || "Alamat Pelanggan"
    }));
   } else {
-   // 2. Fallback query langsung ke tabel orders jika RPC kosong/belum aktif
+   // 2. Fallback direct query jika RPC belum disetup atau return kosong
    const { data: tableData, error: tableErr } = await db
     .from("orders")
     .select("id, status, total_amount, shipping_fee, address_snapshot, created_at, merchant_id, mitra_id")
@@ -416,7 +403,7 @@ async function loadAvailable(){
     .is("courier_id", null)
     .order("created_at", { ascending: false });
 
-   if(!tableErr && Array.isArray(tableData)) {
+   if (!tableErr && Array.isArray(tableData)) {
     readyOrders = tableData.map(o => ({
      order_id: o.id,
      merchant_id: o.mitra_id || o.merchant_id,
@@ -429,7 +416,7 @@ async function loadAvailable(){
    }
   }
  } catch(e) {
-  console.warn("Pemeriksaan pesanan tersedia menggunakan fallback query.");
+  console.warn("Gagal memuat pesanan siap antar:", e);
  }
 
  container.replaceChildren();
@@ -496,7 +483,6 @@ function addDetailButton(card, orderId, orderSnapshot=""){
    let deliveryAddress = orderSnapshot || "Alamat lokasi pengantaran";
    let deliveryNote = "-";
 
-   // 1. Coba ambil dari RPC
    const { data, error } = await db.rpc("get_antardesa_delivery_details", { p_order_id: orderId });
    
    if(!error && Array.isArray(data) && data.length === 1) {
@@ -550,13 +536,11 @@ async function loadMyDeliveries(){
  let rows = [];
 
  try {
-  // 1. Coba ambil dari RPC
   const { data: rpcData, error: rpcErr } = await db.rpc("list_my_antardesa_deliveries");
 
   if(!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
    rows = rpcData;
   } else {
-   // 2. Fallback direct query ke tabel orders
    const { data: tableData, error: tableErr } = await db
     .from("orders")
     .select("id, status, total_amount, shipping_fee, address_snapshot, created_at, updated_at, merchant_id, mitra_id")
@@ -645,11 +629,9 @@ async function claimOrder(orderId, button){
  button.textContent = "Mengambil pesanan...";
 
  try{
-  // 1. Coba eksekusi melalui RPC
   const { data, error } = await db.rpc("claim_antardesa_delivery", { p_order_id: orderId });
 
   if(error) {
-   // Fallback: Langsung update tabel orders jika RPC belum disetup
    const { error: directErr } = await db
     .from("orders")
     .update({
@@ -686,11 +668,9 @@ async function completeOrder(orderId, button){
  button.textContent = "Memproses...";
 
  try{
-  // 1. Coba eksekusi melalui RPC
   const { data, error } = await db.rpc("complete_antardesa_delivery", { p_order_id: orderId });
 
   if(error) {
-   // Fallback: Langsung update tabel orders jika RPC belum disetup
    const { error: directErr } = await db
     .from("orders")
     .update({
