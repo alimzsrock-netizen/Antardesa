@@ -356,6 +356,12 @@
       maximumFractionDigits: 0
     });
 
+    function formatPrice(val) {
+      const price = Number(val);
+      if (!Number.isFinite(price) || price < 0) return "Rp0";
+      return rupiahFormatter.format(price);
+    }
+
     function byId(id) { return document.getElementById(id); }
 
     function setMsg(text, type) {
@@ -368,9 +374,7 @@
 
     /* =================== FUNGSI NAVIGASI SPA =================== */
     function switchTab(tabName) {
-      // Sembunyikan semua halaman
       document.querySelectorAll(".mitra-page").forEach(p => p.classList.add("hidden"));
-      // Hapus status aktif dari semua tombol nav
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
 
       const targetPage = byId("tab-" + tabName);
@@ -381,14 +385,12 @@
       
       window.scrollTo(0, 0);
 
-      // Panggil data sesuai tab aktif agar selalu segar (fresh)
       if (tabName === "toko") loadMitraProducts();
       if (tabName === "pesanan") loadMerchantOrders();
     }
 
     /* =================== MODUL K2: KELOLA PRODUK & KOMPRESI GAMBAR =================== */
     
-    // Fungsi Kompresi Otomatis Canvas API (Dipertahankan 100%)
     function compressImage(file, maxWidth = 800, quality = 0.75) {
       return new Promise(function(resolve) {
         if (!file || !file.type.startsWith("image/")) {
@@ -463,12 +465,10 @@
         return;
       }
 
-      // Pembuatan elemen secara DOM-safe untuk mencegah bug Stringification
       mitraProducts.forEach(function(prod) {
         const item = document.createElement("div");
         item.className = "product-item";
 
-        // Kontainer Gambar
         const imgBox = document.createElement("div");
         imgBox.className = "product-item-img";
         if (prod.image_url) {
@@ -481,7 +481,6 @@
           imgBox.textContent = "📦";
         }
 
-        // Info Produk
         const info = document.createElement("div");
         info.className = "product-item-info";
 
@@ -496,9 +495,8 @@
 
         const price = document.createElement("div");
         price.className = "product-item-price";
-        price.textContent = rupiahFormatter.format(prod.price) + " | Stok: " + prod.stock;
+        price.textContent = formatPrice(prod.price) + " | Stok: " + prod.stock;
 
-        // Baris Tombol Aksi
         const actions = document.createElement("div");
         actions.className = "actions-grid";
 
@@ -524,7 +522,6 @@
       });
     }
 
-    // Event Handler Form
     function openProductForm(prod = null) {
       editingProductId = prod ? prod.id : null;
       byId("formProductTitle").textContent = prod ? "Edit Produk" : "Tambah Produk Baru";
@@ -538,7 +535,6 @@
 
       byId("productFormBox").classList.remove("hidden");
       setMsg("", "");
-      // Scroll sedikit ke form agar fokus
       byId("productFormBox").scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
@@ -548,7 +544,6 @@
       editingProductId = null;
     });
 
-    // Simpan Data & Upload Gambar
     byId("btnSaveProduct").addEventListener("click", async function() {
       if (!supabaseClient || !currentUser) return;
 
@@ -607,7 +602,7 @@
           const { error } = await supabaseClient.from("products").update(payload).eq("id", editingProductId).eq("user_id", currentUser.id);
           resError = error;
         } else {
-          payload.is_active = true; // Produk baru otomatis aktif
+          payload.is_active = true;
           const { error } = await supabaseClient.from("products").insert([payload]);
           resError = error;
         }
@@ -659,19 +654,31 @@
       const container = byId("merchantOrdersList");
 
       try {
-        const { data, error } = await supabaseClient
+        let { data, error } = await supabaseClient
           .from("orders")
           .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,mitra_id,merchant_id")
           .order("created_at", { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+          const fallbackRes = await supabaseClient
+            .from("orders")
+            .select("*")
+            .order("created_at", { ascending: false });
+          
+          if (fallbackRes.error) throw fallbackRes.error;
+          data = fallbackRes.data;
+        }
 
-        // Ambil pesanan yang ditujukan ke mitra ini
-        merchantOrders = Array.isArray(data) ? data.filter(o => o.mitra_id === currentUser.id || o.merchant_id === currentUser.id || !o.mitra_id) : [];
-        if (merchantOrders.length === 0 && Array.isArray(data) && data.length > 0) merchantOrders = data;
+        const rawList = Array.isArray(data) ? data : [];
+        merchantOrders = rawList.filter(o => o.mitra_id === currentUser.id || o.merchant_id === currentUser.id || !o.mitra_id);
+        
+        if (merchantOrders.length === 0 && rawList.length > 0) {
+          merchantOrders = rawList;
+        }
 
         renderMerchantOrders();
       } catch (err) {
+        console.error("Gagal mengambil data pesanan:", err);
         container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal mengambil data pesanan.</p>';
       }
     }
@@ -692,12 +699,12 @@
         const badgeClass = ord.status === "processing" ? "status-processing" : ord.status === "completed" ? "status-completed" : "status-pending";
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <strong style="font-size:0.95em;">Pesanan #${ord.id.substring(0, 8).toUpperCase()}</strong>
+            <strong style="font-size:0.95em;">Pesanan #${String(ord.id).substring(0, 8).toUpperCase()}</strong>
             <span class="order-status-badge ${badgeClass}">${ord.status}</span>
           </div>
           <div class="muted" style="font-size:0.85em; line-height:1.5; margin-bottom:10px;">
             <strong>Total:</strong> <span style="color:var(--accent-color); font-weight:bold;">${formatPrice(ord.total_amount)}</span><br>
-            <strong>Alamat:</strong> ${ord.address_snapshot}
+            <strong>Alamat:</strong> ${ord.address_snapshot || 'Alamat tidak dicantumkan'}
           </div>
         `;
 
@@ -775,16 +782,14 @@
         const { data, error } = await supabaseClient.auth.getSession();
         
         if (error || !data || !data.session) {
-          window.location.href = "login.html"; // Tendang ke login jika tidak ada sesi
+          window.location.href = "login.html";
           return;
         }
 
         currentUser = data.session.user;
         byId("mitraEmail").textContent = currentUser.email;
         
-        // Memuat konten awal (Tab Toko)
         loadMitraProducts();
-        // Mengaktifkan pantauan pesanan real-time di belakang layar
         initRealtime();
 
       } catch (e) {
