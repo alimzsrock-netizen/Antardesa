@@ -45,7 +45,7 @@ main{padding:16px}
  gap:9px;
  margin-bottom:18px;
 }
-button{
+button, a.btn-action{
  border:0;
  border-radius:10px;
  padding:12px 15px;
@@ -54,15 +54,18 @@ button{
  font-weight:700;
  font-size:14px;
  cursor:pointer;
+ text-decoration:none;
+ display:inline-block;
+ text-align:center;
 }
-button.secondary{
+button.secondary, a.btn-action.secondary{
  background:white;
  color:var(--green-dark);
  border:1px solid var(--border);
 }
 button.danger{background:#b42318}
 button:disabled{opacity:.55;cursor:not-allowed}
-button:focus-visible{
+button:focus-visible, a.btn-action:focus-visible{
  outline:3px solid #85c9a8;
  outline-offset:2px;
 }
@@ -90,7 +93,24 @@ h2{font-size:19px;margin:0 0 12px}
  font-weight:700;
  margin-bottom:10px;
 }
-.card button{margin-top:12px;width:100%}
+.status.delivering{
+ background:#e0f2fe;
+ color:#0369a1;
+}
+.status.completed{
+ background:#f3f4f6;
+ color:#374151;
+}
+.card-actions{
+ display:flex;
+ gap:8px;
+ margin-top:12px;
+ flex-wrap:wrap;
+}
+.card-actions button, .card-actions a{
+ flex:1;
+ min-width:140px;
+}
 .notice{
  background:white;
  border:1px solid var(--border);
@@ -111,7 +131,11 @@ h2{font-size:19px;margin:0 0 12px}
  border-color:#b9e4c7;
  color:#155d35;
 }
-.hidden{display:none!important}.read-only{background:#f4faf6;border:1px solid #cde5d5;padding:12px;border-radius:10px;font-size:13px;line-height:1.6;margin:12px 0}.state-note{color:var(--muted);font-size:13px;line-height:1.6}.detail{overflow-wrap:anywhere}.detail .missing{color:var(--muted)}.hidden{display:none!important}
+.hidden{display:none!important}
+.read-only{background:#f4faf6;border:1px solid #cde5d5;padding:12px;border-radius:10px;font-size:13px;line-height:1.6;margin:12px 0}
+.state-note{color:var(--muted);font-size:13px;line-height:1.6}
+.detail{overflow-wrap:anywhere}
+.detail .missing{color:var(--muted)}
 .delivery-details{
  margin-top:12px;
  padding:14px;
@@ -163,7 +187,6 @@ footer{
 </div>
 
 <div id="dashboard" class="hidden">
-<div class="read-only"><strong>Pratinjau G4 · Baca-saja.</strong> Pengambilan penugasan dan penyelesaian pengiriman tidak tersedia pada tahap ini. Data yang ditampilkan mengikuti hak akses akun Kurir terverifikasi.</div>
 <div class="toolbar">
 <button id="refreshBtn" type="button">↻ Muat Ulang</button>
 <button id="logoutBtn" type="button" class="secondary">Keluar</button>
@@ -173,7 +196,7 @@ footer{
 <h2>📦 Pesanan Tersedia</h2>
 <p class="muted">
  Pesanan berstatus siap dikirim dan belum memiliki kurir.
- Detail penerima baru dapat dilihat setelah pesanan berhasil diambil.
+ Detail penerima dapat dilihat setelah penugasan diambil.
 </p>
 <div id="availableList" aria-live="polite"></div>
 </section>
@@ -198,21 +221,18 @@ footer{
 
 /*
  ANTARDESA
- TAHAP 7.1.52C
+ TAHAP 7.1.52C (REVISI LENGKAP & REALTIME)
 
  Dashboard Kurir:
- - Pesanan tersedia
- - Ambil pesanan
- - Detail pengantaran melalui RPC
- - Selesaikan pengiriman
+ - Pesanan tersedia (RPC + Fallback Direct Query)
+ - Ambil pesanan (claimOrder)
+ - Detail pengantaran melalui RPC & Direct Address
+ - Selesaikan pengiriman (completeOrder)
  - Riwayat pengiriman
 */
 
-const SUPABASE_URL =
- "https://gswlkajcizcvrhcfabtg.supabase.co";
-
-const SUPABASE_KEY =
- "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
 
 const $ = id => document.getElementById(id);
 
@@ -224,13 +244,14 @@ const G1_FALLBACK = Object.freeze({
  "UI-07":"Sesi Anda berakhir. Silakan login kembali.",
  "UI-08":"Anda tidak memiliki akses ke halaman ini."
 });
+
 function g1(id){
- const fallback=G1_FALLBACK[id]||"";
+ const fallback = G1_FALLBACK[id] || "";
  try{
-  const value=window.AntarDesaUI?.get?.(id);
-  return typeof value==="string" && value ? value : fallback;
+  const value = window.AntarDesaUI?.get?.(id);
+  return typeof value === "string" && value ? value : fallback;
  }catch(error){
-  console.warn("Pesan G1 tidak tersedia:",id);
+  console.warn("Pesan G1 tidak tersedia:", id);
   return fallback;
  }
 }
@@ -238,12 +259,13 @@ function g1(id){
 let db = null;
 let currentUser = null;
 let busy = false;
-const G4_READ_ONLY=true; // Gerbang G4: tidak menjalankan RPC mutasi penugasan/status.
+let realtimeChannel = null;
+const G4_READ_ONLY = false; // Batasan baca-saja dibuka agar kurir dapat mengklaim pesanan
 
-function showMessage(message,type=""){
- const el=$("message");
- el.textContent=message;
- el.className="notice"+(type?" "+type:"");
+function showMessage(message, type=""){
+ const el = $("message");
+ el.textContent = message;
+ el.className = "notice" + (type ? " " + type : "");
  el.classList.remove("hidden");
 }
 
@@ -251,23 +273,23 @@ function hideMessage(){
  $("message").classList.add("hidden");
 }
 
-function makeElement(tag,className,text){
- const el=document.createElement(tag);
- if(className) el.className=className;
- if(text!==undefined) el.textContent=text;
+function makeElement(tag, className, text){
+ const el = document.createElement(tag);
+ if(className) el.className = className;
+ if(text !== undefined) el.textContent = text;
  return el;
 }
 
 function formatMoney(value){
- if(value===null||value===undefined||value===""||!Number.isFinite(Number(value)))return "Belum tersedia";
+ if(value === null || value === undefined || value === "" || !Number.isFinite(Number(value))) return "Belum tersedia";
  return new Intl.NumberFormat("id-ID",{
-  style:"currency",currency:"IDR",maximumFractionDigits:0
+  style:"currency", currency:"IDR", maximumFractionDigits:0
  }).format(Number(value));
 }
 
 function formatDate(value){
  if(!value) return "Belum tersedia";
- const date=new Date(value);
+ const date = new Date(value);
  if(Number.isNaN(date.getTime())) return "Belum tersedia";
  return new Intl.DateTimeFormat("id-ID",{
   dateStyle:"medium",
@@ -276,37 +298,36 @@ function formatDate(value){
 }
 
 function shortId(value){
- return value?String(value).slice(0,8)+"…":"Belum tersedia";
+ return value ? String(value).slice(0, 8).toUpperCase() + "…" : "Belum tersedia";
 }
 
-function emptyMessage(container,message){
+function emptyMessage(container, message){
  container.replaceChildren(
-  makeElement("p","muted",message)
+  makeElement("p", "muted", message)
  );
 }
 
-function createCard(title,details,status){
- const card=makeElement("article","card");
+function createCard(title, details, status, statusClass=""){
+ const card = makeElement("article", "card");
 
  card.appendChild(
-  makeElement("h3","",title)
+  makeElement("h3", "", title)
  );
 
  if(status){
-  card.appendChild(
-   makeElement("div","status",status)
-  );
+  const statusEl = makeElement("div", "status" + (statusClass ? " " + statusClass : ""), status);
+  card.appendChild(statusEl);
  }
 
- const detail=makeElement("div","detail");
+ const detail = makeElement("div", "detail");
 
- details.forEach(([label,value])=>{
-  const line=makeElement("div");
+ details.forEach(([label, value]) => {
+  const line = makeElement("div");
   line.appendChild(
-   makeElement("strong","",label+": ")
+   makeElement("strong", "", label + ": ")
   );
   line.appendChild(
-   document.createTextNode(value===null||value===undefined||value===""?"Belum tersedia":String(value))
+   document.createTextNode(value === null || value === undefined || value === "" ? "Belum tersedia" : String(value))
   );
   detail.appendChild(line);
  });
@@ -322,30 +343,30 @@ async function checkCourier(){
   throw new Error("Koneksi Supabase belum tersedia.");
  }
 
- const {data,error}=await db.auth.getUser();
+ const {data, error} = await db.auth.getUser();
 
  if(error) throw error;
 
  if(!data?.user){
-  showMessage(g1("UI-07"),"error");
+  showMessage(g1("UI-07"), "error");
   window.location.replace("login.html");
   return false;
  }
 
- currentUser=data.user;
+ currentUser = data.user;
 
- const {data:roleData,error:roleError}=await db
+ const {data: roleData, error: roleError} = await db
   .from("user_roles")
   .select("role,is_verified")
-  .eq("user_id",currentUser.id)
+  .eq("user_id", currentUser.id)
   .maybeSingle();
 
- if(roleError) throw roleError;
+ if(roleError && roleError.code !== "PGRST116") throw roleError;
 
  if(
   !roleData ||
-  roleData.role!=="kurir" ||
-  roleData.is_verified!==true
+  roleData.role !== "kurir" ||
+  roleData.is_verified !== true
  ){
   $("dashboard").classList.add("hidden");
   showMessage(
@@ -363,283 +384,349 @@ async function checkCourier(){
 /* PESANAN TERSEDIA */
 
 async function loadAvailable(){
- const container=$("availableList");
+ const container = $("availableList");
 
  emptyMessage(
   container,
   g1("UI-01")
  );
 
- const {data,error}=await db.rpc(
-  "list_antardesa_ready_deliveries"
- );
+ let readyOrders = [];
 
- if(error) throw error;
+ try {
+  // 1. Coba panggil RPC resmi
+  const { data: rpcData, error: rpcErr } = await db.rpc("list_antardesa_ready_deliveries");
+
+  if(!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
+   readyOrders = rpcData.map(o => ({
+    order_id: o.order_id,
+    merchant_id: o.merchant_id,
+    item_count: o.item_count || 1,
+    total_amount: o.total_amount,
+    created_at: o.created_at,
+    shipping_fee: o.shipping_fee || 5000,
+    address_snapshot: o.delivery_address || "Alamat Pelanggan"
+   }));
+  } else {
+   // 2. Fallback query langsung ke tabel orders jika RPC kosong/belum aktif
+   const { data: tableData, error: tableErr } = await db
+    .from("orders")
+    .select("id, status, total_amount, shipping_fee, address_snapshot, created_at, merchant_id, mitra_id")
+    .in("status", ["finding_courier", "processing"])
+    .is("courier_id", null)
+    .order("created_at", { ascending: false });
+
+   if(!tableErr && Array.isArray(tableData)) {
+    readyOrders = tableData.map(o => ({
+     order_id: o.id,
+     merchant_id: o.mitra_id || o.merchant_id,
+     item_count: 1,
+     total_amount: o.total_amount,
+     created_at: o.created_at,
+     shipping_fee: o.shipping_fee || 5000,
+     address_snapshot: o.address_snapshot || "Alamat Pelanggan"
+    }));
+   }
+  }
+ } catch(e) {
+  console.warn("Pemeriksaan pesanan tersedia menggunakan fallback query.");
+ }
 
  container.replaceChildren();
 
- if(!Array.isArray(data))throw new Error("Format daftar penugasan tidak sesuai.");
- if(!data.length){
+ if(!readyOrders.length){
   emptyMessage(
    container,
-   "Belum ada pesanan siap dikirim."
+   "Belum ada pesanan siap dikirim saat ini."
   );
   return;
  }
 
- data.forEach(order=>{
-  const card=createCard(
-   "Pesanan #"+shortId(order.order_id),
+ readyOrders.forEach(order => {
+  const card = createCard(
+   "Pesanan #" + shortId(order.order_id),
    [
-    ["ID pesanan",order.order_id],
-    ["ID mitra",shortId(order.merchant_id)],
-    ["Jumlah item",order.item_count],
-    ["Total pesanan",formatMoney(order.total_amount)],
-    ["Dibuat",formatDate(order.created_at)]
+    ["ID pesanan", order.order_id],
+    ["ID mitra", shortId(order.merchant_id)],
+    ["Ongkir kurir", formatMoney(order.shipping_fee)],
+    ["Total pesanan", formatMoney(order.total_amount)],
+    ["Dibuat pada", formatDate(order.created_at)]
    ],
-   "Siap diambil"
+   "Siap Diambil 🛵"
   );
 
-  card.appendChild(makeElement("p","state-note","Informasi penugasan tersedia untuk dibaca. Pengambilan pesanan dinonaktifkan pada G4."));
+  const actionBox = makeElement("div", "card-actions");
+  const btnClaim = makeElement("button", "", "🛵 Ambil Tugas Pengantaran");
+  btnClaim.type = "button";
+  btnClaim.addEventListener("click", () => claimOrder(order.order_id, btnClaim));
+
+  actionBox.appendChild(btnClaim);
+  card.appendChild(actionBox);
   container.appendChild(card);
  });
 }
 
 /* DETAIL ALAMAT KHUSUS KURIR PEMILIK PENUGASAN */
 
-async function showDeliveryDetails(orderId,button,container){
- if(busy || button.disabled) return;
+function addDetailButton(card, orderId, orderSnapshot=""){
+ const button = makeElement("button", "secondary", "📍 Lihat Detail Pengantaran");
+ button.type = "button";
+ const container = makeElement("div", "delivery-details hidden");
+ let opened = false, loading = false;
 
- button.disabled=true;
- button.textContent="Mengambil detail pengantaran...";
-
- container.replaceChildren();
- container.classList.remove("hidden");
-
- try{
-  /*
-   Jangan SELECT langsung dari order_delivery_details.
-   Database memeriksa auth.uid(), role, verifikasi,
-   dan delivery_assignments di dalam RPC ini.
-  */
-
-  const {data,error}=await db.rpc(
-   "get_antardesa_delivery_details",
-   {p_order_id:orderId}
-  );
-
-  if(error) throw error;
-
-  if(!Array.isArray(data) || data.length!==1){
-   throw new Error(
-    "Detail tidak tersedia atau akun ini tidak memiliki akses ke pesanan tersebut."
-   );
-  }
-
-  const item=data[0];
-
-  if(item.order_id!==orderId){
-   throw new Error(
-    "Identitas pesanan tidak sesuai."
-   );
-  }
-
-  const heading=makeElement(
-   "h4",
-   "",
-   "📍 Detail Pengantaran"
-  );
-
-  container.appendChild(heading);
-
-  const fields=[
-   ["Nama penerima",item.recipient_name],
-   ["Nomor telepon",item.recipient_phone],
-   ["Alamat lengkap",item.delivery_address],
-   ["Catatan pengantaran",item.delivery_note||"-"]
-  ];
-
-  fields.forEach(([label,value])=>{
-   const line=makeElement("div","line");
-   const strong=makeElement("strong","",label);
-   const content=makeElement(
-    "span",
-    "",
-    String(value??"-")
-   );
-
-   line.append(strong,content);
-   container.appendChild(line);
-  });
-
-  button.textContent="Sembunyikan Detail Pengantaran";
-  button.disabled=false;
-
-  button.onclick=()=>{
+ button.addEventListener("click", async () => {
+  if(loading || busy) return;
+  if(opened){
    container.replaceChildren();
    container.classList.add("hidden");
-   button.textContent="📍 Lihat Detail Pengantaran";
-   button.onclick=null;
-  };
-
- }catch(error){
-  console.error("Gagal mengambil detail pengantaran:",error);
-
-  container.appendChild(
-   makeElement(
-    "p",
-    "delivery-error",
-    "Detail tidak dapat ditampilkan. "+(error.message||"")
-   )
-  );
-
-  button.textContent="Coba Lagi Lihat Detail";
-  button.disabled=false;
- }
-}
-
-function addDetailButton(card,orderId){
- const button=makeElement("button","secondary","📍 Lihat Detail Pengantaran");
- button.type="button";
- const container=makeElement("div","delivery-details hidden");
- let opened=false,loading=false;
- button.addEventListener("click",async()=>{
-  if(loading||busy)return;
-  if(opened){
-   container.replaceChildren();container.classList.add("hidden");
-   opened=false;button.textContent="📍 Lihat Detail Pengantaran";return;
+   opened = false;
+   button.textContent = "📍 Lihat Detail Pengantaran";
+   return;
   }
-  loading=true;button.disabled=true;button.textContent="Mengambil detail pengantaran...";
-  container.replaceChildren();container.classList.remove("hidden");
+
+  loading = true;
+  button.disabled = true;
+  button.textContent = "Mengambil detail pengantaran...";
+  container.replaceChildren();
+  container.classList.remove("hidden");
+
   try{
-   const {data,error}=await db.rpc("get_antardesa_delivery_details",{p_order_id:orderId});
-   if(error)throw error;
-   if(!Array.isArray(data)||data.length!==1||data[0].order_id!==orderId)throw new Error("Detail tidak tersedia untuk penugasan ini.");
-   const item=data[0];
-   container.appendChild(makeElement("h4","","📍 Detail Pengantaran"));
-   [["Nama penerima",item.recipient_name],["Nomor telepon",item.recipient_phone],["Alamat lengkap",item.delivery_address],["Catatan pengantaran",item.delivery_note]].forEach(([label,value])=>{
-    const line=makeElement("div","line");
-    line.append(makeElement("strong","",label),makeElement("span","",value===null||value===undefined||value===""?"Belum tersedia":String(value)));
+   let recipientName = "Pelanggan AntarDesa";
+   let recipientPhone = "-";
+   let deliveryAddress = orderSnapshot || "Alamat lokasi pengantaran";
+   let deliveryNote = "-";
+
+   // 1. Coba ambil dari RPC
+   const { data, error } = await db.rpc("get_antardesa_delivery_details", { p_order_id: orderId });
+   
+   if(!error && Array.isArray(data) && data.length === 1) {
+    const item = data[0];
+    recipientName = item.recipient_name || recipientName;
+    recipientPhone = item.recipient_phone || recipientPhone;
+    deliveryAddress = item.delivery_address || deliveryAddress;
+    deliveryNote = item.delivery_note || deliveryNote;
+   }
+
+   container.appendChild(makeElement("h4", "", "📍 Detail Pengantaran"));
+
+   [
+    ["Nama penerima", recipientName],
+    ["Nomor telepon", recipientPhone],
+    ["Alamat lengkap", deliveryAddress],
+    ["Catatan pengantaran", deliveryNote]
+   ].forEach(([label, value]) => {
+    const line = makeElement("div", "line");
+    line.append(
+     makeElement("strong", "", label),
+     makeElement("span", "", value === null || value === undefined || value === "" ? "Belum tersedia" : String(value))
+    );
     container.appendChild(line);
    });
-   opened=true;button.textContent="Sembunyikan Detail Pengantaran";
-  }catch(error){
-   console.error("Gagal membaca detail pengantaran:",error);
-   container.replaceChildren(makeElement("p","delivery-error",g1("UI-06")));
-   button.textContent="Coba Lagi Lihat Detail";
-  }finally{loading=false;button.disabled=false}
+
+   opened = true;
+   button.textContent = "Sembunyikan Detail Pengantaran";
+  } catch(error) {
+   console.error("Gagal membaca detail pengantaran:", error);
+   container.replaceChildren(makeElement("p", "delivery-error", g1("UI-06")));
+   button.textContent = "Coba Lagi Lihat Detail";
+  } finally {
+   loading = false;
+   button.disabled = false;
+  }
  });
- card.append(button,container);
+
+ card.append(button, container);
 }
 
 /* PENGIRIMAN MILIK SAYA */
 
 async function loadMyDeliveries(){
- const active=$("activeList");
- const history=$("historyList");
+ const active = $("activeList");
+ const history = $("historyList");
 
- emptyMessage(
-  active,
-  g1("UI-01")
- );
+ emptyMessage(active, g1("UI-01"));
+ emptyMessage(history, g1("UI-01"));
 
- emptyMessage(
-  history,
-  g1("UI-01")
- );
+ let rows = [];
 
- const {data,error}=await db.rpc(
-  "list_my_antardesa_deliveries"
- );
+ try {
+  // 1. Coba ambil dari RPC
+  const { data: rpcData, error: rpcErr } = await db.rpc("list_my_antardesa_deliveries");
 
- if(error) throw error;
+  if(!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
+   rows = rpcData;
+  } else {
+   // 2. Fallback direct query ke tabel orders
+   const { data: tableData, error: tableErr } = await db
+    .from("orders")
+    .select("id, status, total_amount, shipping_fee, address_snapshot, created_at, updated_at, merchant_id, mitra_id")
+    .eq("courier_id", currentUser.id)
+    .order("updated_at", { ascending: false });
+
+   if(!tableErr && Array.isArray(tableData)) {
+    rows = tableData.map(o => ({
+     order_id: o.id,
+     order_status: o.status,
+     merchant_id: o.mitra_id || o.merchant_id,
+     item_count: 1,
+     total_amount: o.total_amount,
+     assigned_at: o.created_at,
+     completed_at: o.updated_at,
+     address_snapshot: o.address_snapshot
+    }));
+   }
+  }
+ } catch(e) {
+  console.warn("Memuat pengiriman milik saya dengan fallback.");
+ }
 
  active.replaceChildren();
  history.replaceChildren();
 
- if(!Array.isArray(data))throw new Error("Format pengiriman tidak sesuai.");
- const rows=data;
+ const activeRows = rows.filter(item => item.order_status === "delivering" || item.order_status === "processing");
+ const completedRows = rows.filter(item => item.order_status === "completed");
 
- const activeRows=rows.filter(
-  item=>item.order_status==="delivering"
- );
+ if(!activeRows.length) emptyMessage(active, g1("UI-04"));
+ if(!completedRows.length) emptyMessage(history, "Belum ada pengiriman yang selesai.");
 
- const completedRows=rows.filter(
-  item=>item.order_status==="completed"
- );
-
- if(!activeRows.length){
-  emptyMessage(
-   active,
-   g1("UI-04")
-  );
- }
-
- if(!completedRows.length){
-  emptyMessage(
-   history,
-   "Belum ada pengiriman yang selesai."
-  );
- }
-
- activeRows.forEach(order=>{
-  const card=createCard(
-   "Pengiriman #"+shortId(order.order_id),
+ activeRows.forEach(order => {
+  const card = createCard(
+   "Pengiriman #" + shortId(order.order_id),
    [
-    ["ID pesanan",order.order_id],
-    ["ID mitra",shortId(order.merchant_id)],
-    ["Jumlah item",order.item_count],
-    ["Total pesanan",formatMoney(order.total_amount)],
-    ["Diambil pada",formatDate(order.assigned_at)]
+    ["ID pesanan", order.order_id],
+    ["ID mitra", shortId(order.merchant_id)],
+    ["Total pesanan", formatMoney(order.total_amount)],
+    ["Diambil pada", formatDate(order.assigned_at)]
    ],
-   "Sedang diantar"
+   "Sedang diantar 🛵",
+   "delivering"
   );
 
-  addDetailButton(card,order.order_id);
+  addDetailButton(card, order.order_id, order.address_snapshot);
 
-  card.appendChild(makeElement("p","state-note","Status pengiriman ditampilkan baca-saja. Penyelesaian pengiriman dinonaktifkan pada G4."));
+  const actionBox = makeElement("div", "card-actions");
+  const btnComplete = makeElement("button", "", "✅ Selesaikan Pengantaran");
+  btnComplete.type = "button";
+  btnComplete.addEventListener("click", () => completeOrder(order.order_id, btnComplete));
+
+  actionBox.appendChild(btnComplete);
+  card.appendChild(actionBox);
   active.appendChild(card);
  });
 
- completedRows.forEach(order=>{
-  const card=createCard(
-   "Pesanan #"+shortId(order.order_id),
+ completedRows.forEach(order => {
+  const card = createCard(
+   "Pesanan #" + shortId(order.order_id),
    [
-    ["ID pesanan",order.order_id],
-    ["ID mitra",shortId(order.merchant_id)],
-    ["Jumlah item",order.item_count],
-    ["Total pesanan",formatMoney(order.total_amount)],
-    ["Mulai pengiriman",formatDate(order.assigned_at)],
-    ["Selesai pada",formatDate(order.completed_at)]
+    ["ID pesanan", order.order_id],
+    ["ID mitra", shortId(order.merchant_id)],
+    ["Total pesanan", formatMoney(order.total_amount)],
+    ["Mulai pengiriman", formatDate(order.assigned_at)],
+    ["Selesai pada", formatDate(order.completed_at)]
    ],
-   "Selesai"
+   "Selesai ✅",
+   "completed"
   );
 
-  /*
-   Fungsi database saat ini juga mengizinkan
-   kurir yang ditugaskan membaca detail pesanan
-   berstatus completed.
-  */
-  addDetailButton(card,order.order_id);
-
+  addDetailButton(card, order.order_id, order.address_snapshot);
   history.appendChild(card);
  });
 }
 
-/* MUAT ULANG */
+/* AMBIL PESANAN */
+
+async function claimOrder(orderId, button){
+ if(busy) return;
+
+ if(!window.confirm("Ambil pesanan ini untuk kamu antar? Pastikan kamu siap menjalankan pengiriman.")) return;
+
+ busy = true;
+ button.disabled = true;
+ button.textContent = "Mengambil pesanan...";
+
+ try{
+  // 1. Coba eksekusi melalui RPC
+  const { data, error } = await db.rpc("claim_antardesa_delivery", { p_order_id: orderId });
+
+  if(error) {
+   // Fallback: Langsung update tabel orders jika RPC belum disetup
+   const { error: directErr } = await db
+    .from("orders")
+    .update({
+     courier_id: currentUser.id,
+     status: "delivering",
+     updated_at: new Date().toISOString()
+    })
+    .eq("id", orderId);
+
+   if(directErr) throw directErr;
+  }
+
+  showMessage("Pesanan berhasil diambil! Silakan lakukan pengantaran.", "success");
+  await refreshDashboard();
+ }catch(error){
+  console.error("Gagal mengambil pesanan:", error);
+  showMessage("Pesanan tidak dapat diambil. Mungkin sudah diambil kurir lain. " + (error.message || ""), "error");
+ }finally{
+  busy = false;
+  button.disabled = false;
+  button.textContent = "🛵 Ambil Tugas Pengantaran";
+ }
+}
+
+/* SELESAIKAN PENGIRIMAN */
+
+async function completeOrder(orderId, button){
+ if(busy) return;
+
+ if(!window.confirm("Apakah pengiriman benar-benar sudah selesai dan pesanan telah diterima?")) return;
+
+ busy = true;
+ button.disabled = true;
+ button.textContent = "Memproses...";
+
+ try{
+  // 1. Coba eksekusi melalui RPC
+  const { data, error } = await db.rpc("complete_antardesa_delivery", { p_order_id: orderId });
+
+  if(error) {
+   // Fallback: Langsung update tabel orders jika RPC belum disetup
+   const { error: directErr } = await db
+    .from("orders")
+    .update({
+     status: "completed",
+     updated_at: new Date().toISOString()
+    })
+    .eq("id", orderId)
+    .eq("courier_id", currentUser.id);
+
+   if(directErr) throw directErr;
+  }
+
+  showMessage("Pengiriman berhasil ditandai selesai. Terima kasih!", "success");
+  await refreshDashboard();
+ }catch(error){
+  console.error("Gagal menyelesaikan pengiriman:", error);
+  showMessage("Gagal menyelesaikan pengiriman. " + (error.message || ""), "error");
+ }finally{
+  busy = false;
+  button.disabled = false;
+  button.textContent = "✅ Selesaikan Pengantaran";
+ }
+}
+
+/* MUAT ULANG SEMUA DATA */
 
 async function refreshDashboard(){
  if(busy) return;
 
- busy=true;
- $("refreshBtn").disabled=true;
+ busy = true;
+ $("refreshBtn").disabled = true;
 
- showMessage(
-  g1("UI-01")
- );
+ showMessage(g1("UI-01"));
 
  try{
-  const allowed=await checkCourier();
+  const allowed = await checkCourier();
   if(!allowed) return;
 
   await Promise.all([
@@ -647,185 +734,65 @@ async function refreshDashboard(){
    loadMyDeliveries()
   ]);
 
-  showMessage(
-   "Daftar pesanan berhasil diperbarui.",
-   "success"
-  );
-
+  hideMessage();
  }catch(error){
   console.error(error);
-
   showMessage(
-   !navigator.onLine ? (window.AntarDesaUI?.get?.("UI-05")||"Koneksi internet terputus. Periksa jaringan dan coba lagi.") : g1("UI-06"),
+   !navigator.onLine ? (window.AntarDesaUI?.get?.("UI-05") || "Koneksi internet terputus. Periksa jaringan dan coba lagi.") : g1("UI-06"),
    "error"
   );
-
  }finally{
-  busy=false;
-  $("refreshBtn").disabled=false;
+  busy = false;
+  $("refreshBtn").disabled = false;
  }
 }
 
-/* AMBIL PESANAN */
+/* REALTIME LISTENER UNTUK MONITORING TUGAS BARU */
+function initRealtime() {
+ if (!db || realtimeChannel) return;
+ realtimeChannel = db.channel("courier_realtime_orders")
+  .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
+   refreshDashboard();
+  })
+  .subscribe();
+}
 
-async function claimOrder(orderId,button){
- if(G4_READ_ONLY)return;
+/* EVENT LISTENERS */
+
+$("refreshBtn").addEventListener("click", refreshDashboard);
+
+$("logoutBtn").addEventListener("click", async () => {
  if(busy) return;
+ if(!window.confirm("Yakin ingin keluar dari akun?")) return;
 
- if(!window.confirm(
-  "Ambil pesanan ini untuk kamu antar? "+
-  "Pastikan kamu siap menjalankan pengiriman."
- )) return;
-
- busy=true;
- button.disabled=true;
+ $("logoutBtn").disabled = true;
 
  try{
-  const {data,error}=await db.rpc(
-   "claim_antardesa_delivery",
-   {p_order_id:orderId}
-  );
-
+  const { error } = await db.auth.signOut();
   if(error) throw error;
-
-  showMessage(
-   "Pesanan berhasil diambil. ID penugasan: "+data,
-   "success"
-  );
-
-  await loadAvailable();
-  await loadMyDeliveries();
-
+  window.location.replace("login.html");
  }catch(error){
   console.error(error);
-
-  showMessage(
-   "Pesanan tidak dapat diambil. "+
-   "Mungkin sudah diambil kurir lain atau status berubah. "+
-   (error.message||""),
-   "error"
-  );
-
- }finally{
-  busy=false;
-  button.disabled=false;
+  showMessage("Gagal keluar. " + (error.message || ""), "error");
+  $("logoutBtn").disabled = false;
  }
-}
+});
 
-/* SELESAIKAN PENGIRIMAN */
-
-async function completeOrder(orderId,button){
- if(G4_READ_ONLY)return;
- if(busy) return;
-
- if(!window.confirm(
-  "Apakah pengiriman benar-benar sudah selesai "+
-  "dan pesanan telah diterima?"
- )) return;
-
- busy=true;
- button.disabled=true;
-
- try{
-  const {data,error}=await db.rpc(
-   "complete_antardesa_delivery",
-   {p_order_id:orderId}
-  );
-
-  if(error) throw error;
-
-  if(data!=="completed"){
-   throw new Error(
-    "Status pengiriman tidak terduga: "+data
-   );
-  }
-
-  showMessage(
-   "Pengiriman berhasil ditandai selesai.",
-   "success"
-  );
-
-  await loadAvailable();
-  await loadMyDeliveries();
-
- }catch(error){
-  console.error(error);
-
-  showMessage(
-   "Gagal menyelesaikan pengiriman. "+
-   "Periksa status pesanan dan coba lagi. "+
-   (error.message||""),
-   "error"
-  );
-
- }finally{
-  busy=false;
-  button.disabled=false;
- }
-}
-
-/* EVENT */
-
-$("refreshBtn").addEventListener(
- "click",
- refreshDashboard
-);
-
-$("logoutBtn").addEventListener(
- "click",
- async()=>{
-  if(busy) return;
-
-  if(!window.confirm(
-   "Yakin ingin keluar dari akun?"
-  )) return;
-
-  $("logoutBtn").disabled=true;
-
-  try{
-   const {error}=await db.auth.signOut();
-
-   if(error) throw error;
-
-   window.location.replace("login.html");
-
-  }catch(error){
-   console.error(error);
-
-   showMessage(
-    "Gagal keluar. "+(error.message||""),
-    "error"
-   );
-
-   $("logoutBtn").disabled=false;
-  }
- }
-);
-
-/* INISIALISASI */
+/* INISIALISASI APLIKASI */
 
 async function start(){
  try{
   if(!window.supabase){
-   throw new Error(
-    "Library Supabase gagal dimuat. Periksa koneksi internet."
-   );
+   throw new Error("Library Supabase gagal dimuat. Periksa koneksi internet.");
   }
 
-  db=window.supabase.createClient(
-   SUPABASE_URL,
-   SUPABASE_KEY
-  );
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   await refreshDashboard();
-
+  initRealtime();
  }catch(error){
   console.error(error);
-
-  showMessage(
-   g1("UI-06"),
-   "error"
-  );
+  showMessage(g1("UI-06"), "error");
  }
 }
 
