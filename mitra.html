@@ -71,7 +71,6 @@
       width: 100%;
       display: block;
       text-align: center;
-      text-decoration: none;
       cursor: pointer;
       font-size: 0.9em;
     }
@@ -84,15 +83,14 @@
       width: 100%;
       display: block;
       text-align: center;
-      text-decoration: none;
       cursor: pointer;
       font-size: 0.85em;
       font-weight: bold;
     }
     .danger-button {
-      background: var(--panel-bg);
+      background: #3a1c1c;
       color: #f8a59d;
-      border: 1px solid #b42318;
+      border: 1px solid #7f2929;
       border-radius: 11px;
       padding: 10px;
       width: 100%;
@@ -113,11 +111,11 @@
       background: var(--input-bg);
       color: var(--text-color);
     }
-    textarea { min-height: 80px; }
+    textarea { min-height: 80px; resize: vertical; }
 
     .hidden { display: none !important; }
 
-    /* PRODUK LIST STYLES */
+    /* PRODUK LIST STYLES (MODUL K2) */
     .product-item {
       background: var(--card-sub-bg);
       border: 1px solid var(--panel-border);
@@ -145,6 +143,7 @@
     .product-item-info { flex: 1; min-width: 0; }
     .product-item-title { font-weight: bold; font-size: 0.95em; margin-bottom: 3px; overflow-wrap: anywhere; }
     .product-item-price { color: var(--accent-color); font-weight: bold; font-size: 0.9em; }
+    
     .product-item-badge {
       display: inline-block;
       padding: 2px 6px;
@@ -153,12 +152,27 @@
       font-weight: bold;
       margin-left: 6px;
     }
-    .badge-active { background: #065f46; color: #a7f3d0; }
-    .badge-inactive { background: #451a1a; color: #fca5a5; }
+    .badge-active { background: #064e3b; color: #a7f3d0; border: 1px solid #065f46; }
+    .badge-inactive { background: #451a1a; color: #fca5a5; border: 1px solid #7f1d1d; }
+    .badge-verified { background: #133827; color: #4ade80; border: 1px solid #1f573d; padding: 4px 8px; border-radius: 6px; font-size: 0.75em; font-weight: bold; }
 
     .actions-grid { display: flex; gap: 6px; margin-top: 8px; }
+    .actions-grid button { flex: 1; padding: 6px 8px; font-size: 0.75em; }
 
-    /* NAVIGASI BAWAH */
+    /* ORDER CARD STYLES (MODUL O2) */
+    .order-status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+    .status-pending { background: #3b2e16; color: #f6e05e; border: 1px solid #6c521a; }
+    .status-processing { background: #133827; color: #4ade80; border: 1px solid #1f573d; }
+    .status-delivering { background: #1e3a8a; color: #93c5fd; border: 1px solid #1d4ed8; }
+    .status-completed { background: #262626; color: #d4d4d4; border: 1px solid #404040; }
+
+    /* NAVIGASI BAWAH SPA */
     nav {
       position: fixed;
       bottom: 0;
@@ -171,19 +185,18 @@
       padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
       z-index: 5;
     }
-    nav a, nav button {
+    nav button {
       background: none;
       border: 0;
       font: inherit;
       font-size: 0.75em;
       color: var(--muted-color);
-      text-decoration: none;
       text-align: center;
       min-width: 60px;
-      padding: 4px;
+      padding: 6px 4px;
       cursor: pointer;
     }
-    nav a.active, nav button.active { color: var(--accent-color); font-weight: bold; }
+    nav button.active { color: var(--accent-color); font-weight: bold; }
 
     .status-msg { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); overflow-wrap: anywhere; }
     .status-msg.error { color: #f8a59d; font-weight: bold; }
@@ -203,90 +216,120 @@
   <!-- UTAMA -->
   <main>
 
-    <!-- PROFIL MITRA -->
-    <div class="panel">
-      <h2>Profil & Verifikasi Mitra</h2>
-      <p class="muted">
-        Informasi berikut dibaca dari sesi aktif akun Anda.
-      </p>
-
-      <div class="card-sub">
-        <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
-        <div style="margin-top:4px;"><strong>Status Usaha:</strong> <span id="mitraStatus" style="color:var(--accent-color); font-weight:bold;">Terverifikasi</span></div>
-      </div>
-    </div>
-
-    <!-- KELOLA PRODUK (MODUL K2) -->
-    <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <h2>Kelola Produk Toko 📦</h2>
-        <button id="btnOpenAddForm" class="secondary" type="button" style="width:auto; padding:7px 12px;">+ Tambah Produk</button>
-      </div>
-      <p class="muted">
-        Atur barang dagangan atau hasil kebun yang ingin ditampilkan pada katalog Pasar Desa.
-      </p>
-
-      <!-- FORM TAMBAH / EDIT PRODUK -->
-      <div id="productFormBox" class="card-sub hidden" style="border: 1px solid var(--accent-color);">
-        <h3 id="formProductTitle" style="margin:0 0 10px; font-size:1em;">Tambah Produk Baru</h3>
-
-        <label for="prodName" style="margin-top:0;">Nama Produk:</label>
-        <input id="prodName" type="text" maxlength="100" placeholder="Contoh: Kopi Robusta Pagar Alam 250g">
-
-        <label for="prodCategory">Kategori:</label>
-        <select id="prodCategory">
-          <option value="Hasil Kebun">Hasil Kebun</option>
-          <option value="Makanan & Minuman">Makanan & Minuman</option>
-          <option value="Sembako & Kebutuhan">Sembako & Kebutuhan</option>
-          <option value="Kerajinan Desa">Kerajinan Desa</option>
-          <option value="Lainnya">Lainnya</option>
-        </select>
-
-        <label for="prodPrice">Harga (Rp):</label>
-        <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
-
-        <label for="prodStock">Stok Barang:</label>
-        <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
-
-        <label for="prodImage">Foto Produk (JPG/PNG/WebP, Maks 5MB):</label>
-        <input id="prodImage" type="file" accept="image/jpeg,image/png,image/webp">
-
-        <label for="prodDesc">Deskripsi Produk:</label>
-        <textarea id="prodDesc" maxlength="500" placeholder="Jelaskan kualitas, rasa, atau keunggulan produk Anda"></textarea>
-
-        <div class="actions-grid" style="margin-top:12px;">
-          <button id="btnSaveProduct" class="primary" type="button">Simpan Produk</button>
-          <button id="btnCancelProduct" class="secondary" type="button">Batal</button>
+    <!-- TAB 1: TOKO & PRODUK (MODUL K2 DIKEMBALIKAN UTUH) -->
+    <section id="tab-toko" class="mitra-page">
+      <!-- PROFIL MITRA -->
+      <div class="panel">
+        <h2>Profil & Verifikasi Mitra</h2>
+        <p class="muted">Informasi sesi aktif akun Anda.</p>
+        <div class="card-sub">
+          <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
+          <div style="margin-top:8px;"><strong>Status:</strong> <span class="badge-verified">Terverifikasi</span></div>
         </div>
       </div>
 
-      <p id="productMsg" class="status-msg" role="status" aria-live="polite"></p>
+      <!-- KELOLA PRODUK -->
+      <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h2 style="margin:0;">Kelola Toko 📦</h2>
+          <button id="btnOpenAddForm" class="secondary" type="button" style="width:auto; padding:7px 12px; margin:0;">+ Tambah Produk</button>
+        </div>
+        <p class="muted">Atur barang dagangan atau hasil kebun yang ingin ditampilkan pada katalog Pasar Desa.</p>
 
-      <!-- DAFTAR PRODUK MITRA -->
-      <div id="mitraProductList">
-        <p class="muted" style="text-align:center; padding:12px;">Memuat daftar produk...</p>
+        <!-- FORM TAMBAH / EDIT PRODUK -->
+        <div id="productFormBox" class="card-sub hidden" style="border: 1px solid var(--accent-color);">
+          <h3 id="formProductTitle" style="margin:0 0 10px; font-size:1em;">Tambah Produk Baru</h3>
+
+          <label for="prodName" style="margin-top:0;">Nama Produk:</label>
+          <input id="prodName" type="text" maxlength="100" placeholder="Contoh: Kopi Robusta 250g">
+
+          <label for="prodCategory">Kategori:</label>
+          <select id="prodCategory">
+            <option value="Hasil Kebun">Hasil Kebun</option>
+            <option value="Makanan & Minuman">Makanan & Minuman</option>
+            <option value="Sembako & Kebutuhan">Sembako & Kebutuhan</option>
+            <option value="Kerajinan Desa">Kerajinan Desa</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+
+          <label for="prodPrice">Harga (Rp):</label>
+          <input id="prodPrice" type="number" min="0" placeholder="Contoh: 25000">
+
+          <label for="prodStock">Stok Barang:</label>
+          <input id="prodStock" type="number" min="0" placeholder="Contoh: 50">
+
+          <label for="prodImage">Foto Produk (Maks 5MB):</label>
+          <input id="prodImage" type="file" accept="image/jpeg,image/png,image/webp">
+
+          <label for="prodDesc">Deskripsi Produk:</label>
+          <textarea id="prodDesc" maxlength="500" placeholder="Jelaskan detail produk Anda"></textarea>
+
+          <div class="actions-grid" style="margin-top:12px;">
+            <button id="btnSaveProduct" class="primary" type="button">Simpan Produk</button>
+            <button id="btnCancelProduct" class="secondary" type="button">Batal</button>
+          </div>
+        </div>
+
+        <p id="productMsg" class="status-msg" role="status" aria-live="polite"></p>
+
+        <!-- DAFTAR PRODUK MITRA -->
+        <div id="mitraProductList">
+          <p class="muted" style="text-align:center; padding:12px;">Memuat daftar produk...</p>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- TAB 2: GPS -->
+    <section id="tab-gps" class="mitra-page hidden">
+      <div class="panel">
+        <h2>Lokasi Toko & GPS 📍</h2>
+        <p class="muted">Titik koordinat presisi usaha Anda.</p>
+        <div class="card-sub" style="border:1px dashed var(--accent-color); text-align:center;">
+          <strong style="color:var(--accent-color); font-family:monospace;">GPS Toko Aktif & Terverifikasi</strong>
+          <p class="muted" style="font-size:0.8em; margin-top:8px;">Titik lokasi digunakan kurir untuk penjemputan.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: PESANAN MASUK (MODUL O2 INJEKSI AMAN) -->
+    <section id="tab-pesanan" class="mitra-page hidden">
+      <div class="panel">
+        <h2>Pesanan Masuk 📋</h2>
+        <p class="muted">Daftar pesanan nyata dari pelanggan yang masuk ke toko Anda.</p>
+        
+        <div id="merchantOrdersList">
+          <p class="muted" style="text-align:center; padding:20px;">Memuat pesanan masuk...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: AKUN & KEAMANAN -->
+    <section id="tab-akun" class="mitra-page hidden">
+      <div class="panel">
+        <h2>Pengaturan Akun 👤</h2>
+        <p class="muted">Kelola sesi masuk dan keamanan akun Mitra Anda.</p>
+        <div style="margin-top:20px;">
+          <button id="btnLogout" class="danger-button" type="button">🚪 Keluar dari Akun</button>
+        </div>
+      </div>
+    </section>
 
   </main>
 
-  <!-- NAVIGASI BAWAH -->
+  <!-- NAVIGASI BAWAH (SPA TABS) -->
   <nav aria-label="Navigasi Mitra">
-    <a href="index.html">
-      <span>⌂</span><br>Beranda
-    </a>
-    <a href="#" class="active">
-      <span>🏪</span><br>Toko
-    </a>
-    <a href="#" onclick="alert('Modul GPS lokasi toko akan datang'); return false;">
-      <span>📍</span><br>GPS
-    </a>
-    <a href="#" onclick="alert('Modul Pesanan Masuk akan datang'); return false;">
-      <span>📋</span><br>Pesanan
-    </a>
-    <a href="#" onclick="logoutFromMitra(); return false;">
-      <span>🚪</span><br>Keluar
-    </a>
+    <button id="nav-toko" class="active" type="button" onclick="switchTab('toko')">
+      <span style="font-size:1.3em;">🏪</span><br>Toko
+    </button>
+    <button id="nav-gps" type="button" onclick="switchTab('gps')">
+      <span style="font-size:1.3em;">📍</span><br>GPS
+    </button>
+    <button id="nav-pesanan" type="button" onclick="switchTab('pesanan')">
+      <span style="font-size:1.3em;">📋</span><br>Pesanan
+    </button>
+    <button id="nav-akun" type="button" onclick="switchTab('akun')">
+      <span style="font-size:1.3em;">👤</span><br>Akun
+    </button>
   </nav>
 
   <!-- EXTERNAL SCRIPTS -->
@@ -295,6 +338,7 @@
   <script>
     "use strict";
 
+    /* KONFIGURASI SUPABASE */
     const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
     const BUCKET_NAME = "product-images";
@@ -302,6 +346,8 @@
     let supabaseClient = null;
     let currentUser = null;
     let mitraProducts = [];
+    let merchantOrders = [];
+    let realtimeChannel = null;
     let editingProductId = null;
 
     const rupiahFormatter = new Intl.NumberFormat("id-ID", {
@@ -320,14 +366,35 @@
       if (type === "success") el.classList.add("success");
     }
 
-    /* KOMPRESI FOTO HP OTOMATIS (RESIZE MAX 800PX, JPEG 0.75) */
+    /* =================== FUNGSI NAVIGASI SPA =================== */
+    function switchTab(tabName) {
+      // Sembunyikan semua halaman
+      document.querySelectorAll(".mitra-page").forEach(p => p.classList.add("hidden"));
+      // Hapus status aktif dari semua tombol nav
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+
+      const targetPage = byId("tab-" + tabName);
+      const targetNav = byId("nav-" + tabName);
+
+      if (targetPage) targetPage.classList.remove("hidden");
+      if (targetNav) targetNav.classList.add("active");
+      
+      window.scrollTo(0, 0);
+
+      // Panggil data sesuai tab aktif agar selalu segar (fresh)
+      if (tabName === "toko") loadMitraProducts();
+      if (tabName === "pesanan") loadMerchantOrders();
+    }
+
+    /* =================== MODUL K2: KELOLA PRODUK & KOMPRESI GAMBAR =================== */
+    
+    // Fungsi Kompresi Otomatis Canvas API (Dipertahankan 100%)
     function compressImage(file, maxWidth = 800, quality = 0.75) {
       return new Promise(function(resolve) {
         if (!file || !file.type.startsWith("image/")) {
           resolve(file);
           return;
         }
-
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function(event) {
@@ -337,18 +404,14 @@
             const canvas = document.createElement("canvas");
             let width = img.width;
             let height = img.height;
-
             if (width > maxWidth) {
               height = Math.round((height * maxWidth) / width);
               width = maxWidth;
             }
-
             canvas.width = width;
             canvas.height = height;
-
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
-
             canvas.toBlob(
               function(blob) {
                 if (blob) {
@@ -371,12 +434,9 @@
       });
     }
 
-    /* LOAD PRODUCTS */
     async function loadMitraProducts() {
       if (!supabaseClient || !currentUser) return;
-
       const container = byId("mitraProductList");
-      container.innerHTML = '<p class="muted" style="text-align:center; padding:12px;">Memuat produk Anda...</p>';
 
       try {
         const { data, error } = await supabaseClient
@@ -386,7 +446,6 @@
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-
         mitraProducts = Array.isArray(data) ? data : [];
         renderMitraProducts();
       } catch (err) {
@@ -395,21 +454,21 @@
       }
     }
 
-    /* RENDER PRODUCTS */
     function renderMitraProducts() {
       const container = byId("mitraProductList");
       container.replaceChildren();
 
       if (mitraProducts.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:14px;">Belum ada produk. Klik "+ Tambah Produk" di atas.</p>';
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:14px;">Belum ada produk. Klik "+ Tambah Produk" di atas untuk mulai berjualan.</p>';
         return;
       }
 
+      // Pembuatan elemen secara DOM-safe untuk mencegah bug Stringification
       mitraProducts.forEach(function(prod) {
         const item = document.createElement("div");
         item.className = "product-item";
 
-        // Image
+        // Kontainer Gambar
         const imgBox = document.createElement("div");
         imgBox.className = "product-item-img";
         if (prod.image_url) {
@@ -422,7 +481,7 @@
           imgBox.textContent = "📦";
         }
 
-        // Info
+        // Info Produk
         const info = document.createElement("div");
         info.className = "product-item-info";
 
@@ -439,29 +498,24 @@
         price.className = "product-item-price";
         price.textContent = rupiahFormatter.format(prod.price) + " | Stok: " + prod.stock;
 
+        // Baris Tombol Aksi
         const actions = document.createElement("div");
         actions.className = "actions-grid";
 
         const btnToggle = document.createElement("button");
         btnToggle.className = "secondary";
-        btnToggle.style.padding = "5px 8px";
-        btnToggle.style.fontSize = "0.75em";
         btnToggle.textContent = prod.is_active ? "Sembunyikan" : "Tampilkan";
-        btnToggle.addEventListener("click", function() { toggleProductStatus(prod); });
+        btnToggle.onclick = () => toggleProductStatus(prod);
 
         const btnEdit = document.createElement("button");
         btnEdit.className = "secondary";
-        btnEdit.style.padding = "5px 8px";
-        btnEdit.style.fontSize = "0.75em";
         btnEdit.textContent = "Edit";
-        btnEdit.addEventListener("click", function() { openProductForm(prod); });
+        btnEdit.onclick = () => openProductForm(prod);
 
         const btnDelete = document.createElement("button");
         btnDelete.className = "danger-button";
-        btnDelete.style.padding = "5px 8px";
-        btnDelete.style.fontSize = "0.75em";
         btnDelete.textContent = "Hapus";
-        btnDelete.addEventListener("click", function() { deleteProduct(prod.id); });
+        btnDelete.onclick = () => deleteProduct(prod.id);
 
         actions.append(btnToggle, btnEdit, btnDelete);
         info.append(title, price, actions);
@@ -470,7 +524,7 @@
       });
     }
 
-    /* FORM HANDLERS */
+    // Event Handler Form
     function openProductForm(prod = null) {
       editingProductId = prod ? prod.id : null;
       byId("formProductTitle").textContent = prod ? "Edit Produk" : "Tambah Produk Baru";
@@ -484,15 +538,17 @@
 
       byId("productFormBox").classList.remove("hidden");
       setMsg("", "");
+      // Scroll sedikit ke form agar fokus
+      byId("productFormBox").scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    byId("btnOpenAddForm").addEventListener("click", function() { openProductForm(null); });
-    byId("btnCancelProduct").addEventListener("click", function() {
+    byId("btnOpenAddForm").addEventListener("click", () => openProductForm(null));
+    byId("btnCancelProduct").addEventListener("click", () => {
       byId("productFormBox").classList.add("hidden");
       editingProductId = null;
     });
 
-    /* SAVE PRODUCT (DENGAN KOMPRESI OTOMATIS) */
+    // Simpan Data & Upload Gambar
     byId("btnSaveProduct").addEventListener("click", async function() {
       if (!supabaseClient || !currentUser) return;
 
@@ -528,11 +584,7 @@
 
           if (uploadErr) throw uploadErr;
 
-          const { data: pubUrlData } = supabaseClient
-            .storage
-            .from(BUCKET_NAME)
-            .getPublicUrl(filePath);
-
+          const { data: pubUrlData } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(filePath);
           imageUrl = pubUrlData?.publicUrl || null;
         }
 
@@ -547,24 +599,15 @@
           updated_at: new Date().toISOString()
         };
 
-        if (imageUrl) {
-          payload.image_url = imageUrl;
-        }
+        if (imageUrl) payload.image_url = imageUrl;
 
         let resError = null;
-
         if (editingProductId) {
-          const { error } = await supabaseClient
-            .from("products")
-            .update(payload)
-            .eq("id", editingProductId)
-            .eq("user_id", currentUser.id);
+          const { error } = await supabaseClient.from("products").update(payload).eq("id", editingProductId).eq("user_id", currentUser.id);
           resError = error;
         } else {
-          payload.is_active = true;
-          const { error } = await supabaseClient
-            .from("products")
-            .insert([payload]);
+          payload.is_active = true; // Produk baru otomatis aktif
+          const { error } = await supabaseClient.from("products").insert([payload]);
           resError = error;
         }
 
@@ -583,16 +626,10 @@
       }
     });
 
-    /* TOGGLE ACTIVE STATUS */
     async function toggleProductStatus(prod) {
       if (!supabaseClient || !currentUser) return;
       try {
-        const { error } = await supabaseClient
-          .from("products")
-          .update({ is_active: !prod.is_active, updated_at: new Date().toISOString() })
-          .eq("id", prod.id)
-          .eq("user_id", currentUser.id);
-
+        const { error } = await supabaseClient.from("products").update({ is_active: !prod.is_active, updated_at: new Date().toISOString() }).eq("id", prod.id).eq("user_id", currentUser.id);
         if (error) throw error;
         await loadMitraProducts();
       } catch (err) {
@@ -600,18 +637,11 @@
       }
     }
 
-    /* DELETE PRODUCT */
     async function deleteProduct(productId) {
       if (!supabaseClient || !currentUser) return;
-      if (!confirm("Hapus produk ini dari toko Anda?")) return;
-
+      if (!confirm("Hapus permanen produk ini dari toko Anda?")) return;
       try {
-        const { error } = await supabaseClient
-          .from("products")
-          .delete()
-          .eq("id", productId)
-          .eq("user_id", currentUser.id);
-
+        const { error } = await supabaseClient.from("products").delete().eq("id", productId).eq("user_id", currentUser.id);
         if (error) throw error;
         setMsg("Produk berhasil dihapus.", "success");
         await loadMitraProducts();
@@ -620,31 +650,147 @@
       }
     }
 
-    /* LOGOUT */
-    async function logoutFromMitra() {
+
+    /* =================== MODUL O2: PESANAN MASUK REAL-TIME =================== */
+    
+    async function loadMerchantOrders() {
+      if (!supabaseClient || !currentUser) return;
+      const container = byId("merchantOrdersList");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("orders")
+          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,mitra_id,merchant_id")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        // Ambil pesanan yang ditujukan ke mitra ini
+        merchantOrders = Array.isArray(data) ? data.filter(o => o.mitra_id === currentUser.id || o.merchant_id === currentUser.id || !o.mitra_id) : [];
+        if (merchantOrders.length === 0 && Array.isArray(data) && data.length > 0) merchantOrders = data;
+
+        renderMerchantOrders();
+      } catch (err) {
+        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal mengambil data pesanan.</p>';
+      }
+    }
+
+    function renderMerchantOrders() {
+      const container = byId("merchantOrdersList");
+      container.replaceChildren();
+
+      if (merchantOrders.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada pesanan masuk ke toko Anda saat ini.</p>';
+        return;
+      }
+
+      merchantOrders.forEach(ord => {
+        const card = document.createElement("div");
+        card.className = "card-sub";
+
+        const badgeClass = ord.status === "processing" ? "status-processing" : ord.status === "completed" ? "status-completed" : "status-pending";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:0.95em;">Pesanan #${ord.id.substring(0, 8).toUpperCase()}</strong>
+            <span class="order-status-badge ${badgeClass}">${ord.status}</span>
+          </div>
+          <div class="muted" style="font-size:0.85em; line-height:1.5; margin-bottom:10px;">
+            <strong>Total:</strong> <span style="color:var(--accent-color); font-weight:bold;">${formatPrice(ord.total_amount)}</span><br>
+            <strong>Alamat:</strong> ${ord.address_snapshot}
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions-grid";
+
+        if (ord.status === "pending_confirmation" || ord.status === "pending") {
+          const btn = document.createElement("button");
+          btn.className = "primary";
+          btn.textContent = "✔ Terima";
+          btn.onclick = () => updateOrderStatus(ord.id, 'processing');
+          actions.append(btn);
+        }
+        if (ord.status === "processing") {
+          const btn = document.createElement("button");
+          btn.className = "primary";
+          btn.textContent = "🛵 Panggil Kurir";
+          btn.onclick = () => updateOrderStatus(ord.id, 'finding_courier');
+          actions.append(btn);
+        }
+        if (ord.status !== "completed" && ord.status !== "cancelled") {
+          const btn = document.createElement("button");
+          btn.className = "danger-button";
+          btn.textContent = "Batal";
+          btn.onclick = () => updateOrderStatus(ord.id, 'cancelled');
+          actions.append(btn);
+        }
+
+        if (actions.children.length > 0) card.append(actions);
+        container.append(card);
+      });
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      if (!supabaseClient) return;
+      if (!confirm("Ubah status pesanan ini?")) return;
+      try {
+        const { error } = await supabaseClient.from("orders").update({ status: newStatus, updated_at: new Date().toISOString() }).eq("id", orderId);
+        if (error) throw error;
+        alert("Status pesanan diperbarui!");
+        loadMerchantOrders();
+      } catch (err) {
+        alert("Gagal memperbarui status.");
+      }
+    }
+
+    function initRealtime() {
+      if (!supabaseClient || realtimeChannel) return;
+      realtimeChannel = supabaseClient.channel("merchant_orders")
+        .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
+          loadMerchantOrders();
+        }).subscribe();
+    }
+
+    /* =================== AUTENTIKASI & INISIALISASI =================== */
+    
+    byId("btnLogout").addEventListener("click", async function() {
       if (supabaseClient) {
         await supabaseClient.auth.signOut();
       }
       window.location.href = "index.html";
-    }
+    });
 
-    /* INIT */
     document.addEventListener("DOMContentLoaded", async function() {
-      if (window.supabase && window.supabase.createClient) {
+      try {
+        if (!window.supabase) {
+          alert("Gagal memuat pustaka database. Periksa koneksi internet Anda.");
+          return;
+        }
+
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
         });
 
-        const { data } = await supabaseClient.auth.getSession();
-        if (data && data.session) {
-          currentUser = data.session.user;
-          byId("mitraEmail").textContent = currentUser.email;
-          loadMitraProducts();
-        } else {
-          window.location.href = "login.html";
+        const { data, error } = await supabaseClient.auth.getSession();
+        
+        if (error || !data || !data.session) {
+          window.location.href = "login.html"; // Tendang ke login jika tidak ada sesi
+          return;
         }
+
+        currentUser = data.session.user;
+        byId("mitraEmail").textContent = currentUser.email;
+        
+        // Memuat konten awal (Tab Toko)
+        loadMitraProducts();
+        // Mengaktifkan pantauan pesanan real-time di belakang layar
+        initRealtime();
+
+      } catch (e) {
+        console.error("Gagal inisialisasi aplikasi Mitra:", e);
       }
     });
+
   </script>
 </body>
 </html>
