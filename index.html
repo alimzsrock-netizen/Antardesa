@@ -2503,7 +2503,7 @@
       summaryBox.classList.remove("hidden");
     }
 
-    /* EKSEKUSI CHECKOUT NYATA (MODUL O1) - Disesuaikan untuk merchant_id & mitra_id */
+    /* EKSEKUSI CHECKOUT NYATA (MODUL O1) - Disesuaikan untuk unit_price & fallback aman */
     byId("btnCheckout").addEventListener("click", async function() {
       if (!supabaseClient || !currentUser) {
         alert("Silakan masuk ke akun terlebih dahulu.");
@@ -2556,14 +2556,20 @@
 
         const orderId = orderData.id;
 
-        // 2. Insert rincian ke tabel order_items
-        const orderItemsPayload = cartItems.map(item => ({
-          order_id: orderId,
-          product_id: item.product.id,
-          product_name: item.product.name,
-          price: item.product.price,
-          quantity: item.quantity
-        }));
+        // 2. Insert rincian ke tabel order_items (Memastikan unit_price, price, dan subtotal terisi aman)
+        const orderItemsPayload = cartItems.map(item => {
+          const itemPrice = Number(item.product.price ?? item.product.unit_price ?? item.product.harga ?? 0);
+          const qty = Number(item.quantity ?? 1);
+          return {
+            order_id: orderId,
+            product_id: item.product.id,
+            product_name: item.product.name || "",
+            quantity: qty,
+            unit_price: itemPrice,
+            price: itemPrice,
+            subtotal: itemPrice * qty
+          };
+        });
 
         const { error: itemsError } = await supabaseClient
           .from("order_items")
