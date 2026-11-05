@@ -4,39 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AntarDesa v0.3.0-RC</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="ui-components.css">
   <style>
     * { box-sizing: border-box; }
     
     :root {
-      --bg-color: #f4f7f5;
-      --text-color: #1c3028;
-      --panel-bg: #ffffff;
-      --panel-border: #e3ebe6;
-      --muted-color: #61746b;
-      --input-bg: #ffffff;
-      --input-border: #cbd9d0;
-      --header-bg: #16805d;
-      --card-sub-bg: #f8fbf9;
-      --accent-color: #16805d;
-      --nav-bg: #ffffff;
-      --nav-border: #dde7df;
+      /* Alias kompatibilitas: seluruh halaman lama memakai token Premium Design System. */
+      --bg-color: var(--ad-page);
+      --text-color: var(--ad-text);
+      --panel-bg: var(--ad-surface);
+      --panel-border: var(--ad-border);
+      --muted-color: var(--ad-text-muted);
+      --input-bg: var(--ad-surface-raised);
+      --input-border: var(--ad-border-strong);
+      --header-bg: var(--ad-brand-900);
+      --card-sub-bg: var(--ad-surface-soft);
+      --accent-color: var(--ad-brand-500);
+      --nav-bg: var(--ad-surface);
+      --nav-border: var(--ad-border);
       --font-scale: 15px;
     }
 
+    /* Class ini dipertahankan karena pengalih tema aplikasi yang sudah ada menggunakannya. */
     html.dark-theme {
-      --bg-color: #121e19;
-      --text-color: #e2ebe6;
-      --panel-bg: #1a2923;
-      --panel-border: #283d34;
-      --muted-color: #9cb3a8;
-      --input-bg: #22342c;
-      --input-border: #354e42;
-      --header-bg: #0f5c43;
-      --card-sub-bg: #16241e;
-      --accent-color: #24a177;
-      --nav-bg: #1a2923;
-      --nav-border: #283d34;
+      color-scheme: dark;
+      --ad-page: #0d1c17;
+      --ad-surface: #172a22;
+      --ad-surface-soft: #1c3329;
+      --ad-surface-raised: #20392e;
+      --ad-text: #e7efe9;
+      --ad-text-muted: #b0c0b6;
+      --ad-text-subtle: #91a499;
+      --ad-border: #2b4438;
+      --ad-border-strong: #3a5849;
+      --ad-shadow: 0 8px 24px rgba(0, 0, 0, 0.20);
+      --ad-shadow-soft: 0 3px 12px rgba(0, 0, 0, 0.14);
+      --ad-focus: rgba(66, 181, 138, 0.32);
+      --ad-success: #58c99b;
+      --ad-warning: #e2bd69;
+      --ad-danger: #f08a8a;
+      --ad-info: #83b9dc;
+      --primary: #42b58a;
+      --background: var(--ad-page);
+      --text: var(--ad-text);
+      --white: #172a22;
+    }
+
+    /* Komponen pesan bersama mengikuti class tema lama aplikasi, termasuk pilihan dark manual. */
+    html.dark-theme .ad-ui-empty {
+      --ad-ui-border: #3a5145;
+      --ad-ui-background: #1b2d24;
+      --ad-ui-foreground: #d5e2d9;
+      --ad-ui-accent: #8ba998;
+    }
+    html.dark-theme .ad-ui-warning {
+      --ad-ui-border: #66552e;
+      --ad-ui-background: #342d1d;
+      --ad-ui-foreground: #f0dca8;
+      --ad-ui-accent: #d5aa52;
+    }
+    html.dark-theme .ad-ui-error {
+      --ad-ui-border: #684040;
+      --ad-ui-background: #352222;
+      --ad-ui-foreground: #f2caca;
+      --ad-ui-accent: #e27d7d;
+    }
+    html.dark-theme .ad-ui-info {
+      --ad-ui-border: #38556b;
+      --ad-ui-background: #1d2e3b;
+      --ad-ui-foreground: #c9e0ef;
+      --ad-ui-accent: #75acd0;
+    }
+    html.dark-theme .ad-ui-loading {
+      --ad-ui-border: #355746;
+      --ad-ui-background: #1b3026;
+      --ad-ui-foreground: #c9e7d7;
+      --ad-ui-accent: #55bd91;
     }
 
     html.font-small { --font-scale: 13px; }
@@ -47,8 +91,9 @@
       margin: 0; 
       background: var(--bg-color); 
       color: var(--text-color); 
-      font: var(--font-scale) Arial, sans-serif; 
-      transition: background-color 0.2s, color 0.2s;
+      font: var(--font-scale) var(--ad-font-sans); 
+      line-height: var(--ad-line-height);
+      transition: background-color var(--ad-motion-normal), color var(--ad-motion-normal);
     }
 
     header { 
@@ -56,6 +101,7 @@
       color: white; 
       padding: 22px 18px 26px; 
       border-radius: 0 0 24px 24px; 
+      box-shadow: var(--ad-shadow-soft);
     }
     .header-inner { max-width: 650px; margin: auto; }
     .header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -73,7 +119,7 @@
       font-weight: bold; 
       cursor: pointer; 
     }
-    .account-login { background: white; color: #16805d; border: 0; }
+    .account-login { background: #ffffff; color: var(--ad-brand-900); border: 0; }
     .account-register { border: 1px solid rgba(255,255,255,.8); color: white; background: transparent; }
 
     main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
@@ -81,9 +127,10 @@
     .panel { 
       background: var(--panel-bg); 
       border: 1px solid var(--panel-border); 
-      border-radius: 16px; 
+      border-radius: var(--ad-radius-lg); 
       padding: 18px; 
       margin-bottom: 18px; 
+      box-shadow: var(--ad-shadow-soft);
     }
     .panel h2 { margin: 0 0 8px; font-size: 1.25em; }
     .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
@@ -92,14 +139,17 @@
     .service { 
       background: var(--panel-bg); 
       border: 1px solid var(--panel-border); 
-      border-radius: 14px; 
+      border-radius: var(--ad-radius-md); 
       padding: 16px 4px; 
       min-height: 102px; 
       font: inherit; 
       font-size: 0.8em; 
       color: inherit; 
       cursor: pointer; 
+      box-shadow: var(--ad-shadow-soft);
+      transition: transform var(--ad-motion-fast), box-shadow var(--ad-motion-fast), border-color var(--ad-motion-fast);
     }
+    .service:hover { transform: translateY(-2px); box-shadow: var(--ad-shadow); border-color: var(--ad-brand-300); }
     .service span { display: block; font-size: 28px; margin-bottom: 10px; }
     .service:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #8bcbb0; outline-offset: 2px; }
 
@@ -107,7 +157,7 @@
       background: var(--accent-color); 
       color: white; 
       border: 0; 
-      border-radius: 11px; 
+      border-radius: var(--ad-radius-md); 
       padding: 13px 16px; 
       font-weight: bold; 
       width: 100%; 
@@ -121,7 +171,7 @@
       background: var(--panel-bg); 
       color: var(--accent-color); 
       border: 1px solid var(--accent-color); 
-      border-radius: 11px; 
+      border-radius: var(--ad-radius-md); 
       padding: 12px; 
       width: 100%; 
       display: block; 
@@ -232,13 +282,15 @@
     .product-card { 
       background: var(--panel-bg); 
       border: 1px solid var(--panel-border); 
-      border-radius: 14px; 
+      border-radius: var(--ad-radius-md); 
       overflow: hidden; 
       min-width: 0; 
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: var(--ad-shadow-soft);
+      transition: transform var(--ad-motion-fast), box-shadow var(--ad-motion-fast);
     }
     .product-card:active { transform: scale(0.98); }
+    .product-card:hover { box-shadow: var(--ad-shadow); }
     .product-image { width: 100%; aspect-ratio: 1 / 1; background: var(--card-sub-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--accent-color); font-size: 38px; }
     .product-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .product-content { padding: 11px; }
