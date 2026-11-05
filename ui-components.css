@@ -1,56 +1,158 @@
-
 /*
- * AntarDesa v0.3.0
- * Gelombang 1 - Shared UI Components
+ * AntarDesa v0.3.0+
+ * Shared UI Components - Premium Elegant
  *
  * Scoped styles. Tidak mengubah elemen global.
+ * Nama class lama dipertahankan agar pemanggil JS tetap kompatibel.
  */
 
 .ad-ui-message {
-  --ad-ui-border: #c9dfd4;
-  --ad-ui-background: #eff8f3;
-  --ad-ui-foreground: #1c3028;
+  --ad-ui-border: var(--ad-border, #c9dfd4);
+  --ad-ui-background: var(--ad-surface-soft, #eff8f3);
+  --ad-ui-foreground: var(--ad-text, #1c3028);
+  --ad-ui-accent: var(--ad-brand-600, #16805d);
 
   display: block;
-  padding: 12px 14px;
+  position: relative;
+  padding: 13px 16px;
   margin: 10px 0;
-
   border: 1px solid var(--ad-ui-border);
-  border-radius: 12px;
-
+  border-left: 4px solid var(--ad-ui-accent);
+  border-radius: var(--ad-radius-md, 14px);
   background: var(--ad-ui-background);
   color: var(--ad-ui-foreground);
-
-  font: 14px/1.5 Arial, sans-serif;
+  box-shadow: var(--ad-shadow-soft, 0 3px 12px rgba(24, 55, 42, 0.05));
+  font: 500 14px/1.55 var(--ad-font-sans, Inter, Arial, sans-serif);
   overflow-wrap: anywhere;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .ad-ui-empty {
   --ad-ui-border: #dbe5de;
   --ad-ui-background: #f7faf8;
+  --ad-ui-foreground: #40564a;
+  --ad-ui-accent: #82988a;
 }
 
 .ad-ui-warning {
   --ad-ui-border: #e6d6a7;
   --ad-ui-background: #fff9e8;
   --ad-ui-foreground: #58430e;
+  --ad-ui-accent: #c18a27;
 }
 
 .ad-ui-error {
   --ad-ui-border: #e8bdbd;
   --ad-ui-background: #fff3f3;
   --ad-ui-foreground: #762c2c;
+  --ad-ui-accent: #c44b4b;
 }
 
 .ad-ui-info {
   --ad-ui-border: #c9d9e9;
   --ad-ui-background: #f1f7fd;
   --ad-ui-foreground: #214763;
+  --ad-ui-accent: #397da8;
 }
 
 .ad-ui-loading {
   --ad-ui-border: #c9dfd4;
   --ad-ui-background: #eff8f3;
+  --ad-ui-foreground: #245541;
+  --ad-ui-accent: var(--ad-brand-500, #15966c);
+}
+
+/* Dark theme: scoped to message components only. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-empty,
+  html:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-empty {
+    --ad-ui-border: #3a5145;
+    --ad-ui-background: #1b2d24;
+    --ad-ui-foreground: #d5e2d9;
+    --ad-ui-accent: #8ba998;
+  }
+
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-warning,
+  html:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-warning {
+    --ad-ui-border: #66552e;
+    --ad-ui-background: #342d1d;
+    --ad-ui-foreground: #f0dca8;
+    --ad-ui-accent: #d5aa52;
+  }
+
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-error,
+  html:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-error {
+    --ad-ui-border: #684040;
+    --ad-ui-background: #352222;
+    --ad-ui-foreground: #f2caca;
+    --ad-ui-accent: #e27d7d;
+  }
+
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-info,
+  html:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-info {
+    --ad-ui-border: #38556b;
+    --ad-ui-background: #1d2e3b;
+    --ad-ui-foreground: #c9e0ef;
+    --ad-ui-accent: #75acd0;
+  }
+
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-loading,
+  html:not([data-theme="light"]):not([data-theme="dark"]) .ad-ui-loading {
+    --ad-ui-border: #355746;
+    --ad-ui-background: #1b3026;
+    --ad-ui-foreground: #c9e7d7;
+    --ad-ui-accent: #55bd91;
+  }
+}
+
+/* Explicit dark theme hooks. */
+:root[data-theme="dark"] .ad-ui-empty,
+html[data-theme="dark"] .ad-ui-empty,
+body[data-theme="dark"] .ad-ui-empty {
+  --ad-ui-border: #3a5145;
+  --ad-ui-background: #1b2d24;
+  --ad-ui-foreground: #d5e2d9;
+  --ad-ui-accent: #8ba998;
+}
+
+:root[data-theme="dark"] .ad-ui-warning,
+html[data-theme="dark"] .ad-ui-warning,
+body[data-theme="dark"] .ad-ui-warning {
+  --ad-ui-border: #66552e;
+  --ad-ui-background: #342d1d;
+  --ad-ui-foreground: #f0dca8;
+  --ad-ui-accent: #d5aa52;
+}
+
+:root[data-theme="dark"] .ad-ui-error,
+html[data-theme="dark"] .ad-ui-error,
+body[data-theme="dark"] .ad-ui-error {
+  --ad-ui-border: #684040;
+  --ad-ui-background: #352222;
+  --ad-ui-foreground: #f2caca;
+  --ad-ui-accent: #e27d7d;
+}
+
+:root[data-theme="dark"] .ad-ui-info,
+html[data-theme="dark"] .ad-ui-info,
+body[data-theme="dark"] .ad-ui-info {
+  --ad-ui-border: #38556b;
+  --ad-ui-background: #1d2e3b;
+  --ad-ui-foreground: #c9e0ef;
+  --ad-ui-accent: #75acd0;
+}
+
+:root[data-theme="dark"] .ad-ui-loading,
+html[data-theme="dark"] .ad-ui-loading,
+body[data-theme="dark"] .ad-ui-loading {
+  --ad-ui-border: #355746;
+  --ad-ui-background: #1b3026;
+  --ad-ui-foreground: #c9e7d7;
+  --ad-ui-accent: #55bd91;
 }
 
 @media (prefers-reduced-motion: no-preference) {
