@@ -1,21 +1,209 @@
-
-/* AntarDesa v0.2.0 */
-/* File desain utama */
+/*
+ * AntarDesa Premium Design System
+ * Foundation: Premium Elegant
+ * Theme: Adaptive Light / Dark
+ *
+ * Prinsip:
+ * - Menjaga nama token lama agar kompatibel.
+ * - Hanya menetapkan fondasi visual global.
+ * - Tidak mengatur ulang komponen halaman yang sudah ada.
+ */
 
 :root {
-  --primary: #16805d;
-  --background: #f4f7f5;
-  --text: #1c3028;
+  color-scheme: light dark;
+
+  /* Brand */
+  --ad-brand-950: #102f27;
+  --ad-brand-900: #123d32;
+  --ad-brand-800: #17513f;
+  --ad-brand-700: #17684d;
+  --ad-brand-600: #16805d;
+  --ad-brand-500: #15966c;
+  --ad-brand-400: #42b58a;
+  --ad-brand-300: #83d2b1;
+
+  /* Premium accent */
+  --ad-gold-500: #c6a15b;
+  --ad-gold-400: #d8b978;
+
+  /* Light theme semantic tokens */
+  --ad-page: #f6f4ec;
+  --ad-surface: #ffffff;
+  --ad-surface-soft: #eef2ed;
+  --ad-surface-raised: #ffffff;
+  --ad-text: #20352c;
+  --ad-text-muted: #687970;
+  --ad-text-subtle: #87948d;
+  --ad-border: #dfe7e0;
+  --ad-border-strong: #c8d6cc;
+  --ad-shadow: 0 8px 24px rgba(24, 55, 42, 0.07);
+  --ad-shadow-soft: 0 3px 12px rgba(24, 55, 42, 0.05);
+  --ad-focus: rgba(21, 150, 108, 0.28);
+
+  /* Status */
+  --ad-success: #16805d;
+  --ad-warning: #9a6b16;
+  --ad-danger: #b94343;
+  --ad-info: #326b91;
+
+  /* Legacy aliases: jangan dihapus, dipakai halaman lama */
+  --primary: var(--ad-brand-600);
+  --background: var(--ad-page);
+  --text: var(--ad-text);
   --white: #ffffff;
+
+  /* Typography */
+  --ad-font-sans: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ad-font-size: 16px;
+  --ad-line-height: 1.5;
+
+  /* Shape and spacing */
+  --ad-radius-sm: 10px;
+  --ad-radius-md: 14px;
+  --ad-radius-lg: 18px;
+  --ad-radius-xl: 22px;
+  --ad-radius-pill: 999px;
+  --ad-space-1: 4px;
+  --ad-space-2: 8px;
+  --ad-space-3: 12px;
+  --ad-space-4: 16px;
+  --ad-space-5: 20px;
+  --ad-space-6: 24px;
+
+  /* Motion */
+  --ad-motion-fast: 150ms ease;
+  --ad-motion-normal: 220ms ease;
 }
 
-* {
+/*
+ * Adaptive theme:
+ * - Tanpa pilihan manual, ikuti preferensi sistem perangkat.
+ * - [data-theme] memungkinkan aplikasi mengunci tema secara eksplisit.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]),
+  html:not([data-theme="light"]):not([data-theme="dark"]) {
+    color-scheme: dark;
+
+    --ad-page: #0d1c17;
+    --ad-surface: #172a22;
+    --ad-surface-soft: #1c3329;
+    --ad-surface-raised: #20392e;
+    --ad-text: #e7efe9;
+    --ad-text-muted: #b0c0b6;
+    --ad-text-subtle: #91a499;
+    --ad-border: #2b4438;
+    --ad-border-strong: #3a5849;
+    --ad-shadow: 0 8px 24px rgba(0, 0, 0, 0.20);
+    --ad-shadow-soft: 0 3px 12px rgba(0, 0, 0, 0.14);
+    --ad-focus: rgba(66, 181, 138, 0.32);
+
+    --ad-success: #58c99b;
+    --ad-warning: #e2bd69;
+    --ad-danger: #f08a8a;
+    --ad-info: #83b9dc;
+
+    --primary: #42b58a;
+    --background: var(--ad-page);
+    --text: var(--ad-text);
+    --white: #172a22;
+  }
+}
+
+/* Manual theme hooks for a future/app-level theme switch. */
+:root[data-theme="light"],
+html[data-theme="light"],
+body[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ad-page: #0d1c17;
+  --ad-surface: #172a22;
+  --ad-surface-soft: #1c3329;
+  --ad-surface-raised: #20392e;
+  --ad-text: #e7efe9;
+  --ad-text-muted: #b0c0b6;
+  --ad-text-subtle: #91a499;
+  --ad-border: #2b4438;
+  --ad-border-strong: #3a5849;
+  --ad-shadow: 0 8px 24px rgba(0, 0, 0, 0.20);
+  --ad-shadow-soft: 0 3px 12px rgba(0, 0, 0, 0.14);
+  --ad-focus: rgba(66, 181, 138, 0.32);
+
+  --ad-success: #58c99b;
+  --ad-warning: #e2bd69;
+  --ad-danger: #f08a8a;
+  --ad-info: #83b9dc;
+
+  --primary: #42b58a;
+  --background: var(--ad-page);
+  --text: var(--ad-text);
+  --white: #172a22;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
+  min-height: 100vh;
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: var(--ad-font-sans);
+  font-size: var(--ad-font-size);
+  line-height: var(--ad-line-height);
   background: var(--background);
   color: var(--text);
+  transition:
+    background-color var(--ad-motion-normal),
+    color var(--ad-motion-normal);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ad-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--ad-brand-700);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
