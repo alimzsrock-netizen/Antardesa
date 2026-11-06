@@ -1,0 +1,98 @@
+/* AntarDesa Premium Elegant shared theme
+   Color and surface layer only: preserves each page's existing layout and behavior. */
+:root {
+  color-scheme: dark;
+  --ad-forest:#123D32; --ad-emerald:#15966C; --ad-ivory:#F6F4EC;
+  --ad-gold:#C6A15B; --ad-bg:#0D1C17; --ad-panel:#172A22;
+  --ad-panel-2:#1D352B; --ad-line:rgba(198,161,91,.20);
+  --ad-text:#E5EEE8; --ad-muted:#A9BDB2; --ad-danger:#F2A09A;
+  --ad-shadow:0 12px 30px rgba(0,0,0,.16);
+
+  --bg-color:var(--ad-bg); --text-color:var(--ad-text);
+  --panel-bg:var(--ad-panel); --panel-border:var(--ad-line);
+  --muted-color:var(--ad-muted); --input-bg:#10271F;
+  --input-border:rgba(198,161,91,.32); --header-bg:var(--ad-forest);
+  --card-sub-bg:var(--ad-panel-2); --accent-color:var(--ad-emerald);
+  --nav-bg:rgba(23,42,34,.97); --nav-border:var(--ad-line);
+
+  --bg:var(--ad-bg); --panel:var(--ad-panel); --panel-2:var(--ad-panel-2);
+  --text:var(--ad-text); --muted:var(--ad-muted); --line:var(--ad-line);
+  --green:var(--ad-emerald); --green-dark:var(--ad-forest);
+  --blue:#8BC8E8; --red:#F2A09A; --yellow:var(--ad-gold);
+}
+html{background:var(--ad-bg)}
+body{
+  background:var(--ad-bg)!important;color:var(--ad-text)!important;
+  font-family:"Plus Jakarta Sans",Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+}
+header,.topbar{
+  background:linear-gradient(125deg,#123D32 0%,#14513F 65%,#10372D 100%)!important;
+  color:var(--ad-ivory)!important;border-color:var(--ad-line)!important;
+}
+header p,.brand p{color:#D0DED6!important}
+main{color:var(--ad-text)}
+.panel,.card,.card-sub,.stat-card,.request-card,.delivery-card,.summary-card,
+.product,.order-card,.shipping-panel,.shipping-result,.detail-box,.modal-panel,
+.auth-card,#accessScreen,.empty-state{
+  background:var(--ad-panel)!important;color:var(--ad-text)!important;
+  border-color:var(--ad-line)!important;box-shadow:var(--ad-shadow)
+}
+.panel h1,.panel h2,.panel h3,.card h1,.card h2,.card h3,
+.page-heading h2,.section-title,.card-title,.product-name{color:var(--ad-text)!important}
+.muted,.notice,.field-help,.product-category,.product-stock,.product-description,
+.catalog-status,.order-card small,.page-heading p,.stat-label,footer,.account-email{
+  color:var(--ad-muted)!important
+}
+button,.primary,.buy-button,#retryButton,button.primary{
+  background:var(--ad-emerald)!important;color:#F7FFF9!important;border-color:transparent!important
+}
+.secondary,.refresh,.toolbar button,.nav-btn,nav a,nav button,.bottom-nav a{
+  background-color:rgba(198,161,91,.07)!important;color:#D7E8DE!important;
+  border-color:var(--ad-line)!important
+}
+button:disabled{opacity:.55}
+a{color:#78D5AD}
+input,select,textarea{
+  background:#10271F!important;color:var(--ad-text)!important;
+  border-color:rgba(198,161,91,.30)!important
+}
+input::placeholder,textarea::placeholder{color:#82998D!important}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline-color:var(--ad-gold)!important}
+nav,.bottom-nav{
+  background:rgba(23,42,34,.97)!important;border-color:var(--ad-line)!important;
+  backdrop-filter:blur(14px)
+}
+nav a.active,nav button.active,.nav-btn.active{
+  color:#65D7A7!important;background:rgba(21,150,108,.18)!important
+}
+.stat-num,.product-price,.product-item-price,.activity-dot{color:#65D7A7!important}
+.role-badge,.header-status,.account-status{
+  background:rgba(21,150,108,.16)!important;color:#85E2B8!important;
+  border-color:rgba(21,150,108,.38)!important
+}
+.badge-kurir,.status.delivering{background:rgba(139,200,232,.14)!important;color:#A9D9F1!important}
+.status-pending{background:rgba(198,161,91,.16)!important;color:#E7C985!important;border-color:rgba(198,161,91,.35)!important}
+.status-processing,.status.completed{background:rgba(21,150,108,.15)!important;color:#8AE0B8!important;border-color:rgba(21,150,108,.32)!important}
+.status.cancelled,.status-msg.error,.catalog-status.error,.shipping-status.error{color:var(--ad-danger)!important}
+#message.error{background:#321F24!important;color:#FFD0D0!important;border-color:#713D43!important}
+#message.success{background:#183326!important;color:#BAF4CE!important;border-color:#286344!important}
+#pendingNotice,.preview-banner{background:#30291B!important;border-color:rgba(198,161,91,.45)!important;color:#EAD8A9!important}
+.total-box{background:rgba(21,150,108,.15)!important;color:var(--ad-text)!important}
+.account-note{background:#20362C!important;color:var(--ad-muted)!important}
+.modal{background:rgba(0,0,0,.72)!important}
+.logo{color:var(--ad-ivory)!important}.logo p{color:var(--ad-muted)!important}
+#accessScreen a{color:#78D5AD!important}
+#dashboard header{background:linear-gradient(125deg,#123D32,#14513F)!important}
+.service,.product,.modal-panel,.order-card,.shipping-result{
+  background:var(--ad-panel-2)!important;color:var(--ad-text)!important;border-color:var(--ad-line)!important
+}
+.service{box-shadow:var(--ad-shadow)}
+.product-image,.product-placeholder{background:#20392E!important}
+.product-stock.empty-stock,.required{color:#F2A09A!important}
+.delivery-detail,.order-item{border-color:var(--ad-line)!important}
+#checkoutMessage,.shipping-status{color:var(--ad-muted)!important}
+.shipping-status.success{color:#8AE0B8!important}
+.shipping-status.warning{color:#E7C985!important}
+.auth-container{color:var(--ad-text)!important}
+.auth-card h2,.card h2{color:var(--ad-text)!important}
+.note,#message{color:var(--ad-muted)}
