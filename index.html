@@ -972,6 +972,10 @@
       border-radius: 14px;
       background: var(--ad-surface-soft);
     }
+    #productDetailModal #btnBuyNow,
+    #productDetailModal #btnAddToCart { width: 100%; min-height: 46px; border-radius: 13px; font-weight: 700; }
+    #productDetailModal #btnAddToCart { background: var(--ad-surface-soft); color: var(--ad-text); border: 1px solid var(--ad-border); }
+    #productDetailModal #productActionMessage { margin-bottom: 4px; }
 
     nav {
       padding: 9px 10px calc(9px + env(safe-area-inset-bottom));
@@ -1176,7 +1180,7 @@
           <button id="refreshCatalogButton" class="secondary catalog-refresh" type="button">Muat ulang</button>
         </div>
         <p class="muted catalog-description">
-          Temukan hasil kebun dan produk dari Mitra AntarDesa. Klik kartu produk untuk melihat detail lengkap.
+          Temukan beragam produk dari Mitra AntarDesa. Pilih kategori atau cari produk, lalu buka kartu untuk melihat detail lengkap.
         </p>
 
         <div class="catalog-tools">
@@ -1191,7 +1195,7 @@
         <div id="productGrid" class="product-grid hidden"></div>
 
         <p class="catalog-footer">
-          Produk ditampilkan berdasarkan status aktif. Fitur pembelian dan checkout belum diaktifkan.
+          Produk aktif dapat dimasukkan ke keranjang untuk pratinjau. Checkout dan transaksi nyata tetap dinonaktifkan.
         </p>
       </div>
 
@@ -1240,8 +1244,12 @@
           <button id="btnQtyPlus" class="qty-btn" type="button">+</button>
         </div>
 
-        <button id="btnAddToCart" class="primary" type="button" style="margin-top:10px;">
-          🛒 Masukkan ke Keranjang Belanja
+        <div id="productActionMessage" class="catalog-state hidden" role="status" aria-live="polite" style="margin-top:10px; padding:10px;"></div>
+        <button id="btnBuyNow" class="primary" type="button" style="margin-top:10px;">
+          ⚡ Beli Sekarang
+        </button>
+        <button id="btnAddToCart" class="secondary" type="button" style="margin-top:8px;">
+          🛒 Tambahkan ke Keranjang
         </button>
       </div>
     </div>
@@ -3034,6 +3042,37 @@
       state.style.color = isError ? "#b42318" : "#61746b";
     }
 
+    const PRODUCT_CATEGORIES = [
+      "Buah-buahan", "Sayuran", "Sembako", "Makanan & Minuman",
+      "Kerajinan & Produk Lokal", "Pertanian & Peternakan",
+      "Kebutuhan Rumah Tangga", "Pakaian & Aksesori", "Elektronik", "Lainnya"
+    ];
+
+    function normalizeProductCategory(product) {
+      const raw = String(product.category || "").trim().toLowerCase();
+      const name = String(product.name || "").trim().toLowerCase();
+      const text = raw + " " + name;
+      const hasAny = words => words.some(word => text.includes(word));
+
+      if (raw === "buah-buahan" || raw === "buah" || hasAny(["mangga", "pisang", "jeruk", "apel", "pepaya", "semangka", "melon", "nanas", "durian", "rambutan", "alpukat", "jambu", "salak", "anggur"])) return "Buah-buahan";
+      if (raw === "sayuran" || raw === "sayur" || hasAny(["sayur", "kangkung", "bayam", "sawi", "kol", "kubis", "wortel", "tomat", "cabai", "cabe", "terong", "timun", "mentimun", "kentang", "bawang", "kacang panjang"])) return "Sayuran";
+      if (raw === "sembako" || hasAny(["beras", "gula", "minyak goreng", "tepung", "telur", "garam", "mie instan", "mi instan"])) return "Sembako";
+      if (["makanan & minuman", "makanan dan minuman", "makanan", "minuman", "kue & camilan"].includes(raw) || hasAny(["makanan", "minuman", "kue", "camilan", "snack", "ikan", "daging", "ayam", "sapi", "kopi", "teh", "sambal", "kerupuk"])) return "Makanan & Minuman";
+      if (["kerajinan desa", "kerajinan", "kerajinan & produk lokal", "produk lokal"].includes(raw)) return "Kerajinan & Produk Lokal";
+      if (raw === "pertanian & peternakan" || raw === "pertanian" || raw === "peternakan") return "Pertanian & Peternakan";
+      if (raw === "kebutuhan rumah tangga" || raw === "perlengkapan rumah tangga" || hasAny(["sabun", "deterjen", "alat dapur", "peralatan dapur", "ember", "sapu", "pel", "peralatan rumah"])) return "Kebutuhan Rumah Tangga";
+      if (raw === "pakaian & aksesori" || raw === "pakaian" || raw === "aksesori" || raw === "aksesoris") return "Pakaian & Aksesori";
+      if (raw === "elektronik" || raw === "elektronika") return "Elektronik";
+      // Kategori lama Hasil Kebun tidak dihapus: klasifikasi nama produk di atas,
+      // sedangkan produk yang belum dapat dikenali tetap terlihat di Lainnya.
+      return "Lainnya";
+    }
+
+    function getProductStock(product) {
+      const stock = Number(product && product.stock);
+      return Number.isFinite(stock) && stock >= 0 ? Math.floor(stock) : 0;
+    }
+
     function openProductDetailModal(product) {
       activeModalProduct = product;
       currentModalQty = 1;
@@ -3042,12 +3081,18 @@
       const img = byId("modalProductImg");
       const imgPlaceholder = byId("modalProductImgPlaceholder");
 
-      setText("modalProductCategory", product.category || "Produk Desa");
+      setText("modalProductCategory", normalizeProductCategory(product));
       setText("modalProductName", product.name);
       setText("modalProductPrice", formatPrice(product.price));
       
       const stockValue = Number(product.stock);
-      setText("modalProductStock", Number.isFinite(stockValue) && stockValue > 0 ? "Stok tersedia: " + stockValue + " unit" : "Stok saat ini habis");
+      const availableStock = getProductStock(product);
+      setText("modalProductStock", availableStock > 0 ? "Stok tersedia: " + availableStock + " unit" : "Stok saat ini habis");
+      setHidden("productActionMessage", true);
+      byId("btnBuyNow").disabled = availableStock < 1;
+      byId("btnAddToCart").disabled = availableStock < 1;
+      byId("btnQtyMinus").disabled = availableStock < 1;
+      byId("btnQtyPlus").disabled = availableStock < 1;
       setText("modalProductDesc", product.description || "Belum ada deskripsi lengkap.");
 
       setText("modalSellerName", product.seller_name || product.store_name || "Mitra AntarDesa");
@@ -3084,20 +3129,44 @@
       if (currentModalQty > 1) { currentModalQty--; setText("modalProductQty", currentModalQty); }
     });
     byId("btnQtyPlus").addEventListener("click", function() {
-      if (activeModalProduct) {
-        const maxStock = Number(activeModalProduct.stock) || 999;
-        if (currentModalQty < maxStock) { currentModalQty++; setText("modalProductQty", currentModalQty); }
-      }
+      if (!activeModalProduct) return;
+      const maxStock = getProductStock(activeModalProduct);
+      if (currentModalQty < maxStock) { currentModalQty++; setText("modalProductQty", currentModalQty); }
     });
 
-    byId("btnAddToCart").addEventListener("click", function() {
-      if (!activeModalProduct) return;
+    function addActiveProductToCart(navigateToCart) {
+      if (!activeModalProduct) return false;
+      const stock = getProductStock(activeModalProduct);
+      if (stock < 1) {
+        setText("productActionMessage", "Maaf, stok produk sedang habis.");
+        setHidden("productActionMessage", false);
+        return false;
+      }
       const existingIndex = cartItems.findIndex(item => item.product.id === activeModalProduct.id);
-      if (existingIndex > -1) { cartItems[existingIndex].quantity += currentModalQty; }
-      else { cartItems.push({ product: activeModalProduct, quantity: currentModalQty }); }
+      const existingQty = existingIndex > -1 ? Number(cartItems[existingIndex].quantity) || 0 : 0;
+      if (currentModalQty < 1 || existingQty + currentModalQty > stock) {
+        setText("productActionMessage", "Jumlah melebihi stok tersedia. Stok tersisa " + Math.max(0, stock - existingQty) + " unit.");
+        setHidden("productActionMessage", false);
+        return false;
+      }
+      if (existingIndex > -1) cartItems[existingIndex].quantity += currentModalQty;
+      else cartItems.push({ product: activeModalProduct, quantity: currentModalQty });
       updateCartBadge();
-      closeProductDetailModal();
-      alert("Produk berhasil ditambahkan ke keranjang belanja!");
+      if (navigateToCart) {
+        closeProductDetailModal();
+        show("cart");
+      } else {
+        setText("productActionMessage", "Berhasil ditambahkan ke keranjang. Anda tetap berada di halaman produk.");
+        setHidden("productActionMessage", false);
+      }
+      return true;
+    }
+
+    byId("btnAddToCart").addEventListener("click", function() {
+      addActiveProductToCart(false);
+    });
+    byId("btnBuyNow").addEventListener("click", function() {
+      addActiveProductToCart(true);
     });
 
     function updateCartBadge() {
@@ -3173,7 +3242,10 @@
         btnPlus.className = "secondary";
         btnPlus.style.cssText = "width:28px; height:28px; padding:0;";
         btnPlus.textContent = "+";
+        const itemStock = getProductStock(prod);
+        btnPlus.disabled = cartItem.quantity >= itemStock;
         btnPlus.addEventListener("click", function() {
+          if (cartItem.quantity >= itemStock) return;
           cartItem.quantity++;
           updateCartBadge();
           renderCartPage();
@@ -3241,7 +3313,7 @@
       const content = document.createElement("div");
       content.className = "product-content";
       content.append(
-        createTextElement("span", "product-category", product.category || "Produk Desa"),
+        createTextElement("span", "product-category", normalizeProductCategory(product)),
         createTextElement("h3", "product-name", product.name),
         createTextElement("div", "product-price", formatPrice(product.price)),
         createTextElement("div", "product-stock", Number.isFinite(Number(product.stock)) && Number(product.stock) > 0 ? "Stok: " + product.stock : "Stok habis")
@@ -3264,7 +3336,7 @@
 
       const filtered = publicProducts.filter(p => {
         const text = [p.name, p.description, p.category].join(" ").toLowerCase();
-        return text.includes(keyword) && (!selectedCategory || p.category === selectedCategory);
+        return text.includes(keyword) && (!selectedCategory || normalizeProductCategory(p) === selectedCategory);
       });
 
       grid.replaceChildren();
@@ -3285,16 +3357,18 @@
 
     function populateProductCategories() {
       const select = byId("productCategory");
-      const categories = Array.from(new Set(publicProducts.map(p => String(p.category || "").trim()).filter(Boolean))).sort();
+      const previousValue = select.value;
       select.replaceChildren();
       const allOpt = document.createElement("option");
       allOpt.value = ""; allOpt.textContent = "Semua kategori";
       select.append(allOpt);
-      categories.forEach(cat => {
+      PRODUCT_CATEGORIES.forEach(category => {
         const opt = document.createElement("option");
-        opt.value = cat; opt.textContent = cat;
+        opt.value = category;
+        opt.textContent = category;
         select.append(opt);
       });
+      if (PRODUCT_CATEGORIES.includes(previousValue)) select.value = previousValue;
     }
 
     async function loadPublicProducts() {
