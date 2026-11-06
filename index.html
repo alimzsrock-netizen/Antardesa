@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="theme.js"></script>
   <title>AntarDesa v0.3.0-RC</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="ui-components.css">
@@ -1571,7 +1572,6 @@
             
             <label for="settingTheme" style="margin-top:4px;">Tema Aplikasi:</label>
             <select id="settingTheme">
-              <option value="system">Mengikuti Sistem HP</option>
               <option value="light">Mode Terang</option>
               <option value="dark">Mode Gelap</option>
             </select>
@@ -1747,15 +1747,11 @@
 
     /* ========================================= PENGATURAN TEMA & TEKS ========================================= */
     function applyTheme(theme) {
-      const root = document.documentElement;
-      root.classList.remove("dark-theme");
-      
-      if (theme === "dark") {
-        root.classList.add("dark-theme");
-      } else if (theme === "system") {
-        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          root.classList.add("dark-theme");
-        }
+      const selectedTheme = (theme === "light" || theme === "dark") ? theme : "dark";
+      if (window.AntarDesaTheme) {
+        window.AntarDesaTheme.apply(selectedTheme);
+      } else {
+        document.documentElement.classList.toggle("dark-theme", selectedTheme === "dark");
       }
     }
 
@@ -1771,7 +1767,9 @@
 
     function loadAppSettings() {
       try {
-        const theme = localStorage.getItem("antardesa_theme") || "system";
+        const savedTheme = localStorage.getItem("antardesa_theme");
+        const theme = (savedTheme === "light" || savedTheme === "dark") ? savedTheme : "dark";
+        localStorage.setItem("antardesa_theme", theme);
         const fontSize = localStorage.getItem("antardesa_font_size") || "normal";
         const notifAccount = localStorage.getItem("antardesa_notif_account") !== "false";
         const notifPromo = localStorage.getItem("antardesa_notif_promo") === "true";
@@ -1789,7 +1787,7 @@
     }
 
     byId("settingTheme").addEventListener("change", function() {
-      const theme = this.value;
+      const theme = (this.value === "light" || this.value === "dark") ? this.value : "dark";
       applyTheme(theme);
       try { localStorage.setItem("antardesa_theme", theme); } catch(e){}
     });
@@ -1807,14 +1805,6 @@
     byId("notifPromo").addEventListener("change", function() {
       try { localStorage.setItem("antardesa_notif_promo", this.checked); } catch(e){}
     });
-
-    if (window.matchMedia) {
-      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function() {
-        if (byId("settingTheme").value === "system") {
-          applyTheme("system");
-        }
-      });
-    }
 
     /* ========================================= SIMULASI LAYANAN ========================================= */
     function choose(serviceName) {
