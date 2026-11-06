@@ -399,50 +399,78 @@
     }
 
     /* =================== MODUL K2: KELOLA PRODUK & KOMPRESI GAMBAR =================== */
-    
-    function compressImage(file, maxWidth = 800, quality = 0.75) {
-      return new Promise(function(resolve) {
-        if (!file || !file.type.startsWith("image/")) {
-          resolve(file);
-          return;
+
+    async function compressImage(file, maxDimension = 800, quality = 0.75) {
+      let source = null;
+      let bitmap = null;
+      let objectUrl = null;
+      let canvas = null;
+
+      try {
+        if (typeof createImageBitmap === "function") {
+          try {
+            bitmap = await createImageBitmap(file);
+            source = bitmap;
+          } catch (bitmapError) {
+            console.warn("createImageBitmap tidak tersedia untuk foto produk ini, memakai pemuat cadangan.");
+          }
         }
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function(event) {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = function() {
-            const canvas = document.createElement("canvas");
-            let width = img.width;
-            let height = img.height;
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob(
-              function(blob) {
-                if (blob) {
-                  const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
-                    type: "image/jpeg",
-                    lastModified: Date.now()
-                  });
-                  resolve(compressedFile);
-                } else {
-                  resolve(file);
-                }
-              },
-              "image/jpeg",
-              quality
-            );
-          };
-          img.onerror = function() { resolve(file); };
-        };
-        reader.onerror = function() { resolve(file); };
-      });
+
+        if (!source) {
+          objectUrl = URL.createObjectURL(file);
+          const image = new Image();
+          image.decoding = "async";
+          await new Promise(function(resolve, reject) {
+            image.onload = resolve;
+            image.onerror = function() { reject(new Error("Foto produk tidak dapat dibaca.")); };
+            image.src = objectUrl;
+          });
+          source = image;
+        }
+
+        const sourceWidth = source.width || source.naturalWidth;
+        const sourceHeight = source.height || source.naturalHeight;
+        if (!sourceWidth || !sourceHeight) throw new Error("Ukuran foto produk tidak valid.");
+
+        // Batasi sisi terpanjang agar foto potret dan lanskap sama-sama ringan.
+        const scale = Math.min(1, maxDimension / Math.max(sourceWidth, sourceHeight));
+        const width = Math.max(1, Math.round(sourceWidth * scale));
+        const height = Math.max(1, Math.round(sourceHeight * scale));
+
+        canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d", { alpha: false });
+        if (!context) throw new Error("Peramban tidak dapat memproses foto produk.");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, width, height);
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
+        context.drawImage(source, 0, 0, width, height);
+
+        const blob = await new Promise(function(resolve, reject) {
+          canvas.toBlob(function(result) {
+            if (result) resolve(result);
+            else reject(new Error("Foto produk gagal dikompresi."));
+          }, "image/jpeg", quality);
+        });
+
+        const originalName = (file.name || "produk").replace(/\.[^/.]+$/, "");
+        return new File([blob], originalName + ".jpg", {
+          type: "image/jpeg",
+          lastModified: Date.now()
+        });
+      } finally {
+        if (bitmap && typeof bitmap.close === "function") bitmap.close();
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        if (canvas) { canvas.width = 0; canvas.height = 0; }
+      }
+    }
+
+    function formatImageSize(bytes) {
+      if (!Number.isFinite(bytes) || bytes < 0) return "0 KB";
+      if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
     }
 
     async function loadMitraProducts() {
@@ -573,6 +601,7 @@
       const desc = byId("prodDesc").value.trim();
       const imageFile = byId("prodImage").files[0];
 
+      if (imageFile && imageFile.size > 5 * 1024 * 1024) { setMsg("Ukuran foto produk maksimal 5 MB. Pilih foto yang lebih kecil.", "error"); return; }
       if (!name) { setMsg("Nama produk wajib diisi.", "error"); return; }
       if (!category) { setMsg("Silakan pilih kategori produk.", "error"); return; }
       if (isNaN(price) || price < 0) { setMsg("Harga tidak valid.", "error"); return; }
@@ -586,16 +615,16 @@
         let imageUrl = null;
 
         if (imageFile) {
-          setMsg("Mengompresi foto produk...", "");
-          const compressedFile = await compressImage(imageFile, 800, 0.75);
+          setMsg("Mengoptimalkan foto produk agar lebih ringan...", "");
+          const compressedFile = await compressImage(imageFile, 800, 0.74);
 
-          setMsg("Mengunggah foto...", "");
+          setMsg("Foto dioptimalkan: " + formatImageSize(imageFile.size) + " → " + formatImageSize(compressedFile.size) + ". Mengunggah...", "");
           const filePath = `${currentUser.id}/${Date.now()}.jpg`;
 
           const { error: uploadErr } = await supabaseClient
             .storage
             .from(BUCKET_NAME)
-            .upload(filePath, compressedFile, { upsert: true, contentType: "image/jpeg" });
+            .upload(filePath, compressedFile, { upsert: true, cacheControl: "3600", contentType: "image/jpeg" });
 
           if (uploadErr) throw uploadErr;
 
@@ -629,10 +658,11 @@
 
         if (resError) throw resError;
 
-        setMsg("Produk berhasil disimpan!", "success");
+        setMsg("Produk berhasil disimpan! Daftar produk sedang diperbarui.", "success");
         byId("productFormBox").classList.add("hidden");
         editingProductId = null;
-        await loadMitraProducts();
+        // Muat ulang daftar setelah konfirmasi agar tombol simpan tidak menunggu seluruh daftar.
+        loadMitraProducts();
       } catch (err) {
         console.error("Gagal menyimpan produk:", err);
         setMsg(err.message || "Gagal menyimpan produk. Coba lagi.", "error");
