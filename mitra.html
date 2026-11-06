@@ -247,11 +247,17 @@
           <input id="prodName" type="text" maxlength="100" placeholder="Contoh: Kopi Robusta 250g">
 
           <label for="prodCategory">Kategori:</label>
-          <select id="prodCategory">
-            <option value="Hasil Kebun">Hasil Kebun</option>
+          <select id="prodCategory" required>
+            <option value="" disabled selected>Pilih kategori produk</option>
+            <option value="Buah-buahan">Buah-buahan</option>
+            <option value="Sayuran">Sayuran</option>
+            <option value="Sembako">Sembako</option>
             <option value="Makanan & Minuman">Makanan & Minuman</option>
-            <option value="Sembako & Kebutuhan">Sembako & Kebutuhan</option>
-            <option value="Kerajinan Desa">Kerajinan Desa</option>
+            <option value="Kerajinan & Produk Lokal">Kerajinan & Produk Lokal</option>
+            <option value="Pertanian & Peternakan">Pertanian & Peternakan</option>
+            <option value="Kebutuhan Rumah Tangga">Kebutuhan Rumah Tangga</option>
+            <option value="Pakaian & Aksesori">Pakaian & Aksesori</option>
+            <option value="Elektronik">Elektronik</option>
             <option value="Lainnya">Lainnya</option>
           </select>
 
@@ -530,7 +536,17 @@
       byId("formProductTitle").textContent = prod ? "Edit Produk" : "Tambah Produk Baru";
 
       byId("prodName").value = prod ? prod.name : "";
-      byId("prodCategory").value = prod ? prod.category : "Hasil Kebun";
+      const categorySelect = byId("prodCategory");
+      // Keep legacy category values selectable while editing older products.
+      const legacyCategory = prod && prod.category ? String(prod.category) : "";
+      const hasCategoryOption = Array.from(categorySelect.options).some(option => option.value === legacyCategory);
+      if (legacyCategory && !hasCategoryOption) {
+        const legacyOption = document.createElement("option");
+        legacyOption.value = legacyCategory;
+        legacyOption.textContent = legacyCategory + " (kategori lama)";
+        categorySelect.appendChild(legacyOption);
+      }
+      categorySelect.value = prod ? legacyCategory : "";
       byId("prodPrice").value = prod ? prod.price : "";
       byId("prodStock").value = prod ? prod.stock : "";
       byId("prodDesc").value = prod ? (prod.description || "") : "";
@@ -558,6 +574,7 @@
       const imageFile = byId("prodImage").files[0];
 
       if (!name) { setMsg("Nama produk wajib diisi.", "error"); return; }
+      if (!category) { setMsg("Silakan pilih kategori produk.", "error"); return; }
       if (isNaN(price) || price < 0) { setMsg("Harga tidak valid.", "error"); return; }
       if (isNaN(stock) || stock < 0) { setMsg("Jumlah stok tidak valid.", "error"); return; }
 
