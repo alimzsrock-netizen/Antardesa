@@ -1,401 +1,1652 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js"></script>
-  <title>Panel Admin Verifikasi - AntarDesa</title>
-  <link rel="stylesheet" href="ui-components.css">
-  <style>
-    * { box-sizing: border-box; }
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10251e">
 
+  <title>Panel Admin | AntarDesa</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="ui-components.css">
+  <link rel="stylesheet" href="premium-theme.css">
+
+  <script defer src="theme.js"></script>
+
+  <style>
     :root {
-      --bg-color: #121e19;
-      --text-color: #e2ebe6;
-      --panel-bg: #1a2923;
-      --panel-border: #283d34;
-      --muted-color: #9cb3a8;
-      --input-bg: #22342c;
-      --input-border: #354e42;
-      --header-bg: #0f5c43;
-      --card-sub-bg: #16241e;
-      --accent-color: #24a177;
-      --nav-bg: #1a2923;
-      --nav-border: #283d34;
-      --font-scale: 15px;
+      color-scheme: light;
+      --adm-bg: #f3f6f4;
+      --adm-panel: #ffffff;
+      --adm-panel-soft: #f8faf9;
+      --adm-text: #172720;
+      --adm-muted: #68796f;
+      --adm-border: #dfe8e2;
+      --adm-primary: #176b4b;
+      --adm-primary-dark: #10543a;
+      --adm-success-bg: #e5f5eb;
+      --adm-success: #176b3c;
+      --adm-warning-bg: #fff4d9;
+      --adm-warning: #926000;
+      --adm-danger-bg: #fde9e8;
+      --adm-danger: #a62b2b;
+      --adm-shadow: 0 12px 32px rgba(24, 53, 39, .07);
+    }
+
+    html[data-theme="dark"],
+    html.dark,
+    body.dark {
+      color-scheme: dark;
+      --adm-bg: #101a16;
+      --adm-panel: #192720;
+      --adm-panel-soft: #202f27;
+      --adm-text: #e7f0e9;
+      --adm-muted: #a2b2a7;
+      --adm-border: #33473b;
+      --adm-primary: #56b88a;
+      --adm-primary-dark: #70c99f;
+      --adm-success-bg: #193d2b;
+      --adm-success: #8bd6a8;
+      --adm-warning-bg: #45391d;
+      --adm-warning: #f1cb73;
+      --adm-danger-bg: #482725;
+      --adm-danger: #ffaaa3;
+      --adm-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --adm-bg: #101a16;
+        --adm-panel: #192720;
+        --adm-panel-soft: #202f27;
+        --adm-text: #e7f0e9;
+        --adm-muted: #a2b2a7;
+        --adm-border: #33473b;
+        --adm-primary: #56b88a;
+        --adm-primary-dark: #70c99f;
+        --adm-success-bg: #193d2b;
+        --adm-success: #8bd6a8;
+        --adm-warning-bg: #45391d;
+        --adm-warning: #f1cb73;
+        --adm-danger-bg: #482725;
+        --adm-danger: #ffaaa3;
+        --adm-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      background: var(--bg-color);
-      color: var(--text-color);
-      font: var(--font-scale) Arial, sans-serif;
+      min-height: 100vh;
+      background: var(--adm-bg);
+      color: var(--adm-text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
     }
 
-    header {
-      background: var(--header-bg);
-      color: white;
-      padding: 22px 18px 26px;
-      border-radius: 0 0 24px 24px;
+    #adminApp[hidden],
+    #accessScreen[hidden] {
+      display: none !important;
     }
-    .header-inner { max-width: 650px; margin: auto; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { margin: 0; font-size: 1.6em; }
-    header p { margin: 5px 0 0; font-size: 0.85em; opacity: 0.9; }
 
-    main { max-width: 650px; margin: auto; padding: 18px 16px 92px; }
+    .adm-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--adm-panel);
+      border-bottom: 1px solid var(--adm-border);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .035);
+    }
 
-    .panel {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 18px;
-    }
-    .panel h2 { margin: 0 0 8px; font-size: 1.2em; }
-    .muted { color: var(--muted-color); font-size: 0.88em; line-height: 1.5; }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .stat-card {
-      background: var(--card-sub-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-    }
-    .stat-num { font-size: 1.4em; font-weight: bold; color: var(--accent-color); }
-    .stat-label { font-size: 0.75em; color: var(--muted-color); margin-top: 2px; }
-
-    .request-card {
-      background: var(--card-sub-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 12px;
-    }
-    .request-header {
+    .adm-topbar-inner {
+      width: min(1120px, calc(100% - 32px));
+      min-height: 72px;
+      margin: auto;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-    }
-    .role-badge {
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.75em;
-      font-weight: bold;
-    }
-    .badge-mitra { background: #065f46; color: #a7f3d0; }
-    .badge-kurir { background: #1e3a8a; color: #bfdbfe; }
-
-    .info-row { font-size: 0.85em; margin-bottom: 6px; line-height: 1.4; overflow-wrap: anywhere; }
-    .info-row strong { color: var(--muted-color); }
-
-    .actions-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
+      justify-content: space-between;
+      gap: 16px;
     }
 
-    .btn-approve {
-      background: var(--accent-color);
-      color: white;
-      border: 0;
-      border-radius: 9px;
-      padding: 9px;
-      font-weight: bold;
-      font-size: 0.8em;
-      cursor: pointer;
-    }
-    .btn-reject {
-      background: var(--panel-bg);
-      color: #f8a59d;
-      border: 1px solid #b42318;
-      border-radius: 9px;
-      padding: 9px;
-      font-weight: bold;
-      font-size: 0.8em;
-      cursor: pointer;
-    }
-
-    button:disabled { opacity: 0.5; cursor: wait; }
-
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--nav-bg);
-      border-top: 1px solid var(--nav-border);
+    .adm-brand {
       display: flex;
-      justify-content: space-around;
-      padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-      z-index: 5;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
     }
-    nav a {
-      color: var(--muted-color);
-      text-decoration: none;
-      font-size: 0.8em;
+
+    .adm-brand-mark {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--adm-primary);
+      color: #fff;
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .adm-brand-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 850;
+      letter-spacing: -.3px;
+    }
+
+    .adm-brand-subtitle {
+      margin: 3px 0 0;
+      color: var(--adm-muted);
+      font-size: 11px;
+    }
+
+    .adm-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .adm-user {
+      max-width: 190px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--adm-muted);
+      font-size: 12px;
+    }
+
+    .adm-page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 28px auto 56px;
+    }
+
+    .adm-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .adm-eyebrow {
+      margin: 0 0 7px;
+      color: var(--adm-primary);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .adm-heading h1 {
+      margin: 0;
+      font-size: clamp(25px, 4vw, 34px);
+      line-height: 1.15;
+      letter-spacing: -1px;
+    }
+
+    .adm-heading p:last-child {
+      margin: 8px 0 0;
+      color: var(--adm-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .adm-button {
+      min-height: 40px;
+      border: 1px solid var(--adm-border);
+      border-radius: 11px;
+      padding: 9px 13px;
+      background: var(--adm-panel);
+      color: var(--adm-text);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease,
+        background .15s ease;
+    }
+
+    .adm-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .adm-button:disabled {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+
+    .adm-button-primary {
+      border-color: var(--adm-primary);
+      background: var(--adm-primary);
+      color: #fff;
+    }
+
+    .adm-button-primary:hover:not(:disabled) {
+      background: var(--adm-primary-dark);
+    }
+
+    .adm-button-danger {
+      border-color: var(--adm-danger);
+      background: var(--adm-danger);
+      color: #fff;
+    }
+
+    .adm-button-small {
+      min-height: 36px;
+      padding: 8px 12px;
+      font-size: 11px;
+    }
+
+    .adm-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 13px;
+      margin-bottom: 22px;
+    }
+
+    .adm-stat {
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid var(--adm-border);
+      border-radius: 17px;
+      background: var(--adm-panel);
+      box-shadow: var(--adm-shadow);
+    }
+
+    .adm-stat-label {
+      color: var(--adm-muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .adm-stat-value {
+      display: block;
+      margin-top: 8px;
+      font-size: 29px;
+      font-weight: 850;
+      letter-spacing: -.8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .adm-stat.pending .adm-stat-value {
+      color: var(--adm-warning);
+    }
+
+    .adm-stat.approved .adm-stat-value {
+      color: var(--adm-success);
+    }
+
+    .adm-stat.rejected .adm-stat-value {
+      color: var(--adm-danger);
+    }
+
+    .adm-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .adm-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .adm-filter {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--adm-border);
+      border-radius: 999px;
+      background: var(--adm-panel);
+      color: var(--adm-muted);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .adm-filter.active {
+      border-color: var(--adm-primary);
+      background: var(--adm-primary);
+      color: #fff;
+    }
+
+    .adm-search {
+      width: min(280px, 100%);
+      min-height: 40px;
+      padding: 9px 13px;
+      border: 1px solid var(--adm-border);
+      border-radius: 11px;
+      outline: none;
+      background: var(--adm-panel);
+      color: var(--adm-text);
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .adm-search:focus {
+      border-color: var(--adm-primary);
+      box-shadow: 0 0 0 3px rgba(23, 107, 75, .12);
+    }
+
+    .adm-feedback {
+      display: none;
+      margin: 0 0 15px;
+      padding: 12px 14px;
+      border: 1px solid var(--adm-border);
+      border-radius: 12px;
+      background: var(--adm-panel);
+      color: var(--adm-text);
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .adm-feedback.visible {
+      display: block;
+    }
+
+    .adm-feedback.error {
+      border-color: var(--adm-danger);
+      color: var(--adm-danger);
+    }
+
+    .adm-feedback.success {
+      border-color: var(--adm-success);
+      color: var(--adm-success);
+    }
+
+    .adm-list {
+      display: grid;
+      gap: 13px;
+    }
+
+    .adm-request {
+      min-width: 0;
+      padding: 19px;
+      border: 1px solid var(--adm-border);
+      border-radius: 18px;
+      background: var(--adm-panel);
+      box-shadow: var(--adm-shadow);
+    }
+
+    .adm-request-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .adm-request-title {
+      min-width: 0;
+    }
+
+    .adm-request-title h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .adm-request-role {
+      display: inline-flex;
+      margin-top: 7px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      background: var(--adm-panel-soft);
+      color: var(--adm-muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .adm-status {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      min-width: 86px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 850;
+    }
+
+    .adm-status.pending {
+      background: var(--adm-warning-bg);
+      color: var(--adm-warning);
+    }
+
+    .adm-status.approved {
+      background: var(--adm-success-bg);
+      color: var(--adm-success);
+    }
+
+    .adm-status.rejected {
+      background: var(--adm-danger-bg);
+      color: var(--adm-danger);
+    }
+
+    .adm-status.unknown {
+      background: var(--adm-panel-soft);
+      color: var(--adm-muted);
+    }
+
+    .adm-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 18px;
+      margin-top: 17px;
+    }
+
+    .adm-info {
+      min-width: 0;
+    }
+
+    .adm-info-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--adm-muted);
+      font-size: 10px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .adm-info-value {
+      display: block;
+      color: var(--adm-text);
+      font-size: 12px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .adm-extra {
+      margin-top: 15px;
+      padding-top: 14px;
+      border-top: 1px solid var(--adm-border);
+    }
+
+    .adm-extra summary {
+      color: var(--adm-primary);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .adm-source {
+      margin-top: 13px;
+      color: var(--adm-muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .adm-request-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 13px;
+      border-top: 1px solid var(--adm-border);
+    }
+
+    .adm-dates {
+      color: var(--adm-muted);
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    .adm-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .adm-empty {
+      padding: 38px 18px;
+      border: 1px dashed var(--adm-border);
+      border-radius: 17px;
+      background: var(--adm-panel);
       text-align: center;
     }
-    nav a.active { color: var(--accent-color); font-weight: bold; }
 
-    .status-msg { font-size: 0.8em; line-height: 1.5; margin-top: 10px; color: var(--muted-color); }
-    .status-msg.error { color: #f8a59d; font-weight: bold; }
-    .status-msg.success { color: var(--accent-color); font-weight: bold; }
+    .adm-empty-icon {
+      font-size: 30px;
+    }
+
+    .adm-empty h3 {
+      margin: 12px 0 6px;
+      font-size: 15px;
+    }
+
+    .adm-empty p {
+      margin: 0;
+      color: var(--adm-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .adm-footer {
+      margin-top: 25px;
+      color: var(--adm-muted);
+      font-size: 10px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    #accessScreen {
+      width: min(440px, calc(100% - 32px));
+      margin: 12vh auto 0;
+      padding: 25px;
+      border: 1px solid var(--adm-border);
+      border-radius: 19px;
+      background: var(--adm-panel);
+      box-shadow: var(--adm-shadow);
+      text-align: center;
+    }
+
+    .adm-access-icon {
+      font-size: 37px;
+    }
+
+    #accessScreen h2 {
+      margin: 12px 0 8px;
+      font-size: 20px;
+    }
+
+    #accessMessage {
+      color: var(--adm-muted);
+      font-size: 12px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .adm-access-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 17px;
+    }
+
+    .adm-hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 760px) {
+      .adm-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .adm-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .adm-heading > .adm-button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .adm-topbar-inner {
+        width: calc(100% - 22px);
+        min-height: 64px;
+      }
+
+      .adm-page {
+        width: calc(100% - 22px);
+        margin-top: 21px;
+      }
+
+      .adm-brand-mark {
+        width: 37px;
+        height: 37px;
+        flex-basis: 37px;
+      }
+
+      .adm-brand-title {
+        font-size: 15px;
+      }
+
+      .adm-user {
+        display: none;
+      }
+
+      .adm-stats {
+        gap: 9px;
+      }
+
+      .adm-stat {
+        padding: 13px;
+      }
+
+      .adm-stat-value {
+        font-size: 25px;
+      }
+
+      .adm-toolbar {
+        align-items: stretch;
+      }
+
+      .adm-search {
+        width: 100%;
+      }
+
+      .adm-request {
+        padding: 15px;
+      }
+
+      .adm-info-grid {
+        grid-template-columns: 1fr;
+        gap: 11px;
+      }
+
+      .adm-request-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .adm-actions {
+        width: 100%;
+      }
+
+      .adm-actions .adm-button {
+        flex: 1;
+      }
+    }
   </style>
-<link rel="stylesheet" href="premium-theme.css">
-
 </head>
+
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="header-inner">
-      <div>
-        <h1>Panel Admin</h1>
-        <p>Verifikasi Mitra & Kurir AntarDesa 👑</p>
-      </div>
+  <!-- LAYAR PEMERIKSAAN AKSES -->
+  <section id="accessScreen" role="status" aria-live="polite">
+    <div class="adm-access-icon">🔐</div>
+    <h2>AntarDesa Admin</h2>
+    <p id="accessMessage">
+      Sedang memeriksa sesi dan hak akses administrator...
+    </p>
+
+    <div class="adm-access-actions">
+      <button
+        id="retryButton"
+        class="adm-button adm-button-primary adm-hidden"
+        type="button"
+      >
+        Coba Lagi
+      </button>
+
+      <a
+        id="accessLink"
+        class="adm-button adm-hidden"
+        href="login.html"
+      >
+        Kembali ke Login
+      </a>
     </div>
-  </header>
+  </section>
 
-  <!-- UTAMA -->
-  <main>
 
-    <!-- RINGKASAN STATISTIK -->
-    <div class="panel">
-      <h2>Ringkasan Verifikasi</h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div id="countPending" class="stat-num">0</div>
-          <div class="stat-label">Menunggu</div>
+  <!-- PANEL ADMIN -->
+  <div id="adminApp" hidden>
+
+    <header class="adm-topbar">
+      <div class="adm-topbar-inner">
+
+        <div class="adm-brand">
+          <div class="adm-brand-mark">A</div>
+
+          <div>
+            <p class="adm-brand-title">AntarDesa.</p>
+            <p class="adm-brand-subtitle">Administrator Center</p>
+          </div>
         </div>
-        <div class="stat-card">
-          <div id="countApproved" class="stat-num">0</div>
-          <div class="stat-label">Disetujui</div>
+
+        <div class="adm-top-actions">
+          <span id="adminEmail" class="adm-user"></span>
+
+          <button
+            id="logoutButton"
+            class="adm-button"
+            type="button"
+          >
+            Keluar
+          </button>
         </div>
-        <div class="stat-card">
-          <div id="countRejected" class="stat-num">0</div>
-          <div class="stat-label">Ditolak</div>
+
+      </div>
+    </header>
+
+
+    <main class="adm-page">
+
+      <section class="adm-heading">
+        <div>
+          <p class="adm-eyebrow">Management Console</p>
+          <h1>Panel Admin</h1>
+          <p>
+            Kelola pengajuan verifikasi Mitra dan Kurir
+            AntarDesa.
+          </p>
         </div>
-      </div>
-    </div>
 
-    <!-- DAFTAR PENGAJUAN VERIFIKASI -->
-    <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>Daftar Pengajuan</h2>
-        <button id="btnRefresh" class="btn-approve" type="button" style="padding:6px 12px;">Muat Ulang</button>
-      </div>
-      
-      <p id="adminMsg" class="status-msg" role="status" aria-live="polite"></p>
+        <button
+          id="refreshButton"
+          class="adm-button adm-button-primary"
+          type="button"
+        >
+          ↻ Perbarui Data
+        </button>
+      </section>
 
-      <div id="requestList">
-        <p class="muted" style="text-align:center; padding:16px;">Memuat data pengajuan...</p>
-      </div>
-    </div>
 
-  </main>
+      <!-- RINGKASAN -->
+      <section class="adm-stats" aria-label="Ringkasan pengajuan">
 
-  <!-- NAVIGASI BAWAH -->
-  <nav aria-label="Navigasi Admin">
-    <a href="index.html">
-      <span>⌂</span><br>Beranda
-    </a>
-    <a href="admin.html" class="active">
-      <span>👑</span><br>Verifikasi
-    </a>
-  </nav>
+        <article class="adm-stat">
+          <span class="adm-stat-label">Total Pengajuan</span>
+          <strong id="totalCount" class="adm-stat-value">0</strong>
+        </article>
 
-  <!-- EXTERNAL SCRIPTS -->
+        <article class="adm-stat pending">
+          <span class="adm-stat-label">Menunggu</span>
+          <strong id="pendingCount" class="adm-stat-value">0</strong>
+        </article>
+
+        <article class="adm-stat approved">
+          <span class="adm-stat-label">Disetujui</span>
+          <strong id="approvedCount" class="adm-stat-value">0</strong>
+        </article>
+
+        <article class="adm-stat rejected">
+          <span class="adm-stat-label">Ditolak</span>
+          <strong id="rejectedCount" class="adm-stat-value">0</strong>
+        </article>
+
+      </section>
+
+
+      <!-- PESAN STATUS -->
+      <div
+        id="feedback"
+        class="adm-feedback"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+
+      <!-- FILTER DAN PENCARIAN -->
+      <section class="adm-toolbar">
+
+        <div class="adm-filters" aria-label="Filter status">
+
+          <button
+            class="adm-filter active"
+            type="button"
+            data-filter="all"
+          >
+            Semua
+          </button>
+
+          <button
+            class="adm-filter"
+            type="button"
+            data-filter="pending"
+          >
+            Menunggu
+          </button>
+
+          <button
+            class="adm-filter"
+            type="button"
+            data-filter="approved"
+          >
+            Disetujui
+          </button>
+
+          <button
+            class="adm-filter"
+            type="button"
+            data-filter="rejected"
+          >
+            Ditolak
+          </button>
+
+        </div>
+
+        <input
+          id="searchInput"
+          class="adm-search"
+          type="search"
+          placeholder="Cari nama, email, nomor telepon..."
+          autocomplete="off"
+          aria-label="Cari pengajuan"
+        >
+
+      </section>
+
+
+      <!-- DAFTAR PENGAJUAN -->
+      <section
+        id="requestList"
+        class="adm-list"
+        aria-live="polite"
+      >
+        <div class="adm-empty">
+          <div class="adm-empty-icon">⌛</div>
+          <h3>Memuat pengajuan</h3>
+          <p>Data sedang diambil dari database.</p>
+        </div>
+      </section>
+
+
+      <footer class="adm-footer">
+        AntarDesa Administrator Center · Akses terbatas untuk
+        administrator terverifikasi.
+        <br>
+        Keputusan verifikasi diproses melalui fungsi database.
+      </footer>
+
+    </main>
+  </div>
+
+
+  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     "use strict";
 
-    const SUPABASE_URL = "https://gswlkajcizcvrhcfabtg.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+    /* =====================================================
+       KONFIGURASI SUPABASE
+    ===================================================== */
+
+    const SUPABASE_URL =
+      "https://gswlkajcizcvrhcfabtg.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_fYFVBQDDVi3qrdVYq45I4Q_C4MTqN63";
+
+
+    /* =====================================================
+       STATE APLIKASI
+    ===================================================== */
+
+    const $ = (id) => document.getElementById(id);
 
     let supabaseClient = null;
     let currentUser = null;
-    let verificationRequests = [];
+    let requests = [];
+    let activeFilter = "all";
+    let busyUserId = null;
+    let isLoading = false;
 
-    function byId(id) { return document.getElementById(id); }
+    const STATUS_LABELS = {
+      pending: "Menunggu",
+      approved: "Disetujui",
+      rejected: "Ditolak"
+    };
 
-    function setMsg(text, type) {
-      const el = byId("adminMsg");
-      el.textContent = text;
-      el.className = "status-msg";
-      if (type === "error") el.classList.add("error");
-      if (type === "success") el.classList.add("success");
+
+    /* =====================================================
+       UTILITAS
+    ===================================================== */
+
+    function createElement(tag, className, text) {
+      const element = document.createElement(tag);
+
+      if (className) {
+        element.className = className;
+      }
+
+      if (text !== undefined && text !== null) {
+        element.textContent = String(text);
+      }
+
+      return element;
     }
 
-    async function loadRequests() {
-      if (!supabaseClient || !currentUser) return;
 
-      const listContainer = byId("requestList");
-      listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Memuat pengajuan...</p>';
-      setMsg("", "");
+    function formatDate(value) {
+      if (!value) return "Belum tersedia";
 
-      try {
-        const { data, error } = await supabaseClient
-          .from("verification_requests")
-          .select("id,user_id,requested_role,full_name,phone,business_name,address_detail,notes,status,created_at")
-          .order("created_at", { ascending: false });
+      const date = new Date(value);
 
-        if (error) throw error;
+      if (Number.isNaN(date.getTime())) {
+        return "Tanggal tidak tersedia";
+      }
 
-        verificationRequests = Array.isArray(data) ? data : [];
-        updateStats();
-        renderRequests();
-      } catch (err) {
-        console.error("Gagal memuat pengajuan:", err);
-        setMsg("Gagal mengambil data pengajuan. Pastikan akun Anda memiliki peran 'admin'.", "error");
-        listContainer.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Akses ditolak atau koneksi gagal.</p>';
+      return new Intl.DateTimeFormat("id-ID", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(date);
+    }
+
+
+    function getStatusLabel(status) {
+      return STATUS_LABELS[status] || "Tidak dikenal";
+    }
+
+
+    function getFriendlyError(error) {
+      if (!error) {
+        return "Terjadi kesalahan yang tidak diketahui.";
+      }
+
+      if (error.code === "42501") {
+        return "Akses ditolak. Akun harus memiliki role admin dan berstatus terverifikasi.";
+      }
+
+      if (error.code === "P0002") {
+        return "Pengajuan tidak ditemukan atau sudah diproses oleh administrator lain.";
+      }
+
+      if (error.code === "PGRST202" || error.code === "42883") {
+        return "Fungsi RPC belum tersedia atau skemanya belum diperbarui. Periksa SQL RPC di Supabase.";
+      }
+
+      return error.message ||
+        "Permintaan gagal. Periksa koneksi dan konfigurasi database.";
+    }
+
+
+    function showFeedback(message, type) {
+      const box = $("feedback");
+
+      box.textContent = message || "";
+      box.className = "adm-feedback";
+
+      if (message) {
+        box.classList.add("visible");
+
+        if (type === "error" || type === "success") {
+          box.classList.add(type);
+        }
       }
     }
 
-    function updateStats() {
-      let pending = 0, approved = 0, rejected = 0;
-      verificationRequests.forEach(r => {
-        if (r.status === "pending") pending++;
-        if (r.status === "approved") approved++;
-        if (r.status === "rejected") rejected++;
-      });
 
-      byId("countPending").textContent = pending;
-      byId("countApproved").textContent = approved;
-      byId("countRejected").textContent = rejected;
+    function showAccess(message, allowRetry, showLogin) {
+      $("adminApp").hidden = true;
+      $("accessScreen").hidden = false;
+
+      $("accessMessage").textContent = message;
+
+      $("retryButton").classList.toggle(
+        "adm-hidden",
+        !allowRetry
+      );
+
+      $("accessLink").classList.toggle(
+        "adm-hidden",
+        !showLogin
+      );
     }
 
+
+    function showDashboard() {
+      $("accessScreen").hidden = true;
+      $("adminApp").hidden = false;
+    }
+
+
+    function addInfo(container, label, value) {
+      const wrapper = createElement("div", "adm-info");
+
+      const title = createElement(
+        "span",
+        "adm-info-label",
+        label
+      );
+
+      const content = createElement(
+        "span",
+        "adm-info-value",
+        value || "Tidak tersedia"
+      );
+
+      wrapper.append(title, content);
+      container.appendChild(wrapper);
+    }
+
+
+    /* =====================================================
+       RENDER RINGKASAN
+    ===================================================== */
+
+    function renderStatistics() {
+      const total = requests.length;
+
+      const pending = requests.filter(
+        item => item.status === "pending"
+      ).length;
+
+      const approved = requests.filter(
+        item => item.status === "approved"
+      ).length;
+
+      const rejected = requests.filter(
+        item => item.status === "rejected"
+      ).length;
+
+      $("totalCount").textContent = total;
+      $("pendingCount").textContent = pending;
+      $("approvedCount").textContent = approved;
+      $("rejectedCount").textContent = rejected;
+    }
+
+
+    /* =====================================================
+       RENDER KARTU PENGAJUAN
+    ===================================================== */
+
+    function createRequestCard(request) {
+      const card = createElement("article", "adm-request");
+
+      const head = createElement("div", "adm-request-head");
+      const titleBox = createElement("div", "adm-request-title");
+
+      const name = createElement(
+        "h3",
+        "",
+        request.full_name || "Nama belum tersedia"
+      );
+
+      const role = createElement(
+        "span",
+        "adm-request-role",
+        request.requested_role || "Role tidak diketahui"
+      );
+
+      titleBox.append(name, role);
+
+      const knownStatus = [
+        "pending",
+        "approved",
+        "rejected"
+      ].includes(request.status);
+
+      const status = createElement(
+        "span",
+        "adm-status " + (
+          knownStatus ? request.status : "unknown"
+        ),
+        getStatusLabel(request.status)
+      );
+
+      head.append(titleBox, status);
+      card.appendChild(head);
+
+
+      const infoGrid = createElement("div", "adm-info-grid");
+
+      addInfo(
+        infoGrid,
+        "Email",
+        request.email
+      );
+
+      addInfo(
+        infoGrid,
+        "Nomor Telepon",
+        request.phone
+      );
+
+      addInfo(
+        infoGrid,
+        "Nama Usaha",
+        request.business_name
+      );
+
+      addInfo(
+        infoGrid,
+        "Alamat / Wilayah Operasional",
+        request.address_detail
+      );
+
+      card.appendChild(infoGrid);
+
+
+      const extra = createElement("details", "adm-extra");
+
+      const summary = createElement(
+        "summary",
+        "",
+        "Detail dan informasi teknis"
+      );
+
+      const extraGrid = createElement(
+        "div",
+        "adm-info-grid"
+      );
+
+      addInfo(
+        extraGrid,
+        "Catatan Pemohon",
+        request.notes
+      );
+
+      addInfo(
+        extraGrid,
+        "User ID",
+        request.user_id
+      );
+
+      const sourceLabels = {
+        both: "Formulir verifikasi + data role",
+        verification_requests: "Formulir verifikasi",
+        role_requests: "Data pengajuan role"
+      };
+
+      addInfo(
+        extraGrid,
+        "Sumber Data",
+        sourceLabels[request.source] || request.source
+      );
+
+      addInfo(
+        extraGrid,
+        "Tanggal Pengajuan",
+        formatDate(request.created_at)
+      );
+
+      addInfo(
+        extraGrid,
+        "Tanggal Keputusan",
+        request.reviewed_at
+          ? formatDate(request.reviewed_at)
+          : "Belum diproses"
+      );
+
+      extra.append(summary, extraGrid);
+
+
+      if (
+        !request.phone &&
+        !request.business_name &&
+        !request.address_detail &&
+        !request.notes
+      ) {
+        extra.appendChild(
+          createElement(
+            "p",
+            "adm-source",
+            "Pengajuan ini berasal dari data role lama. " +
+            "Informasi formulir tambahan belum tersedia."
+          )
+        );
+      }
+
+      card.appendChild(extra);
+
+
+      const footer = createElement(
+        "div",
+        "adm-request-footer"
+      );
+
+      const dateText = createElement(
+        "div",
+        "adm-dates",
+        "Diajukan: " + formatDate(request.created_at)
+      );
+
+      footer.appendChild(dateText);
+
+
+      const actions = createElement("div", "adm-actions");
+
+      if (
+        request.status === "pending" &&
+        request.user_id
+      ) {
+        const approveButton = createElement(
+          "button",
+          "adm-button adm-button-primary adm-button-small",
+          "✓ Setujui"
+        );
+
+        approveButton.type = "button";
+
+        approveButton.addEventListener("click", () => {
+          processRequest("approve", request, approveButton);
+        });
+
+
+        const rejectButton = createElement(
+          "button",
+          "adm-button adm-button-danger adm-button-small",
+          "Tolak"
+        );
+
+        rejectButton.type = "button";
+
+        rejectButton.addEventListener("click", () => {
+          processRequest("reject", request, rejectButton);
+        });
+
+        actions.append(approveButton, rejectButton);
+      }
+
+      if (request.status !== "pending") {
+        actions.appendChild(
+          createElement(
+            "span",
+            "adm-source",
+            "Pengajuan sudah diproses."
+          )
+        );
+      }
+
+      footer.appendChild(actions);
+      card.appendChild(footer);
+
+      return card;
+    }
+
+
+    /* =====================================================
+       FILTER DAN PENCARIAN
+    ===================================================== */
+
+    function getVisibleRequests() {
+      const keyword = $("searchInput").value
+        .trim()
+        .toLocaleLowerCase("id-ID");
+
+      return requests.filter(request => {
+        const statusMatches =
+          activeFilter === "all" ||
+          request.status === activeFilter;
+
+        const searchable = [
+          request.full_name,
+          request.email,
+          request.phone,
+          request.business_name,
+          request.address_detail,
+          request.requested_role,
+          request.user_id
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase("id-ID");
+
+        const keywordMatches =
+          !keyword || searchable.includes(keyword);
+
+        return statusMatches && keywordMatches;
+      });
+    }
+
+
     function renderRequests() {
-      const container = byId("requestList");
+      renderStatistics();
+
+      const container = $("requestList");
+      const visible = getVisibleRequests();
+
       container.replaceChildren();
 
-      if (verificationRequests.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:16px;">Belum ada pengajuan verifikasi.</p>';
+      if (visible.length === 0) {
+        const empty = createElement("div", "adm-empty");
+
+        empty.appendChild(
+          createElement("div", "adm-empty-icon", "📭")
+        );
+
+        empty.appendChild(
+          createElement(
+            "h3",
+            "",
+            requests.length === 0
+              ? "Belum ada pengajuan"
+              : "Tidak ada hasil yang cocok"
+          )
+        );
+
+        empty.appendChild(
+          createElement(
+            "p",
+            "",
+            requests.length === 0
+              ? "Belum terdapat pengajuan verifikasi Mitra atau Kurir."
+              : "Coba ubah filter atau kata kunci pencarian."
+          )
+        );
+
+        container.appendChild(empty);
         return;
       }
 
-      verificationRequests.forEach(req => {
-        const card = document.createElement("div");
-        card.className = "request-card";
-
-        const header = document.createElement("div");
-        header.className = "request-header";
-
-        const title = document.createElement("strong");
-        title.style.fontSize = "0.95em";
-        title.textContent = req.full_name;
-
-        const badge = document.createElement("span");
-        badge.className = "role-badge " + (req.requested_role === "mitra" ? "badge-mitra" : "badge-kurir");
-        badge.textContent = req.requested_role.toUpperCase() + " (" + req.status.toUpperCase() + ")";
-
-        header.append(title, badge);
-
-        const phone = document.createElement("div");
-        phone.className = "info-row";
-        phone.innerHTML = "<strong>WhatsApp:</strong> " + req.phone;
-
-        const business = document.createElement("div");
-        business.className = "info-row";
-        business.innerHTML = "<strong>Toko/Wilayah:</strong> " + (req.business_name || "-");
-
-        const address = document.createElement("div");
-        address.className = "info-row";
-        address.innerHTML = "<strong>Alamat:</strong> " + req.address_detail;
-
-        card.append(header, phone, business, address);
-
-        if (req.notes) {
-          const notes = document.createElement("div");
-          notes.className = "info-row";
-          notes.innerHTML = "<strong>Catatan:</strong> " + req.notes;
-          card.append(notes);
-        }
-
-        // Tombol Aksi jika status masih Pending
-        if (req.status === "pending") {
-          const actions = document.createElement("div");
-          actions.className = "actions-grid";
-
-          const btnApprove = document.createElement("button");
-          btnApprove.className = "btn-approve";
-          btnApprove.textContent = "✅ Setujui";
-          btnApprove.addEventListener("click", () => processVerification(req, "approved"));
-
-          const btnReject = document.createElement("button");
-          btnReject.className = "btn-reject";
-          btnReject.textContent = "❌ Tolak";
-          btnReject.addEventListener("click", () => processVerification(req, "rejected"));
-
-          actions.append(btnApprove, btnReject);
-          card.append(actions);
-        }
-
-        container.append(card);
+      visible.forEach(request => {
+        container.appendChild(
+          createRequestCard(request)
+        );
       });
     }
 
-    async function processVerification(req, targetStatus) {
-      if (!confirm(`Konfirmasi perubahan status pengajuan ${req.full_name} menjadi '${targetStatus}'?`)) return;
 
-      setMsg("Memproses perubahan status...", "");
+    document.querySelectorAll("[data-filter]").forEach(button => {
+      button.addEventListener("click", function() {
+        activeFilter = this.dataset.filter;
+
+        document.querySelectorAll("[data-filter]").forEach(item => {
+          item.classList.toggle(
+            "active",
+            item.dataset.filter === activeFilter
+          );
+        });
+
+        renderRequests();
+      });
+    });
+
+
+    $("searchInput").addEventListener("input", renderRequests);
+
+
+    /* =====================================================
+       MEMUAT PENGAJUAN MELALUI RPC
+    ===================================================== */
+
+    async function loadRequests(initialLoad = false) {
+      if (!supabaseClient || isLoading) return false;
+
+      isLoading = true;
+
+      const refreshButton = $("refreshButton");
+      refreshButton.disabled = true;
+      refreshButton.textContent = "Memuat...";
 
       try {
-        // 1. Update status pada verification_requests
-        const { error: verifErr } = await supabaseClient
-          .from("verification_requests")
-          .update({ status: targetStatus, updated_at: new Date().toISOString() })
-          .eq("id", req.id);
+        const { data, error } = await supabaseClient.rpc(
+          "admin_list_role_requests"
+        );
 
-        if (verifErr) throw verifErr;
-
-        // 2. Jika disetujui, update/upsert user_roles
-        if (targetStatus === "approved") {
-          const { error: roleErr } = await supabaseClient
-            .from("user_roles")
-            .upsert({
-              user_id: req.user_id,
-              role: req.requested_role,
-              is_verified: true,
-              updated_at: new Date().toISOString()
-            });
-
-          if (roleErr) throw roleErr;
+        if (error) {
+          throw error;
         }
 
-        setMsg(`Pengajuan ${req.full_name} telah diperbarui menjadi '${targetStatus}'.`, "success");
-        await loadRequests();
-      } catch (err) {
-        console.error("Gagal memproses verifikasi:", err);
-        setMsg(err.message || "Gagal memproses pengajuan. Coba lagi.", "error");
+        requests = Array.isArray(data) ? data : [];
+
+        renderRequests();
+        showFeedback("", "");
+
+        if (initialLoad) {
+          showDashboard();
+        }
+
+        return true;
+
+      } catch (error) {
+        console.error("Gagal memuat pengajuan:", error);
+
+        const message = getFriendlyError(error);
+
+        if (error.code === "42501") {
+          showAccess(
+            message,
+            false,
+            true
+          );
+        } else if (initialLoad) {
+          showAccess(
+            message,
+            true,
+            true
+          );
+        } else {
+          showFeedback(message, "error");
+        }
+
+        return false;
+
+      } finally {
+        isLoading = false;
+        refreshButton.disabled = false;
+        refreshButton.textContent = "↻ Perbarui Data";
       }
     }
 
-    byId("btnRefresh").addEventListener("click", loadRequests);
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (window.supabase && window.supabase.createClient) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-          auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
-        });
+    /* =====================================================
+       PROSES PERSETUJUAN DAN PENOLAKAN
+    ===================================================== */
 
-        const { data } = await supabaseClient.auth.getSession();
-        if (data && data.session) {
-          currentUser = data.session.user;
-          loadRequests();
+    async function processRequest(action, request, button) {
+      if (
+        !supabaseClient ||
+        !request ||
+        !request.user_id ||
+        busyUserId
+      ) {
+        return;
+      }
+
+      const name = request.full_name || "Pemohon";
+      const role = request.requested_role || "role";
+
+      const confirmationMessage =
+        action === "approve"
+          ? "Setujui pengajuan " + role +
+            " atas nama " + name + "?"
+          : "Tolak pengajuan " + role +
+            " atas nama " + name + "?";
+
+      if (!window.confirm(confirmationMessage)) {
+        return;
+      }
+
+      busyUserId = request.user_id;
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Memproses...";
+      }
+
+      showFeedback(
+        action === "approve"
+          ? "Sedang memproses persetujuan..."
+          : "Sedang memproses penolakan...",
+        ""
+      );
+
+      try {
+        const functionName =
+          action === "approve"
+            ? "admin_approve_antardesa_role"
+            : "admin_reject_antardesa_role";
+
+        const { data, error } = await supabaseClient.rpc(
+          functionName,
+          {
+            p_user_id: request.user_id
+          }
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        const successMessage =
+          action === "approve"
+            ? "Pengajuan berhasil disetujui."
+            : "Pengajuan berhasil ditolak.";
+
+        showFeedback(successMessage, "success");
+
+        await loadRequests(false);
+
+      } catch (error) {
+        console.error("Gagal memproses pengajuan:", error);
+
+        const message = getFriendlyError(error);
+
+        if (error.code === "42501") {
+          showAccess(message, false, true);
         } else {
-          window.location.href = "login.html";
+          showFeedback(message, "error");
+        }
+
+      } finally {
+        busyUserId = null;
+
+        if (button) {
+          button.disabled = false;
         }
       }
+    }
+
+
+    /* =====================================================
+       REFRESH
+    ===================================================== */
+
+    $("refreshButton").addEventListener("click", function() {
+      loadRequests(false);
     });
+
+
+    /* =====================================================
+       LOGOUT
+    ===================================================== */
+
+    $("logoutButton").addEventListener("click", async function() {
+      if (!supabaseClient) return;
+
+      const button = this;
+
+      button.disabled = true;
+      button.textContent = "Keluar...";
+
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) {
+          throw error;
+        }
+
+        window.location.replace("login.html");
+
+      } catch (error) {
+        console.error("Logout gagal:", error);
+
+        showFeedback(
+          "Gagal mengakhiri sesi. Periksa koneksi dan coba lagi.",
+          "error"
+        );
+
+        button.disabled = false;
+        button.textContent = "Keluar";
+      }
+    });
+
+
+    /* =====================================================
+       INISIALISASI DAN PEMERIKSAAN AKSES
+    ===================================================== */
+
+    async function initializeAdmin() {
+      $("retryButton").disabled = true;
+      $("accessMessage").textContent =
+        "Sedang memeriksa sesi dan hak akses administrator...";
+
+      try {
+        if (
+          !window.supabase ||
+          typeof window.supabase.createClient !== "function"
+        ) {
+          throw new Error(
+            "Library Supabase gagal dimuat. Periksa koneksi internet."
+          );
+        }
+
+        if (
+          !SUPABASE_PUBLISHABLE_KEY ||
+          !SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_")
+        ) {
+          throw new Error(
+            "Supabase Publishable Key belum dikonfigurasi dengan benar."
+          );
+        }
+
+        if (!supabaseClient) {
+          supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+          );
+        }
+
+        const {
+          data: authData,
+          error: authError
+        } = await supabaseClient.auth.getUser();
+
+        if (authError) {
+          throw authError;
+        }
+
+        if (!authData || !authData.user) {
+          window.location.replace("login.html");
+          return;
+        }
+
+        currentUser = authData.user;
+
+        $("adminEmail").textContent =
+          currentUser.email || "Administrator";
+
+        // RPC pertama sekaligus memverifikasi admin di database.
+        const loaded = await loadRequests(true);
+
+        if (!loaded) {
+          return;
+        }
+
+      } catch (error) {
+        console.error("Inisialisasi admin gagal:", error);
+
+        showAccess(
+          getFriendlyError(error),
+          true,
+          true
+        );
+
+      } finally {
+        $("retryButton").disabled = false;
+      }
+    }
+
+
+    $("retryButton").addEventListener(
+      "click",
+      initializeAdmin
+    );
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeAdmin,
+      { once: true }
+    );
+
   </script>
+
 </body>
 </html>
