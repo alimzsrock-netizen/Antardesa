@@ -3565,7 +3565,7 @@
       setText("modalProductDesc", product.description || "Belum ada deskripsi lengkap.");
 
       setText("modalSellerName", product.seller_name || product.store_name || "Mitra AntarDesa");
-      setText("modalSellerLocation", product.seller_location || "Wilayah Operasional AntarDesa");
+      setText("modalSellerLocation", product.seller_location || "Lokasi toko belum tersedia");
       setText("modalProductQty", currentModalQty);
 
       const imageUrl = safeImageUrl(product.image_url);
@@ -3901,6 +3901,59 @@
       if (PRODUCT_CATEGORIES.includes(previousValue)) select.value = previousValue;
     }
 
+    async function enrichPublicProductsWithMerchantProfiles(products) {
+      const merchantIds = Array.from(new Set(
+        (Array.isArray(products) ? products : [])
+          .map(product => product && product.merchant_id ? String(product.merchant_id) : "")
+          .filter(Boolean)
+      ));
+
+      if (merchantIds.length === 0) {
+        return (Array.isArray(products) ? products : []).map(product => ({
+          ...product,
+          seller_name: "Mitra AntarDesa",
+          seller_location: "Lokasi toko belum tersedia"
+        }));
+      }
+
+      try {
+        const { data, error } = await supabaseClient.rpc(
+          "antardesa_get_public_merchant_profiles",
+          { p_merchant_ids: merchantIds }
+        );
+        if (error) throw error;
+
+        const profilesByMerchantId = new Map(
+          (Array.isArray(data) ? data : []).map(profile => [String(profile.merchant_id), profile])
+        );
+
+        return (Array.isArray(products) ? products : []).map(product => {
+          const profile = product && product.merchant_id
+            ? profilesByMerchantId.get(String(product.merchant_id))
+            : null;
+          const storeName = profile && typeof profile.store_name === "string"
+            ? profile.store_name.trim()
+            : "";
+          const locationNote = profile && typeof profile.location_note === "string"
+            ? profile.location_note.trim()
+            : "";
+
+          return {
+            ...product,
+            seller_name: storeName || "Mitra AntarDesa",
+            seller_location: locationNote || "Lokasi toko belum tersedia"
+          };
+        });
+      } catch (error) {
+        console.warn("Profil publik mitra belum dapat dimuat:", error);
+        return (Array.isArray(products) ? products : []).map(product => ({
+          ...product,
+          seller_name: "Mitra AntarDesa",
+          seller_location: "Lokasi toko belum tersedia"
+        }));
+      }
+    }
+
     async function loadPublicProducts() {
       const refreshBtn = byId("refreshCatalogButton");
       refreshBtn.disabled = true;
@@ -3910,11 +3963,11 @@
       try {
         if (!supabaseClient) throw new Error("SUPABASE_NOT_AVAILABLE");
         const { data, error } = await withTimeout(
-          supabaseClient.from("products").select("id,user_id,name,description,category,price,stock,image_url,created_at").eq("is_active", true).order("created_at", { ascending: false }).limit(PRODUCT_LIMIT),
+          supabaseClient.from("products").select("id,user_id,merchant_id,name,description,category,price,stock,image_url,created_at").eq("is_active", true).order("created_at", { ascending: false }).limit(PRODUCT_LIMIT),
           4000
         );
         if (error) throw error;
-        publicProducts = Array.isArray(data) ? data : [];
+        publicProducts = await enrichPublicProductsWithMerchantProfiles(Array.isArray(data) ? data : []);
         publicProductsLoaded = true;
         populateProductCategories();
         renderProductCatalog();
