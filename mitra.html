@@ -229,6 +229,16 @@
           <div><strong>Akun:</strong> <span id="mitraEmail">Memuat...</span></div>
           <div style="margin-top:8px;"><strong>Status:</strong> <span class="badge-verified">Terverifikasi</span></div>
         </div>
+        <div class="card-sub" style="margin-top:12px;">
+          <h3 style="margin:0 0 8px; font-size:1em;">Identitas Toko Publik</h3>
+          <p class="muted" style="font-size:0.85em; margin:0 0 10px;">Nama toko ini akan ditampilkan pada detail produk di katalog AntarDesa.</p>
+          <label for="merchantStoreName">Nama Toko:</label>
+          <input id="merchantStoreName" type="text" maxlength="120" autocomplete="organization" placeholder="Contoh: Warung Berkah">
+          <button id="btnSaveStoreProfile" class="primary" type="button" style="margin-top:10px;">Simpan Nama Toko</button>
+          <p id="merchantStoreProfileMsg" class="status-msg" role="status" aria-live="polite"></p>
+          <div style="margin-top:8px;"><strong>Lokasi publik:</strong> <span id="merchantPublicLocation" class="muted">Memuat...</span></div>
+          <p class="muted" style="font-size:0.75em; margin:6px 0 0;">Yang ditampilkan hanya keterangan lokasi, bukan koordinat GPS.</p>
+        </div>
       </div>
 
       <!-- KELOLA PRODUK -->
@@ -327,6 +337,9 @@
 
   <!-- NAVIGASI BAWAH (SPA TABS) -->
   <nav aria-label="Navigasi Mitra">
+    <button id="nav-home" type="button" onclick="window.location.href='index.html'">
+      <span style="font-size:1.3em;">⌂</span><br>Home
+    </button>
     <button id="nav-toko" class="active" type="button" onclick="switchTab('toko')">
       <span style="font-size:1.3em;">🏪</span><br>Toko
     </button>
@@ -379,6 +392,93 @@
       el.className = "status-msg";
       if (type === "error") el.classList.add("error");
       if (type === "success") el.classList.add("success");
+    }
+
+    function setStoreProfileMsg(text, type) {
+      const el = byId("merchantStoreProfileMsg");
+      if (!el) return;
+      el.textContent = text;
+      el.className = "status-msg";
+      if (type === "error") el.classList.add("error");
+      if (type === "success") el.classList.add("success");
+    }
+
+    async function loadMerchantPublicProfile() {
+      if (!supabaseClient || !currentUser) return;
+      const nameInput = byId("merchantStoreName");
+      const locationEl = byId("merchantPublicLocation");
+      try {
+        const { data: profile, error: profileError } = await supabaseClient
+          .from("merchant_public_profiles")
+          .select("store_name")
+          .eq("merchant_id", currentUser.id)
+          .maybeSingle();
+        if (profileError) throw profileError;
+        nameInput.value = profile && profile.store_name ? profile.store_name : "";
+
+        const { data: publicProfiles, error: publicError } = await supabaseClient.rpc(
+          "antardesa_get_public_merchant_profiles",
+          { p_merchant_ids: [currentUser.id] }
+        );
+        if (publicError) throw publicError;
+        const ownPublicProfile = Array.isArray(publicProfiles) ? publicProfiles[0] : null;
+        locationEl.textContent = ownPublicProfile && ownPublicProfile.location_note
+          ? ownPublicProfile.location_note
+          : "Lokasi toko belum tersedia";
+      } catch (err) {
+        console.error("Gagal memuat profil publik mitra:", err);
+        locationEl.textContent = "Informasi lokasi belum dapat dimuat";
+        setStoreProfileMsg("Gagal memuat profil toko. Periksa koneksi dan hak akses.", "error");
+      }
+    }
+
+    async function saveMerchantPublicProfile() {
+      if (!supabaseClient || !currentUser) return;
+      const button = byId("btnSaveStoreProfile");
+      const storeName = byId("merchantStoreName").value.trim();
+      if (!storeName || storeName.length > 120) {
+        setStoreProfileMsg("Nama toko wajib diisi dan maksimal 120 karakter.", "error");
+        return;
+      }
+
+      button.disabled = true;
+      setStoreProfileMsg("Menyimpan nama toko...", "");
+      try {
+        const { data: existingProfile, error: lookupError } = await supabaseClient
+          .from("merchant_public_profiles")
+          .select("merchant_id")
+          .eq("merchant_id", currentUser.id)
+          .maybeSingle();
+        if (lookupError) throw lookupError;
+
+        let saveError = null;
+        if (existingProfile) {
+          const result = await supabaseClient
+            .from("merchant_public_profiles")
+            .update({ store_name: storeName, updated_at: new Date().toISOString() })
+            .eq("merchant_id", currentUser.id);
+          saveError = result.error;
+        } else {
+          const result = await supabaseClient
+            .from("merchant_public_profiles")
+            .insert({ merchant_id: currentUser.id, store_name: storeName });
+          saveError = result.error;
+        }
+        if (saveError) throw saveError;
+
+        setStoreProfileMsg("Nama toko berhasil disimpan.", "success");
+        await loadMerchantPublicProfile();
+      } catch (err) {
+        console.error("Gagal menyimpan nama toko:", err);
+        setStoreProfileMsg(
+          err && err.code === "42501"
+            ? "Akses ditolak. Pastikan akun ini merupakan mitra terverifikasi."
+            : "Nama toko gagal disimpan. Silakan coba kembali.",
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+      }
     }
 
     /* =================== FUNGSI NAVIGASI SPA =================== */
@@ -818,6 +918,8 @@
       window.location.href = "index.html";
     });
 
+    byId("btnSaveStoreProfile").addEventListener("click", saveMerchantPublicProfile);
+
     document.addEventListener("DOMContentLoaded", async function() {
       try {
         if (!window.supabase) {
@@ -838,8 +940,9 @@
 
         currentUser = data.session.user;
         byId("mitraEmail").textContent = currentUser.email;
-        
+
         loadMitraProducts();
+        loadMerchantPublicProfile();
         initRealtime();
 
       } catch (e) {
