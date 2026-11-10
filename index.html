@@ -1028,6 +1028,17 @@
       }
     }
 
+    #home .catalog-results-panel {
+      min-width: 0;
+    }
+
+    #home .category-grid > .catalog-results-panel.catalog-results-inline {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-width: 0;
+      margin: 3px 0 5px;
+    }
+
     #home .catalog-count {
       color: var(--ad-text-muted);
       font-size: 0.77rem;
@@ -1397,9 +1408,11 @@
         </div>
 
 
-        <div id="catalogCount" class="catalog-count" aria-live="polite">Memuat katalog...</div>
-        <div id="catalogState" class="catalog-state" role="status" aria-live="polite">Sedang mengambil produk dari Mitra AntarDesa...</div>
-        <div id="productGrid" class="product-grid hidden"></div>
+        <div id="catalogResultsPanel" class="catalog-results-panel">
+          <div id="catalogCount" class="catalog-count" aria-live="polite">Memuat katalog...</div>
+          <div id="catalogState" class="catalog-state" role="status" aria-live="polite">Sedang mengambil produk dari Mitra AntarDesa...</div>
+          <div id="productGrid" class="product-grid hidden"></div>
+        </div>
 
         <p class="catalog-footer">
           Produk aktif dapat dimasukkan ke keranjang untuk pratinjau. Checkout dan transaksi nyata tetap dinonaktifkan.
@@ -3804,6 +3817,41 @@
         : "Menampilkan semua kategori";
     }
 
+    function positionCatalogResultsPanel() {
+      const categoryGrid = byId("categoryGrid");
+      const resultsPanel = byId("catalogResultsPanel");
+      const categoryBrowser = categoryGrid.closest(".category-browser");
+      const selectedCategory = byId("productCategory").value;
+
+      if (!selectedCategory) {
+        // Saat "Semua produk" dipilih, kembalikan hasil ke bawah seluruh kategori.
+        if (resultsPanel.previousElementSibling !== categoryBrowser) {
+          categoryBrowser.insertAdjacentElement("afterend", resultsPanel);
+        }
+        resultsPanel.classList.remove("catalog-results-inline");
+        return;
+      }
+
+      const categoryTiles = Array.from(categoryGrid.children).filter(element =>
+        element.matches("[data-category-card]")
+      );
+      const selectedTile = categoryTiles.find(tile =>
+        tile.dataset.category === selectedCategory
+      );
+
+      if (!selectedTile) {
+        categoryBrowser.insertAdjacentElement("afterend", resultsPanel);
+        resultsPanel.classList.remove("catalog-results-inline");
+        return;
+      }
+
+      // Sisipkan hasil tepat setelah kartu kategori yang dipilih.
+      // Panel melebar mengikuti seluruh kolom grid; kartu-kartu berikutnya
+      // tetap berada setelah panel dan tidak tertutup.
+      selectedTile.insertAdjacentElement("afterend", resultsPanel);
+      resultsPanel.classList.add("catalog-results-inline");
+    }
+
     function renderProductCatalog() {
       const searchInput = byId("productSearch");
       const categorySelect = byId("productCategory");
@@ -3814,6 +3862,7 @@
       const keyword = searchInput.value.trim().toLowerCase();
       const selectedCategory = categorySelect.value;
       updateCategoryBrowserSelection();
+      positionCatalogResultsPanel();
 
       const filtered = publicProducts.filter(p => {
         const text = [p.name, p.description, p.category].join(" ").toLowerCase();
