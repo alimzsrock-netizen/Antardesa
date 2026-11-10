@@ -322,7 +322,46 @@ loginForm.addEventListener(
 
       redirecting = true;
 
-      window.location.replace("index.html");
+      /*
+        KEMBALI KE TUJUAN YANG DIMINTA SEBELUM LOGIN.
+
+        Hanya izinkan tujuan internal yang sudah ditentukan.
+        Parameter URL dari luar tidak boleh menjadi alamat redirect.
+      */
+      const loginReturnParams =
+        new URLSearchParams(window.location.search);
+
+      const requestedReturnTo =
+        loginReturnParams.get("returnTo");
+
+      let postLoginDestination = "index.html";
+
+      if (requestedReturnTo === "cart") {
+
+        postLoginDestination =
+          "index.html?returnTo=cart";
+
+      } else if (requestedReturnTo === "product") {
+
+        const requestedProductId =
+          loginReturnParams.get("productId");
+
+        if (requestedProductId) {
+
+          const safeReturnParams =
+            new URLSearchParams();
+
+          safeReturnParams.set("returnTo", "product");
+          safeReturnParams.set("productId", requestedProductId);
+
+          postLoginDestination =
+            "index.html?" + safeReturnParams.toString();
+
+        }
+
+      }
+
+      window.location.replace(postLoginDestination);
 
     } catch (error) {
 
