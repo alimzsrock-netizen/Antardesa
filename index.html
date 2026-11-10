@@ -1880,6 +1880,153 @@
     let currentModalQty = 1;
     let ordersRealtimeChannel = null;
 
+    // Keranjang hanya disimpan untuk akun yang sedang login pada perangkat ini.
+    const CART_STORAGE_PREFIX = "antardesa_account_cart_v1:";
+    let cartRestoreSequence = 0;
+    let cartLoadedUserId = null;
+    let cartRestoreInProgress = false;
+    let returnDestinationHandled = false;
+    let publicProductsLoaded = false;
+    let authStateResolved = false;
+
+    function getAccountCartStorageKey(userId) {
+      return CART_STORAGE_PREFIX + String(userId || "");
+    }
+
+    function persistAccountCart() {
+      if (!currentUser || !currentUser.id) return;
+      const payload = cartItems
+        .filter(item => item && item.product && item.product.id && Number(item.quantity) > 0)
+        .map(item => ({ productId: String(item.product.id), quantity: Math.floor(Number(item.quantity)) }));
+      try {
+        localStorage.setItem(getAccountCartStorageKey(currentUser.id), JSON.stringify(payload));
+      } catch (error) {
+        console.warn("Keranjang akun tidak dapat disimpan pada perangkat ini:", error);
+      }
+    }
+
+    function buildLoginUrl(destination, productId) {
+      const params = new URLSearchParams();
+      params.set("returnTo", destination === "product" ? "product" : "cart");
+      if (destination === "product" && productId) params.set("productId", String(productId));
+      return "login.html?" + params.toString();
+    }
+
+    function requireLoginForCartAction(destination, productId) {
+      if (currentUser && currentUser.id) return true;
+      window.location.href = buildLoginUrl(destination, productId);
+      return false;
+    }
+
+    async function restoreAccountCart(userId) {
+      if (!supabaseClient || !userId) return;
+      const sequence = ++cartRestoreSequence;
+      cartLoadedUserId = userId;
+      cartRestoreInProgress = true;
+      let savedItems = [];
+      try {
+        const raw = localStorage.getItem(getAccountCartStorageKey(userId));
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed)) savedItems = parsed;
+      } catch (error) {
+        console.warn("Data keranjang lokal tidak dapat dibaca:", error);
+      }
+
+      if (savedItems.length === 0) {
+        if (currentUser && currentUser.id === userId && sequence === cartRestoreSequence) {
+          cartItems = [];
+          cartRestoreInProgress = false;
+          updateCartBadge();
+          renderCartPage();
+        }
+        return;
+      }
+
+      const quantities = new Map();
+      savedItems.forEach(item => {
+        const id = item && item.productId ? String(item.productId) : "";
+        const quantity = Math.floor(Number(item && item.quantity));
+        if (id && Number.isFinite(quantity) && quantity > 0) {
+          quantities.set(id, Math.min(999, (quantities.get(id) || 0) + quantity));
+        }
+      });
+
+      if (quantities.size === 0) {
+        cartItems = [];
+        cartRestoreInProgress = false;
+        persistAccountCart();
+        updateCartBadge();
+        return;
+      }
+
+      try {
+        const ids = Array.from(quantities.keys());
+        const { data, error } = await supabaseClient
+          .from("products")
+          .select("id,user_id,name,description,category,price,stock,image_url,created_at")
+          .eq("is_active", true)
+          .in("id", ids);
+        if (error) throw error;
+        if (!currentUser || currentUser.id !== userId || sequence !== cartRestoreSequence) return;
+
+        const productsById = new Map((Array.isArray(data) ? data : []).map(product => [String(product.id), product]));
+        cartItems = [];
+        quantities.forEach((quantity, id) => {
+          const product = productsById.get(id);
+          if (!product) return;
+          const stock = getProductStock(product);
+          if (stock < 1) return;
+          cartItems.push({ product, quantity: Math.min(quantity, stock) });
+        });
+        cartRestoreInProgress = false;
+        persistAccountCart();
+        updateCartBadge();
+        if (document.getElementById("cart") && !document.getElementById("cart").classList.contains("hidden")) {
+          renderCartPage();
+        }
+      } catch (error) {
+        console.warn("Pemulihan keranjang akun belum berhasil:", error);
+        if (currentUser && currentUser.id === userId && sequence === cartRestoreSequence) {
+          cartRestoreInProgress = false;
+          setPlainMessage(byId("cartItemList"), "Keranjang belum dapat dimuat. Periksa koneksi lalu muat ulang halaman.", { style: "text-align:center; padding:20px;" });
+        }
+      }
+    }
+
+    function handlePendingReturnDestination() {
+      if (returnDestinationHandled) return;
+      const params = new URLSearchParams(window.location.search);
+      const destination = params.get("returnTo");
+      if (!destination) return;
+
+      if (!authStateResolved) return;
+      if (!currentUser || !currentUser.id) {
+        if (destination === "product" && params.get("productId")) {
+          window.location.replace(buildLoginUrl("product", params.get("productId")));
+        } else if (destination === "cart") {
+          window.location.replace(buildLoginUrl("cart"));
+        }
+        return;
+      }
+
+      if (destination === "product") {
+        if (!publicProductsLoaded) return;
+        const productId = params.get("productId");
+        const product = publicProducts.find(item => String(item.id) === String(productId));
+        returnDestinationHandled = true;
+        if (product) {
+          show("home");
+          openProductDetailModal(product);
+        } else {
+          show("home");
+          setCatalogState("Produk yang Anda pilih sudah tidak tersedia. Silakan pilih produk lain.", true);
+        }
+      } else if (destination === "cart") {
+        returnDestinationHandled = true;
+        show("cart");
+      }
+    }
+
     /* ========================================= DATA KATALOG ========================================= */
     let publicProducts = [];
     const PRODUCT_LIMIT = 60;
@@ -1931,6 +2078,10 @@
 
     /* ========================================= NAVIGASI & TAB TERAKHIR ========================================= */
     function show(pageId) {
+      if (pageId === "cart" && (!currentUser || !currentUser.id)) {
+        window.location.href = buildLoginUrl("cart");
+        return;
+      }
       document.querySelectorAll(".page").forEach(function(page) {
         page.classList.toggle("hidden", page.id !== pageId);
       });
@@ -3129,6 +3280,11 @@
     function showGuestState() {
       roleLoadSequence++;
       currentUser = null;
+      cartRestoreSequence++;
+      cartLoadedUserId = null;
+      cartRestoreInProgress = false;
+      cartItems = [];
+      updateCartBadge();
       currentRole = null;
       currentProfile = null;
       currentVerificationRequest = null;
@@ -3182,7 +3338,14 @@
         myOrders = [];
       }
       currentUser = user;
-      if (isDifferentUser) resetDashboardLinks();
+      if (isDifferentUser) {
+        resetDashboardLinks();
+        cartItems = [];
+        updateCartBadge();
+        restoreAccountCart(user.id);
+      } else if (cartLoadedUserId !== user.id) {
+        restoreAccountCart(user.id);
+      }
 
       const actions = byId("headerAccountActions");
       actions.replaceChildren();
@@ -3269,10 +3432,14 @@
         const { data, error } = await withTimeout(supabaseClient.auth.getSession(), 5000);
         if (error) { throw error; }
         if (!data || !data.session || !data.session.user) {
+          authStateResolved = true;
           showGuestState();
+          handlePendingReturnDestination();
           return;
         }
+        authStateResolved = true;
         showSignedInState(data.session.user);
+        handlePendingReturnDestination();
         await Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus(), loadUserAddresses(), loadMyOrders()]);
       } catch (error) {
         console.warn("Pemulihan sesi belum berhasil:", error);
@@ -3425,6 +3592,12 @@
 
     function addActiveProductToCart(navigateToCart) {
       if (!activeModalProduct) return false;
+      if (!requireLoginForCartAction("product", activeModalProduct.id)) return false;
+      if (cartRestoreInProgress) {
+        setText("productActionMessage", "Keranjang akun sedang dimuat. Silakan coba kembali beberapa saat lagi.");
+        setHidden("productActionMessage", false);
+        return false;
+      }
       const stock = getProductStock(activeModalProduct);
       if (stock < 1) {
         setText("productActionMessage", "Maaf, stok produk sedang habis.");
@@ -3440,6 +3613,7 @@
       }
       if (existingIndex > -1) cartItems[existingIndex].quantity += currentModalQty;
       else cartItems.push({ product: activeModalProduct, quantity: currentModalQty });
+      persistAccountCart();
       updateCartBadge();
       if (navigateToCart) {
         closeProductDetailModal();
@@ -3460,7 +3634,9 @@
 
     function updateCartBadge() {
       const badge = byId("cartBadge");
-      const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      const totalCount = currentUser && currentUser.id
+        ? cartItems.reduce((sum, item) => sum + item.quantity, 0)
+        : 0;
       if (totalCount > 0) { badge.textContent = totalCount; badge.classList.remove("hidden"); }
       else { badge.classList.add("hidden"); }
     }
@@ -3519,6 +3695,7 @@
         btnMinus.addEventListener("click", function() {
           if (cartItem.quantity > 1) cartItem.quantity--;
           else cartItems.splice(index, 1);
+          persistAccountCart();
           updateCartBadge();
           renderCartPage();
         });
@@ -3536,6 +3713,7 @@
         btnPlus.addEventListener("click", function() {
           if (cartItem.quantity >= itemStock) return;
           cartItem.quantity++;
+          persistAccountCart();
           updateCartBadge();
           renderCartPage();
         });
@@ -3546,6 +3724,7 @@
         btnDel.textContent = "🗑️";
         btnDel.addEventListener("click", function() {
           cartItems.splice(index, 1);
+          persistAccountCart();
           updateCartBadge();
           renderCartPage();
         });
@@ -3687,8 +3866,10 @@
         );
         if (error) throw error;
         publicProducts = Array.isArray(data) ? data : [];
+        publicProductsLoaded = true;
         populateProductCategories();
         renderProductCatalog();
+        handlePendingReturnDestination();
       } catch (err) {
         publicProducts = [];
         setCatalogState("Gagal memuat katalog produk.", true);
@@ -3727,15 +3908,18 @@
         // selama proses startup tidak terlewat.
         supabaseClient.auth.onAuthStateChange(function(event, session) {
           if (event === "SIGNED_OUT" || !session || !session.user) {
-            if (event === "SIGNED_OUT") {
+            if (event === "SIGNED_OUT" || event === "INITIAL_SESSION") {
+              authStateResolved = true;
               showGuestState();
-              show("home");
+              if (event === "SIGNED_OUT") show("home");
+              handlePendingReturnDestination();
             }
             return;
           }
           if (["INITIAL_SESSION", "SIGNED_IN", "USER_UPDATED"].includes(event)) {
             const userId = session.user.id;
             showSignedInState(session.user);
+            handlePendingReturnDestination();
             setTimeout(function() {
               if (currentUser && currentUser.id === userId) {
                 Promise.all([loadUserRole(), loadUserProfile(), loadVerificationStatus(), loadUserAddresses(), loadMyOrders()]);
