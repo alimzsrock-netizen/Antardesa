@@ -144,7 +144,7 @@
     .product-item-info { flex: 1; min-width: 0; }
     .product-item-title { font-weight: bold; font-size: 0.95em; margin-bottom: 3px; overflow-wrap: anywhere; }
     .product-item-price { color: var(--accent-color); font-weight: bold; font-size: 0.9em; }
-    
+
     .product-item-badge {
       display: inline-block;
       padding: 2px 6px;
@@ -315,7 +315,7 @@
       <div class="panel">
         <h2>Pesanan Masuk 📋</h2>
         <p class="muted">Daftar pesanan nyata dari pelanggan yang masuk ke toko Anda.</p>
-        
+
         <div id="merchantOrdersList">
           <p class="muted" style="text-align:center; padding:20px;">Memuat pesanan masuk...</p>
         </div>
@@ -491,7 +491,7 @@
 
       if (targetPage) targetPage.classList.remove("hidden");
       if (targetNav) targetNav.classList.add("active");
-      
+
       window.scrollTo(0, 0);
 
       if (tabName === "toko") loadMitraProducts();
@@ -798,38 +798,30 @@
 
 
     /* =================== MODUL O2: PESANAN MASUK REAL-TIME =================== */
-    
+
     async function loadMerchantOrders() {
       if (!supabaseClient || !currentUser) return;
       const container = byId("merchantOrdersList");
 
       try {
-        let { data, error } = await supabaseClient
+        const { data, error } = await supabaseClient
           .from("orders")
-          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,mitra_id,merchant_id")
+          .select("id,status,total_amount,shipping_fee,address_snapshot,created_at,merchant_id")
+          .eq("merchant_id", currentUser.id)
           .order("created_at", { ascending: false });
 
-        if (error) {
-          const fallbackRes = await supabaseClient
-            .from("orders")
-            .select("*")
-            .order("created_at", { ascending: false });
-          
-          if (fallbackRes.error) throw fallbackRes.error;
-          data = fallbackRes.data;
-        }
+        if (error) throw error;
 
-        const rawList = Array.isArray(data) ? data : [];
-        merchantOrders = rawList.filter(o => o.mitra_id === currentUser.id || o.merchant_id === currentUser.id || !o.mitra_id);
-        
-        if (merchantOrders.length === 0 && rawList.length > 0) {
-          merchantOrders = rawList;
-        }
-
+        merchantOrders = Array.isArray(data) ? data : [];
         renderMerchantOrders();
       } catch (err) {
-        console.error("Gagal mengambil data pesanan:", err);
-        container.innerHTML = '<p class="muted" style="color:#f8a59d; text-align:center;">Gagal mengambil data pesanan.</p>';
+        console.error("Gagal mengambil pesanan mitra:", err);
+        container.replaceChildren();
+
+        const message = document.createElement("p");
+        message.className = "muted status-msg error";
+        message.textContent = "Gagal mengambil daftar pesanan. Silakan coba kembali.";
+        container.append(message);
       }
     }
 
@@ -838,67 +830,132 @@
       container.replaceChildren();
 
       if (merchantOrders.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada pesanan masuk ke toko Anda saat ini.</p>';
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.style.cssText = "text-align:center; padding:20px;";
+        empty.textContent = "Belum ada pesanan masuk ke toko Anda saat ini.";
+        container.append(empty);
         return;
       }
 
-      merchantOrders.forEach(ord => {
+      const statusLabels = {
+        pending: "Menunggu konfirmasi",
+        accepted: "Diterima Mitra",
+        rejected: "Ditolak Mitra",
+        preparing: "Sedang disiapkan",
+        ready: "Siap diantar",
+        delivering: "Sedang diantar",
+        completed: "Selesai",
+        cancelled: "Dibatalkan",
+        pending_confirmation: "Pesanan lama — menunggu konfirmasi",
+        processing: "Status lama — diproses",
+        finding_courier: "Status lama — mencari kurir"
+      };
+
+      merchantOrders.forEach(function(ord) {
         const card = document.createElement("div");
         card.className = "card-sub";
 
-        const badgeClass = ord.status === "processing" ? "status-processing" : ord.status === "completed" ? "status-completed" : "status-pending";
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <strong style="font-size:0.95em;">Pesanan #${String(ord.id).substring(0, 8).toUpperCase()}</strong>
-            <span class="order-status-badge ${badgeClass}">${ord.status}</span>
-          </div>
-          <div class="muted" style="font-size:0.85em; line-height:1.5; margin-bottom:10px;">
-            <strong>Total:</strong> <span style="color:var(--accent-color); font-weight:bold;">${formatPrice(ord.total_amount)}</span><br>
-            <strong>Alamat:</strong> ${ord.address_snapshot || 'Alamat tidak dicantumkan'}
-          </div>
-        `;
+        const header = document.createElement("div");
+        header.style.cssText = "display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;";
+
+        const title = document.createElement("strong");
+        title.style.fontSize = "0.95em";
+        title.textContent = "Pesanan #" + String(ord.id).substring(0, 8).toUpperCase();
+
+        const badge = document.createElement("span");
+        badge.className = "order-status-badge";
+        if (ord.status === "pending") badge.classList.add("status-pending");
+        else if (["accepted", "preparing", "ready"].includes(ord.status)) badge.classList.add("status-processing");
+        else if (ord.status === "delivering") badge.classList.add("status-delivering");
+        else if (ord.status === "completed") badge.classList.add("status-completed");
+        else badge.classList.add("status-pending");
+        badge.textContent = statusLabels[ord.status] || "Status: " + String(ord.status || "tidak diketahui");
+
+        header.append(title, badge);
+
+        const details = document.createElement("div");
+        details.className = "muted";
+        details.style.cssText = "font-size:0.85em; line-height:1.5; margin-bottom:10px;";
+
+        const totalLine = document.createElement("div");
+        const totalLabel = document.createElement("strong");
+        totalLabel.textContent = "Total: ";
+        const totalValue = document.createElement("span");
+        totalValue.style.cssText = "color:var(--accent-color); font-weight:bold;";
+        totalValue.textContent = formatPrice(ord.total_amount);
+        totalLine.append(totalLabel, totalValue);
+
+        const addressLine = document.createElement("div");
+        const addressLabel = document.createElement("strong");
+        addressLabel.textContent = "Alamat: ";
+        const addressValue = document.createElement("span");
+        addressValue.textContent = ord.address_snapshot || "Alamat tidak dicantumkan";
+        addressLine.append(addressLabel, addressValue);
+
+        details.append(totalLine, addressLine);
+        card.append(header, details);
 
         const actions = document.createElement("div");
         actions.className = "actions-grid";
 
-        if (ord.status === "pending_confirmation" || ord.status === "pending") {
-          const btn = document.createElement("button");
-          btn.className = "primary";
-          btn.textContent = "✔ Terima";
-          btn.onclick = () => updateOrderStatus(ord.id, 'processing');
-          actions.append(btn);
+        function addRpcAction(label, className, rpcName, rpcArgs) {
+          const button = document.createElement("button");
+          button.className = className;
+          button.textContent = label;
+
+          button.addEventListener("click", async function() {
+            if (!confirm("Lanjutkan tindakan untuk pesanan ini?")) return;
+            button.disabled = true;
+
+            try {
+              const { error } = await supabaseClient.rpc(rpcName, rpcArgs);
+              if (error) throw error;
+              await loadMerchantOrders();
+            } catch (err) {
+              console.error("Gagal memproses pesanan:", err);
+              alert("Tindakan gagal. Status pesanan mungkin sudah berubah atau akses tidak diizinkan. Silakan muat ulang daftar.");
+              button.disabled = false;
+            }
+          });
+
+          actions.append(button);
         }
-        if (ord.status === "processing") {
-          const btn = document.createElement("button");
-          btn.className = "primary";
-          btn.textContent = "🛵 Panggil Kurir";
-          btn.onclick = () => updateOrderStatus(ord.id, 'finding_courier');
-          actions.append(btn);
-        }
-        if (ord.status !== "completed" && ord.status !== "cancelled") {
-          const btn = document.createElement("button");
-          btn.className = "danger-button";
-          btn.textContent = "Batal";
-          btn.onclick = () => updateOrderStatus(ord.id, 'cancelled');
-          actions.append(btn);
+
+        if (ord.status === "pending") {
+          addRpcAction("✔ Terima", "primary", "respond_antardesa_order", {
+            p_order_id: ord.id,
+            p_decision: "accepted"
+          });
+          addRpcAction("Tolak Pesanan", "danger-button", "respond_antardesa_order", {
+            p_order_id: ord.id,
+            p_decision: "rejected"
+          });
+        } else if (ord.status === "accepted") {
+          addRpcAction("Siapkan Pesanan", "primary", "advance_antardesa_order", {
+            p_order_id: ord.id,
+            p_next_status: "preparing"
+          });
+        } else if (ord.status === "preparing") {
+          addRpcAction("Tandai Siap Diantar", "primary", "advance_antardesa_order", {
+            p_order_id: ord.id,
+            p_next_status: "ready"
+          });
+        } else if (ord.status === "ready") {
+          const note = document.createElement("p");
+          note.className = "muted";
+          note.textContent = "Pesanan siap dan menunggu kurir mengambilnya.";
+          card.append(note);
+        } else if (["pending_confirmation", "processing", "finding_courier"].includes(ord.status)) {
+          const note = document.createElement("p");
+          note.className = "muted";
+          note.textContent = "Pesanan ini menggunakan status dari alur lama dan ditampilkan hanya untuk riwayat. Tidak ada perubahan otomatis.";
+          card.append(note);
         }
 
         if (actions.children.length > 0) card.append(actions);
         container.append(card);
       });
-    }
-
-    async function updateOrderStatus(orderId, newStatus) {
-      if (!supabaseClient) return;
-      if (!confirm("Ubah status pesanan ini?")) return;
-      try {
-        const { error } = await supabaseClient.from("orders").update({ status: newStatus, updated_at: new Date().toISOString() }).eq("id", orderId);
-        if (error) throw error;
-        alert("Status pesanan diperbarui!");
-        loadMerchantOrders();
-      } catch (err) {
-        alert("Gagal memperbarui status.");
-      }
     }
 
     function initRealtime() {
@@ -910,7 +967,7 @@
     }
 
     /* =================== AUTENTIKASI & INISIALISASI =================== */
-    
+
     byId("btnLogout").addEventListener("click", async function() {
       if (supabaseClient) {
         await supabaseClient.auth.signOut();
@@ -932,7 +989,7 @@
         });
 
         const { data, error } = await supabaseClient.auth.getSession();
-        
+
         if (error || !data || !data.session) {
           window.location.href = "login.html";
           return;
